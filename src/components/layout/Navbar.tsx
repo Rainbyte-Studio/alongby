@@ -252,9 +252,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
       ref={headerRef}
       className="sticky top-0 z-40 bg-[var(--color-surface)] border-b border-[var(--color-border)] font-sans"
     >
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 xl:px-8 h-16 flex items-center justify-between gap-2 sm:gap-6">
+      <div className="max-w-7xl w-full min-w-0 mx-auto px-3 sm:px-6 xl:px-8 h-16 flex items-center justify-between gap-2 sm:gap-6">
         {/* Zone 1: Brand Wordmark + Desktop Navigation */}
-        <div className="flex items-center gap-6 xl:gap-10 min-w-0 shrink-0">
+        <div className="flex items-center gap-6 xl:gap-10 min-w-0 xl:shrink-0">
           <Link
             to="/"
             className="flex items-center text-[var(--color-text-primary)] hover:opacity-85 transition-opacity cursor-pointer py-1 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
@@ -311,7 +311,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
         </div>
 
         {/* Zone 3: Right Side Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink-0 ml-auto">
           {currentUser && userProfile ? (
             <>
               {/* Desktop Role Switcher (Dev / Evaluation) */}
@@ -393,7 +393,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => onOpenAuth?.('signin')}
-                className="hidden xl:inline-flex"
+                className="alongby-desktop-only hidden xl:inline-flex"
               >
                 Sign In
               </Button>
@@ -409,7 +409,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="primary"
                 size="sm"
                 onClick={() => onOpenAuth?.('signup', 'client')}
-                className="hidden xl:inline-flex px-3 sm:px-4 text-xs sm:text-[13px]"
+                className="alongby-desktop-only hidden xl:inline-flex px-3 sm:px-4 text-xs sm:text-[13px]"
               >
                 Start a Project
               </Button>
@@ -425,7 +425,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
             aria-expanded={mobileMenuOpen}
             aria-controls="alongby-mobile-nav"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            className="xl:hidden inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2 rounded-[var(--radius-button)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+            className="alongby-mobile-menu-toggle xl:hidden inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-[var(--radius-button)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
           >
             {mobileMenuOpen ? (
               <X className="w-5 h-5" aria-hidden="true" />
