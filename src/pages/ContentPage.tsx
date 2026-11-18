@@ -86,6 +86,7 @@ const SectionGrid: React.FC<{ items: readonly { title: string; text: string }[] 
 export const ContentPage: React.FC<ContentPageProps> = ({ kind }) => {
   const location = useLocation();
   const page = pageData[kind];
+  const editorialImage = kind === "clients" ? "editorial-clients.svg" : kind === "professionals" ? "editorial-professionals.svg" : "editorial-hero.svg";
 
   useEffect(() => {
     if (!location.hash) {
@@ -104,9 +105,16 @@ export const ContentPage: React.FC<ContentPageProps> = ({ kind }) => {
       <section className="bg-[var(--color-surface)] border-b border-[var(--color-border)] px-4 sm:px-6 lg:px-8 pt-16 pb-16 sm:pt-24 sm:pb-24">
         <div className="max-w-7xl mx-auto">
           <Link to="/" className="inline-flex items-center text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-10 underline underline-offset-4">Back to Alongby</Link>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)] mb-4">{page.eyebrow}</p>
-          <h1 className="typo-hero max-w-4xl mb-6">{page.title}</h1>
-          <p className="text-base sm:text-lg text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">{page.intro}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            <div className="lg:col-span-7">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)] mb-4">{page.eyebrow}</p>
+              <h1 className="typo-hero max-w-4xl mb-6">{page.title}</h1>
+              <p className="text-base sm:text-lg text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">{page.intro}</p>
+            </div>
+            <div className="lg:col-span-5 overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] aspect-[5/3] lg:aspect-[4/3] bg-[#d6d2ca]">
+              <img src={`/images/${editorialImage}`} alt="Minimal monochrome editorial artwork reflecting thoughtful creative collaboration" width="1000" height="780" className="w-full h-full object-cover" />
+            </div>
+          </div>
         </div>
       </section>
 
