@@ -9,6 +9,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { RoleGuard } from './components/auth/RoleGuard';
 
 import { LandingPage } from './pages/LandingPage';
+import { ContentPage } from './pages/ContentPage';
 import { ClientOnboardingPage } from './pages/onboarding/ClientOnboardingPage';
 import { ProfessionalOnboardingPage } from './pages/onboarding/ProfessionalOnboardingPage';
 import { ClientDashboardPage } from './pages/client/ClientDashboardPage';
@@ -56,6 +57,10 @@ function AppContent() {
         <Routes>
           {/* Public Landing Page */}
           <Route path="/" element={<LandingPage onOpenAuth={handleOpenAuth} />} />
+          <Route path="/how-it-works" element={<ContentPage kind="how" />} />
+          <Route path="/for-clients" element={<ContentPage kind="clients" />} />
+          <Route path="/for-professionals" element={<ContentPage kind="professionals" />} />
+          <Route path="/about" element={<ContentPage kind="about" />} />
 
           {/* Onboarding Routes */}
           <Route
