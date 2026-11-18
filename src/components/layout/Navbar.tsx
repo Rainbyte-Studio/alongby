@@ -107,6 +107,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
 
     const mediaQuery = window.matchMedia('(min-width: 1280px)');
     const initialFocus = window.requestAnimationFrame(() => mobilePanelRef.current?.focus());
+    const trapFocus = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || !mobilePanelRef.current) return;
+      const elements = Array.from(mobilePanelRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(el => el.getClientRects().length > 0);
+      const first = mobileToggleRef.current;
+      const focusables = [first, ...elements].filter((el): el is HTMLElement => Boolean(el));
+      if (!focusables.length) return;
+      const activeIndex = focusables.indexOf(document.activeElement as HTMLElement);
+      if (event.shiftKey && activeIndex <= 0) { event.preventDefault(); focusables[focusables.length - 1].focus(); }
+      else if (!event.shiftKey && activeIndex === focusables.length - 1) { event.preventDefault(); focusables[0].focus(); }
+    };
+    document.addEventListener("keydown", trapFocus);
     const handleMediaChange = (e: MediaQueryListEvent) => {
       if (e.matches) {
         setMobileMenuOpen(false);
@@ -116,6 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
 
     return () => {
       window.cancelAnimationFrame(initialFocus);
+      document.removeEventListener("keydown", trapFocus);
       delete document.documentElement.dataset.mobileNavOpen;
       document.body.style.position = previous.position;
       document.body.style.top = previous.top;
@@ -445,7 +457,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
             ref={mobilePanelRef}
             tabIndex={-1}
             aria-label="Mobile navigation"
-            className="xl:hidden relative z-40 border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
+            className="xl:hidden fixed inset-x-0 top-16 z-40 border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5">
               {currentUser && userProfile ? (
