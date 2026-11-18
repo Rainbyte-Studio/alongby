@@ -127,7 +127,7 @@ export const ContentPage: React.FC<ContentPageProps> = ({ kind }) => {
             </div>
           </section>
           <section className="px-4 sm:px-6 lg:px-8 py-16 sm:py-20 bg-[var(--color-surface)] border-y border-[var(--color-border)]">
-            <div className="max-w-7xl mx-auto max-w-none">
+            <div className="max-w-7xl mx-auto">
               <h2 className="typo-section-heading mb-5">A note on budgets and payments</h2>
               <p className="text-sm sm:text-base max-w-3xl leading-relaxed text-[var(--color-text-secondary)]">
                 The budget you enter in the initial brief is indicative. A quote helps you compare potential approaches; the final deliverables, fees and two-phase milestone terms are specified in the accepted proposal and contract. Alongby provides project, proposal and agreement workflows. It does not hold client funds or operate as a licensed escrow service.
