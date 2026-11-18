@@ -28,10 +28,10 @@ interface NavbarProps {
 }
 
 const PUBLIC_NAV_ITEMS = [
-  { id: 'how-it-works', label: 'How It Works', to: '/#how-it-works' },
-  { id: 'for-clients', label: 'For Clients', to: '/#for-clients' },
-  { id: 'for-professionals', label: 'For Professionals', to: '/#for-professionals' },
-  { id: 'principles', label: 'Our Philosophy', to: '/#principles' },
+  { id: 'how-it-works', label: 'How It Works', to: '/how-it-works' },
+  { id: 'for-clients', label: 'For Clients', to: '/for-clients' },
+  { id: 'for-professionals', label: 'For Professionals', to: '/for-professionals' },
+  { id: 'principles', label: 'Our Approach', to: '/about' },
 ] as const;
 
 export const scrollToLandingSection = (sectionId: string) => {
@@ -290,12 +290,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
             >
               {PUBLIC_NAV_ITEMS.map((item) => {
                 const isActive =
-                  location.pathname === '/' && location.hash === `#${item.id}`;
+                  location.pathname === item.to;
                 return (
                   <Link
                     key={item.id}
                     to={item.to}
-                    onClick={() => handlePublicSectionClick(item.id)}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={`relative py-1 transition-colors whitespace-nowrap shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                       isActive
                         ? 'text-[var(--color-text-primary)] font-semibold underline underline-offset-[6px] decoration-[var(--color-primary)]'
@@ -504,7 +504,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                       <Link
                         key={item.id}
                         to={item.to}
-                        onClick={() => handlePublicSectionClick(item.id)}
+                        onClick={() => setMobileMenuOpen(false)}
                         className="flex items-center px-3 py-2 min-h-[42px] rounded-[var(--radius-button)] text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)]/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                       >
                         {item.label}
@@ -564,7 +564,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                         <Link
                           key={item.id}
                           to={item.to}
-                          onClick={() => handlePublicSectionClick(item.id)}
+                          onClick={() => setMobileMenuOpen(false)}
                           className={`flex items-center px-3 py-2.5 min-h-[44px] rounded-[var(--radius-button)] text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                             isActive
                               ? 'bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] font-semibold'
