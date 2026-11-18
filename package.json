@@ -13,6 +13,9 @@
     "verify:demo": "tsx scripts/verifyDemoAccounts.ts"
   },
   "dependencies": {
+    "@fontsource/lobster": "^5.3.0",
+    "@fontsource/noto-sans": "^5.3.0",
+    "@fontsource/playfair-display": "^5.3.0",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",

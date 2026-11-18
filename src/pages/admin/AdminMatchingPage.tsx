@@ -27,17 +27,15 @@ import {
   Send,
   CheckCircle2,
   AlertCircle,
-  Clock,
   Euro,
   Calendar,
-  XCircle,
   FileText,
   Info,
   ChevronDown,
   ChevronUp,
   MapPin,
   Eye,
-  ShieldCheck,
+  X,
 } from 'lucide-react';
 
 export const AdminMatchingPage: React.FC = () => {
@@ -246,7 +244,7 @@ export const AdminMatchingPage: React.FC = () => {
       <DashboardLayout title="Matching & Curation">
         <div className="py-24 flex flex-col items-center justify-center">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-xs text-neutral-500">Loading project matching candidates…</p>
+          <p className="mt-4 text-xs text-[var(--color-text-muted)]">Loading project matching candidates…</p>
         </div>
       </DashboardLayout>
     );
@@ -256,8 +254,8 @@ export const AdminMatchingPage: React.FC = () => {
     return (
       <DashboardLayout title="Matching & Curation">
         <div className="max-w-md mx-auto py-16 text-center space-y-4">
-          <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
-          <h2 className="text-base font-bold text-neutral-900">{errorMsg}</h2>
+          <AlertCircle className="w-10 h-10 text-[var(--color-error)] mx-auto" />
+          <h2 className="text-base font-bold text-[var(--color-text-primary)]">{errorMsg}</h2>
           <Button variant="outline" onClick={() => navigate('/admin')}>
             Back to Platform Admin
           </Button>
@@ -297,7 +295,7 @@ export const AdminMatchingPage: React.FC = () => {
       title={`Matching Review: ${project.title}`}
       subtitle={`Client: ${project.clientName || 'Client'} (${project.clientCompanyName || 'Company'}) • Project Status: ${project.status.replace(/_/g, ' ')}`}
       action={
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -319,7 +317,7 @@ export const AdminMatchingPage: React.FC = () => {
             <Button
               variant="secondary"
               size="sm"
-              leftIcon={<FileText className="w-3.5 h-3.5 text-stone-600" />}
+              leftIcon={<FileText className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />}
             >
               Curated Shortlist Review
             </Button>
@@ -330,25 +328,35 @@ export const AdminMatchingPage: React.FC = () => {
       <div className="space-y-6">
         {/* Messages */}
         {successMsg && (
-          <div className="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="p-3.5 rounded-[var(--radius-input)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] text-xs text-[var(--color-success-text)] flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <CheckCircle2 className="w-4 h-4 text-[var(--color-success)] shrink-0" />
               <span>{successMsg}</span>
             </div>
-            <button onClick={() => setSuccessMsg(null)} className="text-emerald-700 hover:text-emerald-900 font-bold ml-4">
-              ×
+            <button
+              type="button"
+              onClick={() => setSuccessMsg(null)}
+              aria-label="Dismiss notification"
+              className="p-1 rounded text-[var(--color-success-text)] hover:bg-black/5 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+            >
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
 
         {errorMsg && (
-          <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <div className="p-3.5 rounded-[var(--radius-input)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <AlertCircle className="w-4 h-4 text-[var(--color-error)] shrink-0" />
               <span>{errorMsg}</span>
             </div>
-            <button onClick={() => setErrorMsg(null)} className="text-rose-700 hover:text-rose-900 font-bold ml-4">
-              ×
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              aria-label="Dismiss error"
+              className="p-1 rounded text-[var(--color-error-text)] hover:bg-black/5 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+            >
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
@@ -357,23 +365,23 @@ export const AdminMatchingPage: React.FC = () => {
         <Card className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
                 Service & Type
               </div>
-              <div className="mt-1 font-semibold text-neutral-900 text-sm">
+              <div className="mt-1 font-semibold text-[var(--color-text-primary)] text-sm">
                 {service?.name || project.serviceId}
               </div>
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-[var(--color-text-secondary)]">
                 {projectType?.name || project.projectTypeId}
               </div>
             </div>
 
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
                 Indicative Budget
               </div>
-              <div className="mt-1 font-semibold text-neutral-900 text-sm flex items-center gap-1">
-                <Euro className="w-3.5 h-3.5 text-neutral-500" />
+              <div className="mt-1 font-semibold tabular-nums text-[var(--color-text-primary)] text-sm flex items-center gap-1">
+                <Euro className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                 {project.brief.budget.budgetType === 'unsure' ? (
                   <span>Budget unspecified</span>
                 ) : (
@@ -382,26 +390,26 @@ export const AdminMatchingPage: React.FC = () => {
                   </span>
                 )}
               </div>
-              <div className="text-xs text-neutral-500">Indicative range</div>
+              <div className="text-xs text-[var(--color-text-secondary)]">Indicative range</div>
             </div>
 
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
                 Target Timeline
               </div>
-              <div className="mt-1 font-semibold text-neutral-900 text-sm flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-neutral-500" />
+              <div className="mt-1 font-semibold text-[var(--color-text-primary)] text-sm flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                 <span>
                   Start: {project.brief.timeline.preferredStart.replace(/_/g, ' ')}
                 </span>
               </div>
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-[var(--color-text-secondary)]">
                 Flexibility: {project.brief.timeline.flexibility.replace(/_/g, ' ')}
               </div>
             </div>
 
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
                 Project State
               </div>
               <div className="mt-1">
@@ -409,10 +417,10 @@ export const AdminMatchingPage: React.FC = () => {
                   {project.status.replace(/_/g, ' ')}
                 </Badge>
               </div>
-              <div className="text-xs text-neutral-600 font-medium mt-1.5">
+              <div className="text-xs text-[var(--color-text-secondary)] font-medium mt-1.5">
                 Brief locked
               </div>
-              <div className="text-[11px] text-neutral-400">
+              <div className="text-xs text-[var(--color-text-muted)] tabular-nums">
                 Snapshot v{project.version || 1}
               </div>
             </div>
@@ -422,75 +430,91 @@ export const AdminMatchingPage: React.FC = () => {
         {/* Curation Metrics Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           <Card className="p-4 text-center">
-            <div className="text-xl font-serif font-bold text-neutral-900">{totalEvaluated}</div>
-            <div className="text-[11px] text-neutral-500 font-medium">Evaluated</div>
+            <div className="text-2xl font-sans font-bold tabular-nums text-[var(--color-text-primary)]">{totalEvaluated}</div>
+            <div className="text-xs text-[var(--color-text-secondary)] font-medium mt-0.5">Evaluated</div>
           </Card>
           <Card className="p-4 text-center">
-            <div className="text-xl font-serif font-bold text-neutral-900">{eligibleCount}</div>
-            <div className="text-[11px] text-neutral-500 font-medium">Eligible Pool</div>
+            <div className="text-2xl font-sans font-bold tabular-nums text-[var(--color-text-primary)]">{eligibleCount}</div>
+            <div className="text-xs text-[var(--color-text-secondary)] font-medium mt-0.5">Eligible Pool</div>
           </Card>
           <Card className="p-4 text-center">
-            <div className="text-xl font-serif font-bold text-neutral-900">{oppsSentCount}</div>
-            <div className="text-[11px] text-neutral-500 font-medium">Opportunities Sent</div>
+            <div className="text-2xl font-sans font-bold tabular-nums text-[var(--color-text-primary)]">{oppsSentCount}</div>
+            <div className="text-xs text-[var(--color-text-secondary)] font-medium mt-0.5">Opportunities Sent</div>
           </Card>
           <Card className="p-4 text-center">
-            <div className="text-xl font-serif font-bold text-emerald-600">{responsesCount}</div>
-            <div className="text-[11px] text-neutral-500 font-medium">Quotes Received</div>
+            <div className="text-2xl font-sans font-bold tabular-nums text-[var(--color-success)]">{responsesCount}</div>
+            <div className="text-xs text-[var(--color-text-secondary)] font-medium mt-0.5">Quotes Received</div>
           </Card>
           <Card className="p-4 text-center">
-            <div className="text-xl font-serif font-bold text-neutral-500">{passedCount}</div>
-            <div className="text-[11px] text-neutral-500 font-medium">Passed / Declined</div>
+            <div className="text-2xl font-sans font-bold tabular-nums text-[var(--color-text-secondary)]">{passedCount}</div>
+            <div className="text-xs text-[var(--color-text-secondary)] font-medium mt-0.5">Passed / Declined</div>
           </Card>
         </div>
 
         {/* Filter Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-          <div className="flex items-center gap-1.5 p-1 bg-neutral-100 rounded-lg text-xs">
+          <div
+            role="tablist"
+            aria-label="Filter matching candidates"
+            className="flex flex-wrap items-center gap-1 p-1 bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-[var(--radius-button)] text-[13px]"
+          >
             <button
+              type="button"
+              role="tab"
+              aria-selected={filterMode === 'all'}
               onClick={() => setFilterMode('all')}
-              className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-[6px] font-medium tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                 filterMode === 'all'
-                  ? 'bg-white text-neutral-900 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-2xs border border-[var(--color-border)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent'
               }`}
             >
               All Recommendations ({matches.length})
             </button>
             <button
+              type="button"
+              role="tab"
+              aria-selected={filterMode === 'eligible'}
               onClick={() => setFilterMode('eligible')}
-              className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-[6px] font-medium tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                 filterMode === 'eligible'
-                  ? 'bg-white text-neutral-900 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-2xs border border-[var(--color-border)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent'
               }`}
             >
               Eligible Only ({eligibleCount})
             </button>
             <button
+              type="button"
+              role="tab"
+              aria-selected={filterMode === 'sent'}
               onClick={() => setFilterMode('sent')}
-              className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-[6px] font-medium tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                 filterMode === 'sent'
-                  ? 'bg-white text-neutral-900 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-2xs border border-[var(--color-border)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent'
               }`}
             >
               Sent ({oppsSentCount})
             </button>
             <button
+              type="button"
+              role="tab"
+              aria-selected={filterMode === 'responded'}
               onClick={() => setFilterMode('responded')}
-              className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-[6px] font-medium tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                 filterMode === 'responded'
-                  ? 'bg-white text-neutral-900 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-2xs border border-[var(--color-border)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent'
               }`}
             >
               Responded ({responsesCount})
             </button>
           </div>
 
-          <div className="text-xs text-neutral-500">
-            Matching engine: <span className="font-semibold text-neutral-700">Alongby Match v1</span>{' '}
-            <span className="text-[11px] text-neutral-400">(Deterministic)</span>
+          <div className="text-xs text-[var(--color-text-secondary)]">
+            Matching engine: <span className="font-semibold text-[var(--color-text-primary)]">Alongby Match v1</span>{' '}
+            <span className="text-xs text-[var(--color-text-muted)]">(Deterministic)</span>
           </div>
         </div>
 
@@ -522,28 +546,28 @@ export const AdminMatchingPage: React.FC = () => {
               return (
                 <Card
                   key={candidate.id}
-                  className={`p-5 transition-shadow ${
+                  className={`p-5 transition-colors ${
                     candidate.eligibilityStatus === 'ineligible' || candidate.status === 'excluded' || candidate.status === 'admin_removed'
-                      ? 'opacity-70 bg-neutral-50/70'
-                      : 'bg-white'
+                      ? 'opacity-75 bg-[var(--color-surface-secondary)]/60'
+                      : 'bg-[var(--color-surface)]'
                   }`}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     {/* Professional Bio & Score */}
-                    <div className="flex items-start gap-4">
-                      {/* Score Circle */}
-                      <div className="shrink-0 flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-neutral-900 text-white shadow-sm">
-                        <span className="text-lg font-bold font-serif leading-none">
+                    <div className="flex items-start gap-4 min-w-0">
+                      {/* Score Badge */}
+                      <div className="shrink-0 flex flex-col items-center justify-center w-14 h-14 rounded-[var(--radius-card)] bg-[var(--color-primary)] text-[var(--color-primary-text)]">
+                        <span className="text-lg font-sans font-bold tabular-nums leading-none">
                           {candidate.matchScore}
                         </span>
-                        <span className="text-[9px] uppercase tracking-wider text-neutral-400 mt-0.5">
+                        <span className="text-[10px] uppercase tracking-wider text-white/75 mt-0.5">
                           Score
                         </span>
                       </div>
 
-                      <div className="space-y-1">
+                      <div className="space-y-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-bold text-neutral-900 text-sm">
+                          <span className="typo-card-title text-[var(--color-text-primary)] break-words">
                             {candidate.professionalName}
                           </span>
                           <Badge
@@ -566,31 +590,31 @@ export const AdminMatchingPage: React.FC = () => {
                           )}
                         </div>
 
-                        <div className="text-xs font-medium text-neutral-700">
+                        <div className="text-[13px] font-medium text-[var(--color-text-secondary)]">
                           {candidate.professionalTitle}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3 text-[11px] text-neutral-400">
+                        <div className="flex flex-wrap items-center gap-2.5 text-xs text-[var(--color-text-muted)] tabular-nums">
                           <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-neutral-400" />
+                            <MapPin className="w-3 h-3 text-[var(--color-text-muted)]" />
                             {candidate.professionalCountry} ({candidate.professionalTimezone})
                           </span>
-                          <span>•</span>
+                          <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
                           <span>
-                            Availability: <strong className="text-neutral-700">{candidate.availabilityStatus}</strong> (Next: {candidate.nextAvailableDate})
+                            Availability: <strong className="font-semibold text-[var(--color-text-primary)]">{candidate.availabilityStatus}</strong> (Next: {candidate.nextAvailableDate})
                           </span>
-                          <span>•</span>
-                          <span>
+                          <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                          <span className="font-semibold text-[var(--color-text-primary)]">
                             Floor: €{(candidate.minimumBudgetMinor / 100).toLocaleString()} EUR
                           </span>
                         </div>
 
-                        {/* Chips for match reasons */}
+                        {/* Match reasons */}
                         <div className="flex flex-wrap gap-1.5 pt-2">
                           {candidate.matchReasons?.slice(0, 3).map((r, i) => (
                             <span
                               key={i}
-                              className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 font-medium"
+                              className="text-xs px-2.5 py-0.5 rounded-[6px] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium"
                             >
                               ✓ {r}
                             </span>
@@ -599,14 +623,14 @@ export const AdminMatchingPage: React.FC = () => {
 
                         {/* Ineligibility or warning notices */}
                         {candidate.eligibilityReasons && candidate.eligibilityReasons.length > 0 && (
-                          <div className="pt-1 text-[11px] text-rose-600 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3 shrink-0" />
+                          <div className="pt-1 text-xs text-[var(--color-error-text)] flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                             <span>Ineligibility factor: {candidate.eligibilityReasons.join('; ')}</span>
                           </div>
                         )}
                         {candidate.warnings && candidate.warnings.length > 0 && (
-                          <div className="pt-0.5 text-[11px] text-amber-600 flex items-center gap-1">
-                            <Info className="w-3 h-3 shrink-0" />
+                          <div className="pt-0.5 text-xs text-[var(--color-warning-text)] flex items-center gap-1">
+                            <Info className="w-3.5 h-3.5 shrink-0" />
                             <span>Warning: {candidate.warnings.join('; ')}</span>
                           </div>
                         )}
@@ -614,10 +638,11 @@ export const AdminMatchingPage: React.FC = () => {
                     </div>
 
                     {/* Actions Column */}
-                    <div className="shrink-0 flex flex-wrap items-center gap-2 border-t lg:border-t-0 pt-3 lg:pt-0 border-neutral-100">
+                    <div className="shrink-0 flex flex-wrap items-center gap-2 border-t lg:border-t-0 pt-3 lg:pt-0 border-[var(--color-border)]">
                       <Button
                         variant="ghost"
                         size="sm"
+                        aria-expanded={isExpanded}
                         onClick={() =>
                           setExpandedCandidateId(isExpanded ? null : candidate.id)
                         }
@@ -638,6 +663,7 @@ export const AdminMatchingPage: React.FC = () => {
                           size="sm"
                           onClick={() => setSelectedQuote(quote)}
                           leftIcon={<Eye className="w-3.5 h-3.5" />}
+                          className="tabular-nums"
                         >
                           View Quote (€{(quote.amountMinor / 100).toLocaleString()})
                         </Button>
@@ -660,7 +686,7 @@ export const AdminMatchingPage: React.FC = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => setCandidateToExclude(candidate)}
-                            className="text-neutral-400 hover:text-rose-600"
+                            className="text-[var(--color-text-muted)] hover:text-[var(--color-error-text)] hover:bg-[var(--color-error-bg)]"
                           >
                             Exclude
                           </Button>
@@ -669,10 +695,10 @@ export const AdminMatchingPage: React.FC = () => {
 
                       {(candidate.status === 'excluded' || candidate.status === 'admin_removed') && (
                         <div className="text-right">
-                          <span className="text-xs font-medium text-neutral-500 block">
+                          <span className="text-xs font-medium text-[var(--color-text-secondary)] block">
                             Excluded from candidate pool
                           </span>
-                          <span className="text-[10px] text-neutral-400 block">
+                          <span className="text-xs text-[var(--color-text-muted)] tabular-nums block">
                             {candidate.excludedAt
                               ? `Excluded on ${new Date(candidate.excludedAt).toLocaleDateString()}`
                               : 'Removed by Admin'}
@@ -682,10 +708,10 @@ export const AdminMatchingPage: React.FC = () => {
 
                       {candidate.status === 'opportunity_sent' && opp && (
                         <div className="text-right">
-                          <span className="text-[11px] text-neutral-500 block">
+                          <span className="text-xs text-[var(--color-text-secondary)] tabular-nums block">
                             Sent on {new Date(opp.createdAt).toLocaleDateString()}
                           </span>
-                          <span className="text-[10px] text-neutral-400 block">
+                          <span className="text-xs text-[var(--color-text-muted)] tabular-nums block">
                             Expires {new Date(opp.expiresAt).toLocaleDateString()}
                           </span>
                         </div>
@@ -695,25 +721,25 @@ export const AdminMatchingPage: React.FC = () => {
 
                   {/* Expanded Score Breakdown Drawer */}
                   {isExpanded && (
-                    <div className="mt-4 pt-4 border-t border-neutral-100 bg-neutral-50/80 p-4 rounded-xl space-y-3">
-                      <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                    <div className="mt-4 pt-4 border-t border-[var(--color-border)] bg-[var(--color-surface-secondary)] p-4 rounded-[var(--radius-input)] space-y-3">
+                      <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
                         Score Breakdown Details
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {getScoreDimensions(candidate).map((dim, idx) => (
                           <div
                             key={idx}
-                            className="p-3 bg-white rounded-lg border border-neutral-200/80 shadow-2xs space-y-1.5"
+                            className="p-3 bg-[var(--color-surface)] rounded-[var(--radius-input)] border border-[var(--color-border)] space-y-1.5"
                           >
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-neutral-900">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-semibold text-[var(--color-text-primary)]">
                                 {dim.category}
                               </span>
-                              <span className="text-xs font-bold text-neutral-800 bg-neutral-100 px-2 py-0.5 rounded font-mono">
+                              <span className="text-xs font-sans font-semibold tabular-nums text-[var(--color-text-primary)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] px-2 py-0.5 rounded">
                                 {dim.achieved} / {dim.max}
                               </span>
                             </div>
-                            <p className="text-[11px] text-neutral-600 leading-relaxed">
+                            <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
                               {dim.explanation}
                             </p>
                           </div>
@@ -728,113 +754,106 @@ export const AdminMatchingPage: React.FC = () => {
         )}
 
         {/* Quote Inspection Modal */}
-        {selectedQuote && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-            <Card className="w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 space-y-5 bg-white shadow-xl">
-              <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+        <Modal
+          isOpen={!!selectedQuote}
+          onClose={() => setSelectedQuote(null)}
+          title={
+            selectedQuote?.quoteType === 'alternative'
+              ? 'Alternative Commercial Proposal'
+              : 'Commercial Quote Submission'
+          }
+          description={
+            selectedQuote
+              ? `Submitted on ${new Date(selectedQuote.submittedAt).toLocaleString()}`
+              : undefined
+          }
+          maxWidth="lg"
+        >
+          {selectedQuote && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-[var(--radius-input)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-baseline justify-between gap-3">
                 <div>
-                  <h3 className="text-base font-bold text-neutral-900 font-serif">
-                    {selectedQuote.quoteType === 'alternative'
-                      ? 'Alternative Commercial Proposal'
-                      : 'Commercial Quote Submission'}
-                  </h3>
-                  <p className="text-xs text-neutral-500">
-                    Submitted on {new Date(selectedQuote.submittedAt).toLocaleString()}
-                  </p>
+                  <span className="text-xs font-medium text-[var(--color-text-muted)] block">Total Proposed Amount</span>
+                  <span className="text-2xl font-sans font-bold tabular-nums text-[var(--color-text-primary)]">
+                    €{(selectedQuote.amountMinor / 100).toLocaleString()} {selectedQuote.currency}
+                  </span>
                 </div>
-                <button
-                  onClick={() => setSelectedQuote(null)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-neutral-900 text-lg font-bold"
+                <Badge
+                  variant={
+                    selectedQuote.budgetRelation === 'within_budget'
+                      ? 'success'
+                      : selectedQuote.budgetRelation === 'slightly_above'
+                      ? 'warning'
+                      : 'neutral'
+                  }
                 >
-                  ×
-                </button>
+                  {selectedQuote.budgetRelation.replace(/_/g, ' ')}
+                </Badge>
               </div>
 
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-neutral-50 flex items-baseline justify-between">
-                  <div>
-                    <span className="text-xs text-neutral-500 block">Total Proposed Amount</span>
-                    <span className="text-2xl font-serif font-bold text-neutral-900">
-                      €{(selectedQuote.amountMinor / 100).toLocaleString()} {selectedQuote.currency}
-                    </span>
-                  </div>
-                  <Badge
-                    variant={
-                      selectedQuote.budgetRelation === 'within_budget'
-                        ? 'success'
-                        : selectedQuote.budgetRelation === 'slightly_above'
-                        ? 'warning'
-                        : 'neutral'
-                    }
-                  >
-                    {selectedQuote.budgetRelation.replace(/_/g, ' ')}
-                  </Badge>
+              {selectedQuote.quoteType === 'alternative' && selectedQuote.alternativeExplanation && (
+                <div className="p-3.5 rounded-[var(--radius-input)] bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-xs text-[var(--color-warning-text)]">
+                  <strong className="font-semibold block mb-1">Alternative Proposal Justification:</strong>
+                  <p className="leading-relaxed">{selectedQuote.alternativeExplanation}</p>
                 </div>
+              )}
 
-                {selectedQuote.quoteType === 'alternative' && selectedQuote.alternativeExplanation && (
-                  <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900">
-                    <strong className="block mb-1">Alternative Proposal Justification:</strong>
-                    <p className="leading-relaxed">{selectedQuote.alternativeExplanation}</p>
-                  </div>
-                )}
+              <div>
+                <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">Scope Delivery Summary</span>
+                <p className="text-[13px] text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] p-3 rounded-[var(--radius-input)] leading-relaxed whitespace-pre-wrap">
+                  {selectedQuote.scopeSummary}
+                </p>
+              </div>
 
+              <div className="grid grid-cols-2 gap-4 text-xs">
                 <div>
-                  <span className="text-xs font-bold text-neutral-700 block mb-1">Scope Delivery Summary</span>
-                  <p className="text-xs text-neutral-600 bg-neutral-50 p-3 rounded-md leading-relaxed whitespace-pre-wrap">
-                    {selectedQuote.scopeSummary}
-                  </p>
+                  <span className="text-[var(--color-text-muted)] font-medium block">Target Kick-off Date</span>
+                  <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">{selectedQuote.proposedStartDate}</span>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <span className="text-neutral-400 block">Target Kick-off Date</span>
-                    <span className="font-semibold text-neutral-800">{selectedQuote.proposedStartDate}</span>
-                  </div>
-                  <div>
-                    <span className="text-neutral-400 block">Estimated Duration</span>
-                    <span className="font-semibold text-neutral-800">{selectedQuote.estimatedDurationDays} days</span>
-                  </div>
-                  <div>
-                    <span className="text-neutral-400 block">Revisions Included</span>
-                    <span className="font-semibold text-neutral-800">{selectedQuote.revisionsIncluded}</span>
-                  </div>
-                  <div>
-                    <span className="text-neutral-400 block">Status</span>
-                    <span className="font-semibold text-neutral-800 uppercase">{selectedQuote.status}</span>
-                  </div>
+                <div>
+                  <span className="text-[var(--color-text-muted)] font-medium block">Estimated Duration</span>
+                  <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">{selectedQuote.estimatedDurationDays} days</span>
                 </div>
-
-                {selectedQuote.includedItems && selectedQuote.includedItems.length > 0 && (
-                  <div>
-                    <span className="text-xs font-bold text-neutral-700 block mb-1">Inclusions</span>
-                    <ul className="list-disc list-inside text-xs text-neutral-600 space-y-0.5">
-                      {selectedQuote.includedItems.map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {selectedQuote.excludedItems && selectedQuote.excludedItems.length > 0 && (
-                  <div>
-                    <span className="text-xs font-bold text-neutral-700 block mb-1">Exclusions</span>
-                    <ul className="list-disc list-inside text-xs text-neutral-600 space-y-0.5">
-                      {selectedQuote.excludedItems.map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <div>
+                  <span className="text-[var(--color-text-muted)] font-medium block">Revisions Included</span>
+                  <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">{selectedQuote.revisionsIncluded}</span>
+                </div>
+                <div>
+                  <span className="text-[var(--color-text-muted)] font-medium block">Status</span>
+                  <span className="font-semibold text-[var(--color-text-primary)] uppercase">{selectedQuote.status}</span>
+                </div>
               </div>
 
-              <div className="pt-3 border-t border-neutral-100 flex justify-end">
+              {selectedQuote.includedItems && selectedQuote.includedItems.length > 0 && (
+                <div>
+                  <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">Inclusions</span>
+                  <ul className="list-disc list-inside text-xs text-[var(--color-text-secondary)] space-y-0.5">
+                    {selectedQuote.includedItems.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedQuote.excludedItems && selectedQuote.excludedItems.length > 0 && (
+                <div>
+                  <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">Exclusions</span>
+                  <ul className="list-disc list-inside text-xs text-[var(--color-text-secondary)] space-y-0.5">
+                    {selectedQuote.excludedItems.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="pt-3 border-t border-[var(--color-border)] flex justify-end">
                 <Button variant="outline" size="sm" onClick={() => setSelectedQuote(null)}>
                   Close
                 </Button>
               </div>
-            </Card>
-          </div>
-        )}
+            </div>
+          )}
+        </Modal>
 
         {/* Exclude Professional Confirmation Modal */}
         {candidateToExclude && (
@@ -848,13 +867,13 @@ export const AdminMatchingPage: React.FC = () => {
             maxWidth="md"
           >
             <div className="space-y-4 pt-1">
-              <div className="p-3.5 rounded-lg bg-neutral-50 border border-neutral-200 text-xs text-neutral-700 flex items-center justify-between">
-                <div>
-                  <span className="font-semibold text-neutral-900 block text-sm">
+              <div className="p-3.5 rounded-[var(--radius-input)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <span className="font-semibold text-[var(--color-text-primary)] block text-sm break-words">
                     {candidateToExclude.professionalName}
                   </span>
-                  <span className="text-neutral-500">
-                    {candidateToExclude.professionalTitle} • Match Score: {candidateToExclude.matchScore}
+                  <span className="text-[var(--color-text-secondary)] tabular-nums">
+                    {candidateToExclude.professionalTitle} · Match Score: {candidateToExclude.matchScore}
                   </span>
                 </div>
                 <Badge variant={candidateToExclude.eligibilityStatus === 'eligible' ? 'success' : 'neutral'}>
@@ -862,11 +881,11 @@ export const AdminMatchingPage: React.FC = () => {
                 </Badge>
               </div>
 
-              <p className="text-xs text-neutral-500 leading-relaxed">
+              <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">
                 Exclusion is specific to this project brief only. Their profile, account standing, and eligibility for future project opportunities remain fully active.
               </p>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[var(--color-border)]">
                 <Button
                   variant="outline"
                   size="sm"
@@ -876,11 +895,10 @@ export const AdminMatchingPage: React.FC = () => {
                   Cancel
                 </Button>
                 <Button
-                  variant="primary"
+                  variant="destructive"
                   size="sm"
                   isLoading={excluding}
                   onClick={handleConfirmExclude}
-                  className="bg-rose-600 hover:bg-rose-700 text-white border-transparent"
                 >
                   Exclude Professional
                 </Button>

@@ -9,7 +9,7 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
 import { Card } from '../../components/ui/Card';
-import { ArrowRight, AlertCircle, Sparkles, Check } from 'lucide-react';
+import { ArrowRight, AlertCircle, Check } from 'lucide-react';
 import { AvailabilityStatus } from '../../types';
 
 const SERVICE_OPTIONS = [
@@ -162,25 +162,24 @@ export const ProfessionalOnboardingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[85vh] bg-[var(--color-bg-app)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 text-neutral-800 text-xs font-medium mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-neutral-500" />
-            <span>Professional Profile & Availability</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold font-serif tracking-tight text-neutral-900">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)] mb-2.5">
+            Professional Profile &amp; Availability
+          </p>
+          <h1 className="typo-page-title text-[var(--color-text-primary)]">
             Complete your Professional Profile
           </h1>
-          <p className="mt-2 text-sm text-neutral-500 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2 text-sm sm:text-[15px] text-[var(--color-text-secondary)] max-w-lg mx-auto leading-relaxed">
             Alongby curates matches using verified skills, experience, and structured availability. You will not be displayed in a public directory.
           </p>
         </div>
 
-        <Card className="p-8">
+        <Card className="p-6 sm:p-8">
           {error && (
-            <div className="mb-6 p-3 rounded-md bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="mb-6 p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[var(--color-error)]" />
               <span>{error}</span>
             </div>
           )}
@@ -231,8 +230,8 @@ export const ProfessionalOnboardingPage: React.FC = () => {
 
             {/* Primary Services Multi-select */}
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">
-                Primary Services Offered <span className="text-red-500">*</span>
+              <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-2">
+                Primary Services Offered <span className="text-[var(--color-error)]">*</span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {SERVICE_OPTIONS.map((srv) => {
@@ -242,10 +241,10 @@ export const ProfessionalOnboardingPage: React.FC = () => {
                       key={srv}
                       type="button"
                       onClick={() => toggleService(srv)}
-                      className={`px-3 py-2 text-xs font-medium rounded-md border text-left flex items-center justify-between transition-colors cursor-pointer ${
+                      className={`px-3.5 py-2.5 min-h-[42px] text-[13px] font-medium rounded-[var(--radius-button)] border text-left flex items-center justify-between transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                         isSelected
-                          ? 'border-neutral-900 bg-neutral-900 text-white'
-                          : 'border-neutral-200 hover:border-neutral-300 bg-white text-neutral-700'
+                          ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-text)]'
+                          : 'border-[var(--color-border-strong)] hover:border-[var(--color-text-muted)] bg-[var(--color-surface)] text-[var(--color-text-primary)]'
                       }`}
                     >
                       <span>{srv}</span>
@@ -269,6 +268,7 @@ export const ProfessionalOnboardingPage: React.FC = () => {
                 type="number"
                 min="1"
                 max="50"
+                className="tabular-nums"
                 value={yearsOfExperience}
                 onChange={(e) => setYearsOfExperience(parseInt(e.target.value, 10) || 1)}
               />
@@ -277,6 +277,7 @@ export const ProfessionalOnboardingPage: React.FC = () => {
                 type="number"
                 step="250"
                 min="500"
+                className="tabular-nums"
                 value={minBudgetEur}
                 onChange={(e) => setMinBudgetEur(parseInt(e.target.value, 10) || 1000)}
                 helperText="Indicative floor for matched project scopes"
@@ -284,11 +285,11 @@ export const ProfessionalOnboardingPage: React.FC = () => {
             </div>
 
             {/* Availability Setup */}
-            <div className="pt-6 border-t border-neutral-100">
-              <h3 className="text-sm font-semibold text-neutral-900 mb-1">
+            <div className="pt-6 border-t border-[var(--color-border)]">
+              <h3 className="typo-card-title text-[var(--color-text-primary)] mb-1">
                 Initial Availability Settings
               </h3>
-              <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
+              <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
                 Alongby uses structured availability to ensure you are only matched with projects when you have real delivery capacity.
               </p>
 
@@ -305,6 +306,7 @@ export const ProfessionalOnboardingPage: React.FC = () => {
                     label="Next Available Start Date"
                     type="date"
                     required
+                    className="tabular-nums"
                     value={nextAvailableDate}
                     onChange={(e) => setNextAvailableDate(e.target.value)}
                   />
@@ -313,6 +315,7 @@ export const ProfessionalOnboardingPage: React.FC = () => {
                     type="number"
                     min="1"
                     max="10"
+                    className="tabular-nums"
                     value={maxProjects}
                     onChange={(e) => setMaxProjects(parseInt(e.target.value, 10) || 1)}
                   />
@@ -320,14 +323,14 @@ export const ProfessionalOnboardingPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-neutral-100 flex items-center justify-end">
+            <div className="pt-4 border-t border-[var(--color-border)] flex items-center justify-end">
               <Button
                 type="submit"
                 variant="primary"
                 isLoading={isSubmitting}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
-                Submit Profile & Enter Workspace
+                Submit Profile &amp; Enter Workspace
               </Button>
             </div>
           </form>

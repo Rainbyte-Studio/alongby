@@ -16,27 +16,27 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-1.5"
+            className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5"
           >
             {label}
-            {required && <span className="text-red-500 ml-0.5">*</span>}
+            {required && <span className="text-[var(--color-error)] ml-0.5">*</span>}
           </label>
         )}
         <textarea
           id={inputId}
           ref={ref}
           rows={rows}
-          className={`w-full px-3.5 py-2.5 text-sm text-neutral-900 bg-white border rounded-md transition-colors placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:border-neutral-900 resize-y ${
+          className={`w-full px-3.5 py-2.5 font-sans text-sm font-normal text-[var(--color-text-primary)] leading-relaxed bg-[var(--color-surface)] border rounded-[var(--radius-input)] transition-colors duration-150 placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-offset-0 resize-y ${
             error
-              ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-              : 'border-neutral-300 focus:ring-neutral-900'
+              ? 'border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]/20'
+              : 'border-[var(--color-border-strong)] hover:border-[var(--color-text-muted)] focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]/15'
           } ${className}`}
           {...props}
         />
         {error ? (
-          <p className="mt-1 text-xs text-red-600 font-medium">{error}</p>
+          <p className="mt-1.5 text-xs text-[var(--color-error-text)] font-medium">{error}</p>
         ) : helperText ? (
-          <p className="mt-1 text-xs text-neutral-500">{helperText}</p>
+          <p className="mt-1.5 text-xs text-[var(--color-text-secondary)] leading-relaxed">{helperText}</p>
         ) : null}
       </div>
     );

@@ -30,18 +30,18 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({ children, allowedRoles }) 
     };
 
     return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-        <div className="max-w-md w-full text-center bg-white p-8 rounded-xl border border-neutral-200 shadow-xs">
-          <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4 border border-rose-100">
+      <div className="min-h-[70vh] flex items-center justify-center px-4 py-12 bg-[var(--color-bg-app)]">
+        <div className="max-w-md w-full text-center bg-[var(--color-surface)] p-8 rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)]">
+          <div className="w-12 h-12 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] text-[var(--color-error)] flex items-center justify-center mx-auto mb-4 border border-[var(--color-error-border)]">
             <ShieldAlert className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold font-serif text-neutral-900 mb-2">
+          <h2 className="typo-section-heading text-[var(--color-text-primary)] mb-2">
             Access Restricted
           </h2>
-          <p className="text-sm text-neutral-500 mb-6 leading-relaxed">
+          <p className="text-sm text-[var(--color-text-secondary)] mb-6 leading-relaxed">
             This area is restricted to {allowedRoles.join(' or ')} accounts.
             {userRole ? (
-              <span> You are currently authenticated with a <strong className="capitalize text-neutral-700">{userRole}</strong> account.</span>
+              <span> You are currently authenticated with a <strong className="capitalize text-[var(--color-text-primary)]">{userRole}</strong> account.</span>
             ) : (
               <span> Please sign in with an authorized account.</span>
             )}

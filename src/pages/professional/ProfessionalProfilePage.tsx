@@ -330,22 +330,21 @@ export const ProfessionalProfilePage: React.FC = () => {
         {successMessage && (
           <div
             id="professional-profile-success"
-            className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-900"
+            className="p-4 rounded-[var(--radius-card)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] flex flex-col sm:flex-row sm:items-center gap-3 text-[var(--color-success-text)]"
           >
-            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-700">
+            <div className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center shrink-0">
               <Check className="w-4 h-4" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold">{successMessage}</h3>
-              <p className="text-xs text-emerald-700 mt-0.5">
+              <p className="text-xs mt-0.5 opacity-90">
                 Your updated capabilities, services, and floor budget are active for future project matching.
               </p>
             </div>
             <Button
-              variant="outline"
+              variant="white"
               size="sm"
               onClick={() => navigate('/professional')}
-              className="bg-white text-emerald-800 border-emerald-300 hover:bg-emerald-100"
             >
               Go to Workspace
             </Button>
@@ -356,68 +355,67 @@ export const ProfessionalProfilePage: React.FC = () => {
         {error && (
           <div
             id="professional-profile-error"
-            className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-900"
+            className="p-4 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-3 text-[var(--color-error-text)]"
           >
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-            <div className="flex-1">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold">Unable to save profile</h3>
-              <p className="text-xs text-rose-700 mt-0.5">{error}</p>
+              <p className="text-xs mt-0.5 opacity-90">{error}</p>
             </div>
           </div>
         )}
 
         {/* Read-Only Governance & Verification Status Bar */}
-        <Card className="p-6 bg-neutral-50/70 border-neutral-200">
+        <Card className="p-6 bg-[var(--color-surface-secondary)]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-white border border-neutral-200 flex items-center justify-center text-neutral-700 shadow-2xs">
-                <ShieldCheck className="w-5 h-5 text-neutral-700" />
+              <div className="w-10 h-10 rounded-[var(--radius-button)] bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-primary)] shrink-0">
+                <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                     Governance Status
                   </span>
                   <Badge variant={verificationBadgeProps.variant} size="sm">
                     {verificationBadgeProps.label}
                   </Badge>
                 </div>
-                <p className="text-xs text-neutral-500 mt-0.5">
-                  Completed Projects: <strong className="text-neutral-700">{professionalProfile?.completedProjectCount ?? 0}</strong>
+                <p className="text-xs text-[var(--color-text-secondary)] tabular-nums mt-0.5">
+                  Completed Projects: <strong className="font-semibold text-[var(--color-text-primary)]">{professionalProfile?.completedProjectCount ?? 0}</strong>
                   {typeof professionalProfile?.averageRating === 'number' && (
                     <span className="ml-3">
-                      Client Rating: <strong className="text-neutral-700">★ {professionalProfile.averageRating.toFixed(1)}</strong>
+                      Client Rating: <strong className="font-semibold text-[var(--color-text-primary)]">★ {professionalProfile.averageRating.toFixed(1)}</strong>
                     </span>
                   )}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-neutral-500">
-              <Lock className="w-3.5 h-3.5 text-neutral-400" />
+            <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+              <Lock className="w-3.5 h-3.5 text-[var(--color-text-muted)] shrink-0" />
               <span>Curation metrics are managed directly by Alongby and cannot be manually modified.</span>
             </div>
           </div>
         </Card>
 
         {/* Fast-Moving Operational State Notice: Link to Live Availability */}
-        <div className="p-5 rounded-xl bg-neutral-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-5 sm:p-6 rounded-[var(--radius-card)] bg-[var(--color-primary)] text-[var(--color-primary-text)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-neutral-800 flex items-center justify-center text-emerald-400 shrink-0">
+            <div className="w-9 h-9 rounded-[var(--radius-button)] bg-white/10 flex items-center justify-center text-[#A7F3D0] shrink-0">
               <Calendar className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-sm font-semibold">Live Availability & Capacity</h4>
-              <p className="text-xs text-neutral-400 mt-0.5">
+              <h4 className="typo-card-title text-white">Live Availability & Capacity</h4>
+              <p className="text-[13px] text-[#D6D3CD] mt-0.5">
                 Fast-moving operational capacity and next start dates are managed separately from your practitioner profile.
               </p>
             </div>
           </div>
           <Button
-            variant="outline"
+            variant="white"
             size="sm"
             onClick={() => navigate('/professional?tab=availability')}
-            className="border-neutral-700 text-white hover:bg-neutral-800 whitespace-nowrap"
           >
             Manage Availability
           </Button>
@@ -426,12 +424,12 @@ export const ProfessionalProfilePage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Identity & Headline Card */}
           <Card className="p-6 sm:p-8">
-            <div className="border-b border-neutral-100 pb-4 mb-6">
-              <div className="flex items-center gap-2 text-neutral-900 font-serif font-bold text-lg">
-                <User className="w-5 h-5 text-neutral-600" />
+            <div className="border-b border-[var(--color-border)] pb-4 mb-6">
+              <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
+                <User className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
                 <span>Practitioner Identity & Headline</span>
-              </div>
-              <p className="text-xs text-neutral-500 mt-1">
+              </h2>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1">
                 Your public identity presented to matched clients and curation review panels.
               </p>
             </div>
@@ -494,7 +492,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                   }}
                   placeholder="e.g. https://elenadesign.io"
                   helperText="Personal portfolio, studio website, or GitHub profile."
-                  leftIcon={<Globe className="w-4 h-4 text-neutral-400" />}
+                  leftIcon={<Globe className="w-4 h-4 text-[var(--color-text-muted)]" />}
                 />
               </div>
 
@@ -510,6 +508,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                     setYearsOfExperience(Number(e.target.value));
                     markDirty();
                   }}
+                  className="tabular-nums"
                   helperText="Verified experience considered in matching algorithm scoring."
                 />
               </div>
@@ -546,12 +545,12 @@ export const ProfessionalProfilePage: React.FC = () => {
 
           {/* Services & Matching Preferences Card */}
           <Card className="p-6 sm:p-8">
-            <div className="border-b border-neutral-100 pb-4 mb-6">
-              <div className="flex items-center gap-2 text-neutral-900 font-serif font-bold text-lg">
-                <Briefcase className="w-5 h-5 text-neutral-600" />
+            <div className="border-b border-[var(--color-border)] pb-4 mb-6">
+              <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
+                <Briefcase className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
                 <span>Services, Skills & Floor Budget</span>
-              </div>
-              <p className="text-xs text-neutral-500 mt-1">
+              </h2>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1">
                 Authoritative parameters used directly by the Alongby matching engine to evaluate project suitability.
               </p>
             </div>
@@ -559,7 +558,7 @@ export const ProfessionalProfilePage: React.FC = () => {
             <div className="space-y-6">
               {/* Primary Services Checkboxes */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">
+                <label className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-2">
                   Primary Services & Disciplines (select all that apply)
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -569,25 +568,26 @@ export const ProfessionalProfilePage: React.FC = () => {
                       <button
                         key={srv}
                         type="button"
+                        aria-pressed={isSelected}
                         onClick={() => handleServiceToggle(srv)}
-                        className={`text-left p-3 rounded-lg border transition-all text-xs font-medium flex items-center justify-between cursor-pointer ${
+                        className={`text-left p-3.5 rounded-[var(--radius-button)] border transition-colors text-[13px] font-medium flex items-center justify-between cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                           isSelected
-                            ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
-                            : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300'
+                            ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] border-[var(--color-primary)]'
+                            : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] border-[var(--color-border)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-secondary)]'
                         }`}
                       >
                         <span>{srv}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0 ml-2" />}
+                        {isSelected && <Check className="w-4 h-4 text-white shrink-0 ml-2" />}
                       </button>
                     );
                   })}
                 </div>
-                <p className="text-xs text-neutral-400 mt-1.5">
+                <p className="text-xs text-[var(--color-text-secondary)] mt-1.5">
                   Updating primary services directly calibrates project category eligibility in the matching engine.
                 </p>
               </div>
 
-              {/* Skills Input with chips */}
+              {/* Skills Input with tags */}
               <div>
                 <Input
                   id="prof-skills"
@@ -608,7 +608,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                     .map((skill) => (
                       <span
                         key={skill}
-                        className="px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-800 text-[11px] font-medium border border-neutral-200/80"
+                        className="px-2.5 py-0.5 rounded-md bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs font-medium border border-[var(--color-border)]"
                       >
                         {skill}
                       </span>
@@ -617,7 +617,7 @@ export const ProfessionalProfilePage: React.FC = () => {
               </div>
 
               {/* Minimum Floor Budget */}
-              <div className="pt-4 border-t border-neutral-100">
+              <div className="pt-4 border-t border-[var(--color-border)]">
                 <div className="max-w-md">
                   <Input
                     id="prof-floor-budget"
@@ -630,12 +630,13 @@ export const ProfessionalProfilePage: React.FC = () => {
                       setFloorBudgetEur(Number(e.target.value));
                       markDirty();
                     }}
+                    className="tabular-nums"
                     helperText="Opportunities below this threshold will be flagged as budget stretch before routing."
-                    leftIcon={<Euro className="w-4 h-4 text-neutral-400" />}
+                    leftIcon={<Euro className="w-4 h-4 text-[var(--color-text-muted)]" />}
                   />
-                  <div className="mt-2 text-xs text-neutral-500 flex items-center gap-1.5">
+                  <div className="mt-2 text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5">
                     <span>Floor Level:</span>
-                    <strong className="text-neutral-900 font-medium">
+                    <strong className="text-[var(--color-text-primary)] font-semibold tabular-nums">
                       €{Number(floorBudgetEur || 0).toLocaleString()} EUR
                     </strong>
                   </div>
@@ -646,13 +647,13 @@ export const ProfessionalProfilePage: React.FC = () => {
 
           {/* Portfolio Highlights Card */}
           <Card className="p-6 sm:p-8">
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-4 mb-6">
+            <div className="flex flex-wrap items-center justify-between border-b border-[var(--color-border)] pb-4 mb-6 gap-4">
               <div>
-                <div className="flex items-center gap-2 text-neutral-900 font-serif font-bold text-lg">
-                  <Layers className="w-5 h-5 text-neutral-600" />
+                <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
+                  <Layers className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
                   <span>Portfolio & Project Highlights</span>
-                </div>
-                <p className="text-xs text-neutral-500 mt-1">
+                </h2>
+                <p className="text-sm text-[var(--color-text-secondary)] mt-1">
                   Curated case studies displayed to clients reviewing proposal shortlists.
                 </p>
               </div>
@@ -673,13 +674,13 @@ export const ProfessionalProfilePage: React.FC = () => {
 
             {/* Existing Portfolio Items */}
             {portfolioItems.length === 0 && !showAddPortfolio && (
-              <div className="text-center py-8 px-4 border border-dashed border-neutral-200 rounded-xl">
-                <p className="text-xs text-neutral-500 mb-3">
+              <div className="text-center py-8 px-4 border border-dashed border-[var(--color-border-strong)] rounded-[var(--radius-card)] bg-[var(--color-surface-secondary)]">
+                <p className="text-xs text-[var(--color-text-secondary)] mb-3">
                   No portfolio highlights added yet. Adding 1–3 past project highlights increases client selection confidence.
                 </p>
                 <Button
                   type="button"
-                  variant="secondary"
+                  variant="outline"
                   size="sm"
                   onClick={() => setShowAddPortfolio(true)}
                   leftIcon={<Plus className="w-3.5 h-3.5" />}
@@ -694,20 +695,20 @@ export const ProfessionalProfilePage: React.FC = () => {
                 {portfolioItems.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 rounded-lg bg-neutral-50 border border-neutral-200/80 flex items-start justify-between gap-4"
+                    className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] flex items-start justify-between gap-4"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-semibold text-neutral-900 truncate">
+                        <h4 className="text-sm font-semibold text-[var(--color-text-primary)] break-words">
                           {item.title}
                         </h4>
                         {item.year && (
-                          <span className="text-[11px] text-neutral-400 font-medium">
+                          <span className="text-xs text-[var(--color-text-secondary)] font-medium tabular-nums">
                             ({item.year})
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                      <p className="text-[13px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">
                         {item.description}
                       </p>
                       {item.liveUrl && (
@@ -715,7 +716,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                           href={item.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[11px] text-neutral-800 hover:text-neutral-950 font-medium mt-2 underline underline-offset-2"
+                          className="inline-flex items-center gap-1 text-xs text-[var(--color-text-primary)] font-medium mt-2 underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
                         >
                           <ExternalLink className="w-3 h-3" />
                           <span>View Live Case Study</span>
@@ -726,7 +727,8 @@ export const ProfessionalProfilePage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleRemovePortfolioItem(item.id)}
-                      className="text-neutral-400 hover:text-rose-600 p-1 transition-colors cursor-pointer"
+                      aria-label={`Remove portfolio highlight ${item.title}`}
+                      className="text-[var(--color-text-muted)] hover:text-[var(--color-error-text)] p-1.5 rounded-[var(--radius-button)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                       title="Remove highlight"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -738,15 +740,15 @@ export const ProfessionalProfilePage: React.FC = () => {
 
             {/* Add Portfolio Highlight Form */}
             {showAddPortfolio && (
-              <div className="p-5 rounded-xl border border-neutral-200 bg-neutral-50/50 space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-neutral-200/60">
-                  <span className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+              <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-secondary)] space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-[var(--color-border)]">
+                  <span className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">
                     New Project Highlight
                   </span>
                   <button
                     type="button"
                     onClick={() => setShowAddPortfolio(false)}
-                    className="text-xs text-neutral-500 hover:text-neutral-900 cursor-pointer"
+                    className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm px-1"
                   >
                     Cancel
                   </button>
@@ -766,6 +768,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                     value={newPortfolioYear}
                     onChange={(e) => setNewPortfolioYear(e.target.value)}
                     placeholder="e.g. 2024"
+                    className="tabular-nums"
                   />
 
                   <div className="sm:col-span-2">
@@ -774,7 +777,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                       value={newPortfolioUrl}
                       onChange={(e) => setNewPortfolioUrl(e.target.value)}
                       placeholder="e.g. https://behance.net/gallery/..."
-                      leftIcon={<Globe className="w-4 h-4 text-neutral-400" />}
+                      leftIcon={<Globe className="w-4 h-4 text-[var(--color-text-muted)]" />}
                     />
                   </div>
 
@@ -813,12 +816,12 @@ export const ProfessionalProfilePage: React.FC = () => {
           </Card>
 
           {/* Historical Consistency & Governance Notice */}
-          <div className="p-5 rounded-xl bg-neutral-50 border border-neutral-200/80 flex items-start gap-3.5 text-neutral-700">
-            <div className="w-8 h-8 rounded-lg bg-neutral-200/60 flex items-center justify-center shrink-0 text-neutral-700">
+          <div className="p-5 rounded-[var(--radius-card)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-start gap-3.5 text-[var(--color-text-secondary)]">
+            <div className="w-8 h-8 rounded-[var(--radius-button)] bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center shrink-0 text-[var(--color-text-primary)]">
               <Sparkles className="w-4 h-4" />
             </div>
-            <div className="text-xs leading-relaxed">
-              <span className="font-semibold text-neutral-900 block mb-0.5">
+            <div className="text-[13px] leading-relaxed">
+              <span className="font-semibold text-[var(--color-text-primary)] block mb-0.5">
                 Future Matching & Commercial Consistency
               </span>
               Updates to your primary services, skills, location, and minimum budget will calibrate future project
@@ -828,16 +831,16 @@ export const ProfessionalProfilePage: React.FC = () => {
           </div>
 
           {/* Actions Bar */}
-          <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-4 border-t border-neutral-200">
-            <div className="flex items-center gap-2 text-xs text-neutral-500">
+          <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[var(--color-border)]">
+            <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
               {isDirty ? (
-                <span className="inline-flex items-center gap-1.5 text-amber-700 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 text-[var(--color-warning-text)] font-medium">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                   Unsaved changes
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 text-neutral-400">
-                  <ShieldCheck className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1.5 text-[var(--color-text-secondary)]">
+                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                   All changes saved
                 </span>
               )}

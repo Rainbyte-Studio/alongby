@@ -541,15 +541,14 @@ export const ProjectCreationPage: React.FC = () => {
 
   if (loading || !projectId) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <LoadingSpinner size="lg" />
-        <p className="mt-4 text-sm text-neutral-500">Preparing your project brief…</p>
+      <div className="min-h-[60vh] bg-[var(--color-bg-app)] flex flex-col items-center justify-center">
+        <LoadingSpinner size="lg" label="Preparing your project brief…" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50/40 pb-20">
+    <div className="min-h-screen bg-[var(--color-bg-app)] pb-20">
       {/* Stepper Progress Bar */}
       <BriefStepper
         currentStep={currentStep}
@@ -561,7 +560,7 @@ export const ProjectCreationPage: React.FC = () => {
 
       {/* Main Step Container */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs p-6 sm:p-10">
+        <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-5 sm:p-10">
           {currentStep === 1 && (
             <StepService brief={brief} onChange={handleBriefChange} />
           )}
@@ -623,7 +622,7 @@ export const ProjectCreationPage: React.FC = () => {
 
           {/* Inline step error notice if blocking */}
           {Object.keys(stepErrors).length > 0 && currentStep !== 9 && (
-            <div className="mt-6 p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800">
+            <div className="mt-6 p-3.5 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-[13px] text-[var(--color-error-text)]">
               {Object.values(stepErrors)[0]}
             </div>
           )}
@@ -632,25 +631,25 @@ export const ProjectCreationPage: React.FC = () => {
           {saveErrorMessage && (
             <div
               role="alert"
-              className="mt-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              className="mt-6 p-4 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-[13px] text-[var(--color-error-text)] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             >
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <AlertCircle className="w-4 h-4 text-[var(--color-error)] shrink-0" />
                 <span>{saveErrorMessage}</span>
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleSaveAndExit}
-                className="text-xs border-rose-300 text-rose-800 hover:bg-rose-100 shrink-0 self-start sm:self-auto"
+                className="text-xs shrink-0 self-start sm:self-auto"
               >
-                Retry Save & Exit
+                Retry Save &amp; Exit
               </Button>
             </div>
           )}
 
           {/* Navigation Controls Bar */}
-          <div className="mt-10 pt-6 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
+          <div className="mt-10 pt-6 border-t border-[var(--color-border)] flex flex-wrap items-center justify-between gap-4">
             <div>
               {currentStep > 1 && (
                 <Button
@@ -672,7 +671,6 @@ export const ProjectCreationPage: React.FC = () => {
                 leftIcon={!isSavingAndExiting ? <Save className="w-3.5 h-3.5" /> : undefined}
                 isLoading={isSavingAndExiting}
                 disabled={isSavingAndExiting || isSubmitting}
-                className="text-neutral-600 hover:text-neutral-900"
                 aria-label="Save draft and exit to dashboard"
               >
                 {isSavingAndExiting ? 'Saving…' : 'Save & Exit'}

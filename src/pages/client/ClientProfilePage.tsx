@@ -183,14 +183,14 @@ export const ClientProfilePage: React.FC = () => {
         {successMessage && (
           <div
             id="client-profile-success"
-            className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-900"
+            className="p-4 rounded-[var(--radius-card)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] flex flex-col sm:flex-row sm:items-center gap-3 text-[var(--color-success-text)]"
           >
-            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-700">
+            <div className="w-8 h-8 rounded-[var(--radius-button)] bg-[var(--color-surface)] border border-[var(--color-success-border)] flex items-center justify-center shrink-0 text-[var(--color-success)]">
               <Check className="w-4 h-4" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold">{successMessage}</h3>
-              <p className="text-xs text-emerald-700 mt-0.5">
+              <p className="text-xs mt-0.5 opacity-90">
                 Your updated company and contact information is now active for upcoming projects and shortlists.
               </p>
             </div>
@@ -198,7 +198,7 @@ export const ClientProfilePage: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={() => navigate('/client')}
-              className="bg-white text-emerald-800 border-emerald-300 hover:bg-emerald-100"
+              className="shrink-0 self-start sm:self-center"
             >
               Go to Dashboard
             </Button>
@@ -209,12 +209,12 @@ export const ClientProfilePage: React.FC = () => {
         {error && (
           <div
             id="client-profile-error"
-            className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-900"
+            className="p-4 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-3 text-[var(--color-error-text)]"
           >
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-[var(--color-error)] shrink-0 mt-0.5" />
             <div className="flex-1">
               <h3 className="text-sm font-semibold">Unable to save profile</h3>
-              <p className="text-xs text-rose-700 mt-0.5">{error}</p>
+              <p className="text-xs mt-0.5">{error}</p>
             </div>
           </div>
         )}
@@ -222,12 +222,12 @@ export const ClientProfilePage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Identity & Contact Card */}
           <Card className="p-6 sm:p-8">
-            <div className="border-b border-neutral-100 pb-4 mb-6">
-              <div className="flex items-center gap-2 text-neutral-900 font-serif font-bold text-lg">
-                <User className="w-5 h-5 text-neutral-600" />
-                <span>Personal & Contact Identity</span>
-              </div>
-              <p className="text-xs text-neutral-500 mt-1">
+            <div className="border-b border-[var(--color-border)] pb-4 mb-6">
+              <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
+                <User className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
+                <span>Personal &amp; Contact Identity</span>
+              </h2>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1">
                 Your primary contact information for Alongby curation specialists and commercial communications.
               </p>
             </div>
@@ -252,7 +252,7 @@ export const ClientProfilePage: React.FC = () => {
                   value={currentUser?.email || ''}
                   disabled
                   helperText="Managed via your secure authentication account (read-only)."
-                  leftIcon={<Mail className="w-4 h-4 text-neutral-400" />}
+                  leftIcon={<Mail className="w-4 h-4" />}
                 />
               </div>
 
@@ -263,8 +263,9 @@ export const ClientProfilePage: React.FC = () => {
                   value={phone}
                   onChange={(e) => handleFieldChange(setPhone, e.target.value)}
                   placeholder="e.g. +44 20 7946 0912"
+                  className="tabular-nums"
                   helperText="Optional direct line for expedited project kickoff coordination."
-                  leftIcon={<Phone className="w-4 h-4 text-neutral-400" />}
+                  leftIcon={<Phone className="w-4 h-4" />}
                 />
               </div>
             </div>
@@ -272,12 +273,12 @@ export const ClientProfilePage: React.FC = () => {
 
           {/* Business & Organization Card */}
           <Card className="p-6 sm:p-8">
-            <div className="border-b border-neutral-100 pb-4 mb-6">
-              <div className="flex items-center gap-2 text-neutral-900 font-serif font-bold text-lg">
-                <Building className="w-5 h-5 text-neutral-600" />
-                <span>Organization & Commercial Details</span>
-              </div>
-              <p className="text-xs text-neutral-500 mt-1">
+            <div className="border-b border-[var(--color-border)] pb-4 mb-6">
+              <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
+                <Building className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
+                <span>Organization &amp; Commercial Details</span>
+              </h2>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1">
                 Details representing your organization on project briefs, matches, and future commercial proposals.
               </p>
             </div>
@@ -291,7 +292,7 @@ export const ClientProfilePage: React.FC = () => {
                   onChange={(e) => handleFieldChange(setCompanyName, e.target.value)}
                   placeholder="e.g. Acme Innovations Ltd"
                   helperText="Leave empty if commissioning as an independent private client."
-                  leftIcon={<Building className="w-4 h-4 text-neutral-400" />}
+                  leftIcon={<Building className="w-4 h-4" />}
                 />
               </div>
 
@@ -303,7 +304,7 @@ export const ClientProfilePage: React.FC = () => {
                   onChange={(e) => handleFieldChange(setCompanyWebsite, e.target.value)}
                   placeholder="e.g. https://acme.example.com"
                   helperText="Helps matched professionals understand your brand identity."
-                  leftIcon={<Globe className="w-4 h-4 text-neutral-400" />}
+                  leftIcon={<Globe className="w-4 h-4" />}
                 />
               </div>
 
@@ -337,20 +338,20 @@ export const ClientProfilePage: React.FC = () => {
                   onChange={(e) => handleFieldChange(setBillingEmail, e.target.value)}
                   placeholder="e.g. finance@acme.example.com"
                   helperText="Invoices, deposit confirmations, and milestone receipts will be dispatched here."
-                  leftIcon={<Mail className="w-4 h-4 text-neutral-400" />}
+                  leftIcon={<Mail className="w-4 h-4" />}
                 />
               </div>
             </div>
           </Card>
 
           {/* Legal & Commercial Snapshot Integrity Callout */}
-          <div className="p-5 rounded-xl bg-neutral-50 border border-neutral-200/80 flex items-start gap-3.5 text-neutral-700">
-            <div className="w-8 h-8 rounded-lg bg-neutral-200/60 flex items-center justify-center shrink-0 text-neutral-700">
+          <div className="p-5 rounded-[var(--radius-card)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-start gap-3.5 text-[var(--color-text-secondary)]">
+            <div className="w-8 h-8 rounded-[var(--radius-button)] bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center shrink-0 text-[var(--color-text-primary)]">
               <FileText className="w-4 h-4" />
             </div>
-            <div className="text-xs leading-relaxed">
-              <span className="font-semibold text-neutral-900 block mb-0.5">
-                Commercial & Historical Record Integrity
+            <div className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">
+              <span className="font-semibold text-[var(--color-text-primary)] block mb-0.5">
+                Commercial &amp; Historical Record Integrity
               </span>
               Profile updates immediately apply to future project briefs, matches, and new commercial proposals.
               Any previously submitted brief snapshots, accepted proposals, or executed contracts remain historically
@@ -359,15 +360,15 @@ export const ClientProfilePage: React.FC = () => {
           </div>
 
           {/* Actions Bar */}
-          <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-4 border-t border-neutral-200">
-            <div className="flex items-center gap-2 text-xs text-neutral-500">
+          <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[var(--color-border)]">
+            <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
               {isDirty ? (
-                <span className="inline-flex items-center gap-1.5 text-amber-700 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 text-[var(--color-warning-text)] font-medium">
+                  <AlertCircle className="w-3.5 h-3.5 text-[var(--color-warning)]" />
                   Unsaved changes
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 text-neutral-400">
+                <span className="inline-flex items-center gap-1.5 text-[var(--color-text-muted)]">
                   <ShieldCheck className="w-3.5 h-3.5" />
                   All changes saved
                 </span>

@@ -78,10 +78,10 @@ export const StepAdditional: React.FC<StepAdditionalProps> = ({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-serif font-bold text-neutral-950 tracking-tight">
+        <h2 className="typo-section-heading text-[var(--color-text-primary)]">
           Additional details & reference attachments
         </h2>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1.5 text-sm text-[var(--color-text-secondary)] leading-relaxed">
           Share inspiration links, technical constraints, or relevant documents (briefs, RFPs, wireframes, style guides).
         </p>
       </div>
@@ -98,12 +98,12 @@ export const StepAdditional: React.FC<StepAdditionalProps> = ({
       />
 
       {/* Attachments Section */}
-      <div className="space-y-3 pt-6 border-t border-neutral-100">
+      <div className="space-y-3 pt-6 border-t border-[var(--color-border)]">
         <div>
-          <label className="block text-xs font-semibold text-neutral-800 uppercase tracking-wider mb-1">
+          <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1">
             Project Attachments (Optional)
           </label>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-[var(--color-text-secondary)] tabular-nums">
             Upload PDF, PNG, JPG, WEBP, DOCX, or ZIP files (up to 15MB each).
           </p>
         </div>
@@ -115,7 +115,7 @@ export const StepAdditional: React.FC<StepAdditionalProps> = ({
             e.preventDefault();
             handleFiles(e.dataTransfer.files);
           }}
-          className="border-2 border-dashed border-neutral-200 rounded-xl p-8 text-center bg-neutral-50/50 hover:bg-neutral-50 transition-colors"
+          className="border border-dashed border-[var(--color-border-strong)] rounded-[var(--radius-card)] p-8 text-center bg-[var(--color-surface-secondary)]/60 hover:bg-[var(--color-surface-secondary)] transition-colors"
         >
           <input
             ref={fileInputRef}
@@ -127,20 +127,20 @@ export const StepAdditional: React.FC<StepAdditionalProps> = ({
           />
 
           <div className="flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-white border border-neutral-200 flex items-center justify-center text-neutral-600 mb-3 shadow-2xs">
+            <div className="w-10 h-10 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-primary)] mb-3">
               <Upload className="w-5 h-5" />
             </div>
-            <p className="text-xs text-neutral-700 font-medium">
+            <p className="text-[13px] text-[var(--color-text-secondary)] font-medium">
               Drag and drop files here, or{' '}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-neutral-950 font-semibold underline cursor-pointer"
+                className="text-[var(--color-text-primary)] font-semibold underline cursor-pointer rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
               >
                 browse files
               </button>
             </p>
-            <p className="text-[11px] text-neutral-400 mt-1">
+            <p className="text-xs text-[var(--color-text-secondary)] mt-1 tabular-nums">
               Max 15MB per file. Securely stored and accessible only to your project.
             </p>
           </div>
@@ -148,14 +148,14 @@ export const StepAdditional: React.FC<StepAdditionalProps> = ({
 
         {/* Upload progress indicator */}
         {uploadProgress !== null && (
-          <div className="p-3 rounded-lg bg-neutral-100 border border-neutral-200 text-xs">
-            <div className="flex items-center justify-between mb-1 text-neutral-700 font-medium">
+          <div className="p-3 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-xs tabular-nums">
+            <div className="flex items-center justify-between mb-1.5 text-[var(--color-text-primary)] font-medium">
               <span>Uploading attachment…</span>
               <span>{uploadProgress}%</span>
             </div>
-            <div className="w-full h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-[var(--color-border)] rounded-full overflow-hidden">
               <div
-                className="h-full bg-neutral-900 transition-all duration-200"
+                className="h-full bg-[var(--color-primary)] transition-all duration-200"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
@@ -164,7 +164,10 @@ export const StepAdditional: React.FC<StepAdditionalProps> = ({
 
         {/* Upload error */}
         {uploadError && (
-          <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center gap-2">
+          <div
+            role="alert"
+            className="p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-center gap-2"
+          >
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{uploadError}</span>
           </div>
@@ -173,21 +176,21 @@ export const StepAdditional: React.FC<StepAdditionalProps> = ({
         {/* Attached files list */}
         {(brief.attachments || []).length > 0 && (
           <div className="space-y-2 pt-2">
-            <div className="text-xs font-semibold text-neutral-700">
-              Uploaded Files ({(brief.attachments || []).length}):
+            <div className="text-[13px] font-medium text-[var(--color-text-primary)] tabular-nums">
+              Uploaded Files ({(brief.attachments || []).length})
             </div>
-            <div className="divide-y divide-neutral-100 border border-neutral-200 rounded-lg overflow-hidden bg-white">
+            <div className="divide-y divide-[var(--color-border)] border border-[var(--color-border)] rounded-[var(--radius-button)] overflow-hidden bg-[var(--color-surface)]">
               {(brief.attachments || []).map((att) => (
                 <div
                   key={att.fileId}
-                  className="p-3 flex items-center justify-between text-xs hover:bg-neutral-50 transition-colors"
+                  className="p-3 flex items-center justify-between gap-2 text-[13px] hover:bg-[var(--color-surface-secondary)]/50 transition-colors"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <FileText className="w-4 h-4 text-neutral-400 shrink-0" />
-                    <span className="font-medium text-neutral-900 truncate">
+                    <FileText className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0" />
+                    <span className="font-medium text-[var(--color-text-primary)] truncate">
                       {att.name}
                     </span>
-                    <span className="text-neutral-400 text-[11px] shrink-0">
+                    <span className="text-[var(--color-text-secondary)] text-xs tabular-nums shrink-0">
                       ({formatFileSize(att.size)})
                     </span>
                   </div>
@@ -196,8 +199,9 @@ export const StepAdditional: React.FC<StepAdditionalProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDeleteAttachment(att)}
-                    className="text-neutral-400 hover:text-rose-600 p-1 h-auto"
+                    className="text-[var(--color-text-secondary)] hover:text-[var(--color-error-text)] p-1.5 min-h-[32px]"
                     title="Remove file"
+                    aria-label={`Remove ${att.name}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>

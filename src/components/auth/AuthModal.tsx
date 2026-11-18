@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -6,7 +6,6 @@ import { authService } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase, UserCheck, Sparkles, AlertCircle } from 'lucide-react';
-import { UserRole } from '../../types';
 import { AlongbyWordmark } from '../brand/AlongbyWordmark';
 
 interface AuthModalProps {
@@ -32,6 +31,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const { refreshData } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode);
+      setSelectedRole(initialRole);
+      setError(null);
+    }
+  }, [isOpen, initialMode, initialRole]);
 
   // Reset state on mode change
   const switchMode = (newMode: 'signin' | 'signup') => {
@@ -127,19 +134,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       maxWidth="md"
     >
       {/* Brand Wordmark Header */}
-      <div className="flex justify-center pb-2 mb-6 border-b border-neutral-100">
-        <AlongbyWordmark size="lg" className="text-neutral-950" />
+      <div className="flex justify-center pb-3 mb-6 border-b border-[var(--color-border)]">
+        <AlongbyWordmark size="lg" className="text-[var(--color-text-primary)]" />
       </div>
 
       {/* Mode toggle */}
-      <div className="flex rounded-md bg-neutral-100 p-1 mb-6">
+      <div className="flex rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] p-1 mb-6">
         <button
           type="button"
           onClick={() => switchMode('signin')}
-          className={`flex-1 py-1.5 text-xs font-medium rounded transition-colors cursor-pointer ${
+          className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
             mode === 'signin'
-              ? 'bg-white text-neutral-900 shadow-xs'
-              : 'text-neutral-500 hover:text-neutral-900'
+              ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] font-semibold shadow-[var(--shadow-card)]'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
           Sign In
@@ -147,10 +154,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <button
           type="button"
           onClick={() => switchMode('signup')}
-          className={`flex-1 py-1.5 text-xs font-medium rounded transition-colors cursor-pointer ${
+          className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
             mode === 'signup'
-              ? 'bg-white text-neutral-900 shadow-xs'
-              : 'text-neutral-500 hover:text-neutral-900'
+              ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] font-semibold shadow-[var(--shadow-card)]'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
           Create Account
@@ -158,8 +165,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       </div>
 
       {error && (
-        <div className="mb-4 p-3 rounded-md bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+        <div className="mb-4 p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[var(--color-error)]" />
           <span>{error}</span>
         </div>
       )}
@@ -169,22 +176,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <>
             {/* Role Selection */}
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">
+              <label className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-2">
                 I am joining as a
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setSelectedRole('client')}
-                  className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                  className={`p-3.5 rounded-[var(--radius-button)] border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                     selectedRole === 'client'
-                      ? 'border-neutral-900 bg-neutral-900 text-white'
-                      : 'border-neutral-200 hover:border-neutral-300 bg-white text-neutral-900'
+                      ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-text)]'
+                      : 'border-[var(--color-border-strong)] hover:border-[var(--color-text-muted)] bg-[var(--color-surface)] text-[var(--color-text-primary)]'
                   }`}
                 >
-                  <Briefcase className={`w-4 h-4 mb-2 ${selectedRole === 'client' ? 'text-white' : 'text-neutral-600'}`} />
-                  <div className="text-xs font-semibold">Client</div>
-                  <div className={`text-[11px] mt-0.5 ${selectedRole === 'client' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                  <Briefcase className={`w-4 h-4 mb-2 ${selectedRole === 'client' ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
+                  <div className="text-[13px] font-semibold">Client</div>
+                  <div className={`text-xs mt-0.5 leading-snug ${selectedRole === 'client' ? 'text-neutral-300' : 'text-[var(--color-text-secondary)]'}`}>
                     I want to hire curated talent
                   </div>
                 </button>
@@ -192,15 +199,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedRole('professional')}
-                  className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                  className={`p-3.5 rounded-[var(--radius-button)] border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                     selectedRole === 'professional'
-                      ? 'border-neutral-900 bg-neutral-900 text-white'
-                      : 'border-neutral-200 hover:border-neutral-300 bg-white text-neutral-900'
+                      ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-text)]'
+                      : 'border-[var(--color-border-strong)] hover:border-[var(--color-text-muted)] bg-[var(--color-surface)] text-[var(--color-text-primary)]'
                   }`}
                 >
-                  <UserCheck className={`w-4 h-4 mb-2 ${selectedRole === 'professional' ? 'text-white' : 'text-neutral-600'}`} />
-                  <div className="text-xs font-semibold">Professional</div>
-                  <div className={`text-[11px] mt-0.5 ${selectedRole === 'professional' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                  <UserCheck className={`w-4 h-4 mb-2 ${selectedRole === 'professional' ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
+                  <div className="text-[13px] font-semibold">Professional</div>
+                  <div className={`text-xs mt-0.5 leading-snug ${selectedRole === 'professional' ? 'text-neutral-300' : 'text-[var(--color-text-secondary)]'}`}>
                     I offer design / dev services
                   </div>
                 </button>
@@ -248,33 +255,33 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       </form>
 
       {/* Quick Testing Helper */}
-      <div className="mt-6 pt-4 border-t border-neutral-100">
-        <div className="flex items-center justify-between text-[11px] font-medium text-neutral-500 mb-2">
+      <div className="mt-6 pt-4 border-t border-[var(--color-border)]">
+        <div className="flex items-center justify-between text-xs font-medium text-[var(--color-text-secondary)] mb-2">
           <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span className="font-semibold text-neutral-700">Quick Evaluation Helpers:</span>
+            <Sparkles className="w-3.5 h-3.5 text-[var(--color-warning)]" />
+            <span className="font-semibold text-[var(--color-text-primary)]">Quick Evaluation Helpers:</span>
           </div>
-          <span className="text-[10px] text-neutral-400 font-mono">dev pass: alongby123</span>
+          <span className="text-xs text-[var(--color-text-muted)] tabular-nums">dev pass: alongby123</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           <button
             type="button"
             onClick={() => fillDemoAccount('client')}
-            className="text-[11px] px-2.5 py-1 rounded-md bg-neutral-100 hover:bg-neutral-200 text-neutral-800 transition-colors font-medium cursor-pointer"
+            className="text-xs px-2.5 py-1.5 rounded-md bg-[var(--color-surface-secondary)] hover:bg-[#E7E3DD] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer"
           >
             Prefill Client
           </button>
           <button
             type="button"
             onClick={() => fillDemoAccount('professional')}
-            className="text-[11px] px-2.5 py-1 rounded-md bg-neutral-100 hover:bg-neutral-200 text-neutral-800 transition-colors font-medium cursor-pointer"
+            className="text-xs px-2.5 py-1.5 rounded-md bg-[var(--color-surface-secondary)] hover:bg-[#E7E3DD] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer"
           >
             Prefill Professional
           </button>
           <button
             type="button"
             onClick={() => fillDemoAccount('admin')}
-            className="text-[11px] px-2.5 py-1 rounded-md bg-neutral-100 hover:bg-neutral-200 text-neutral-800 transition-colors font-medium cursor-pointer"
+            className="text-xs px-2.5 py-1.5 rounded-md bg-[var(--color-surface-secondary)] hover:bg-[#E7E3DD] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer"
           >
             Prefill Admin
           </button>

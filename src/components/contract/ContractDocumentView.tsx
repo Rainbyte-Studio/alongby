@@ -101,33 +101,32 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-16">
       {/* Simulation / Development Notice Banner */}
-      <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-900 print:hidden">
+      <div className="bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] rounded-[var(--radius-card)] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[var(--color-warning-text)] print:hidden">
         <div className="flex items-center gap-2.5">
-          <ShieldCheck className="w-4 h-4 text-amber-700 flex-shrink-0" />
+          <ShieldCheck className="w-4 h-4 flex-shrink-0" />
           <span>
             <strong className="font-semibold">Electronic Signature Gateway ({contract.eSignature.provider}):</strong>{' '}
             {contract.eSignature.providerNotice}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Button
-            variant="secondary"
+            variant="white"
             size="sm"
             onClick={handlePrint}
-            className="flex items-center gap-1 bg-white hover:bg-neutral-50"
+            leftIcon={<Printer className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />}
           >
-            <Printer className="w-3.5 h-3.5 text-neutral-600" />
-            <span>Print / PDF Export</span>
+            Print / PDF Export
           </Button>
         </div>
       </div>
 
       {/* Contract Formal Header */}
-      <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 sm:p-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-neutral-200 pb-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-xs text-neutral-500 uppercase tracking-wider">
+      <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[var(--color-border)] pb-6">
+          <div className="space-y-1.5 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-sans text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">
                 ALONGBY MASTER SERVICES AGREEMENT
               </span>
               {isFullySigned ? (
@@ -140,16 +139,16 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
                 </Badge>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-neutral-900 tracking-tight">
+            <h1 className="typo-page-title text-[var(--color-text-primary)] tabular-nums">
               Contract Ref: {contract.contractNumber}
             </h1>
-            <p className="text-xs text-neutral-500">
-              Project: <span className="font-medium text-neutral-700">{contract.projectTitle}</span>{' '}
-              • Generated: {new Date(contract.generatedAt).toLocaleDateString()}
+            <p className="text-[13px] text-[var(--color-text-secondary)] tabular-nums">
+              Project: <span className="font-semibold text-[var(--color-text-primary)]">{contract.projectTitle}</span>{' '}
+              · Generated: {new Date(contract.generatedAt).toLocaleDateString()}
             </p>
           </div>
 
-          <div className="text-right space-y-1 text-xs text-neutral-500 font-mono">
+          <div className="sm:text-right space-y-1 text-xs text-[var(--color-text-secondary)] tabular-nums shrink-0">
             <div>Template: {contract.templateVersion}</div>
             <div>Terms: {contract.termsVersion}</div>
             <div className="truncate max-w-xs" title={contract.documentFingerprint}>
@@ -160,41 +159,41 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
 
         {/* Parties Identification Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200">
-            <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider block mb-2">
+          <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)]">
+            <span className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider block mb-2">
               Party A — Client
             </span>
             <div className="space-y-1 text-sm">
-              <div className="font-semibold text-neutral-900 flex items-center gap-2">
-                <User className="w-4 h-4 text-neutral-500" />
+              <div className="font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+                <User className="w-4 h-4 text-[var(--color-text-muted)]" />
                 <span>{contract.clientSnapshot.fullName}</span>
               </div>
               {contract.clientSnapshot.companyName && (
-                <div className="text-xs text-neutral-600">
+                <div className="text-xs text-[var(--color-text-secondary)]">
                   Company: {contract.clientSnapshot.companyName}
                 </div>
               )}
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-[var(--color-text-secondary)]">
                 Jurisdiction: {contract.clientSnapshot.country}
               </div>
             </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200">
-            <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider block mb-2">
+          <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)]">
+            <span className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider block mb-2">
               Party B — Independent Specialist
             </span>
             <div className="space-y-1 text-sm">
-              <div className="font-semibold text-neutral-900 flex items-center gap-2">
-                <Building className="w-4 h-4 text-neutral-500" />
+              <div className="font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+                <Building className="w-4 h-4 text-[var(--color-text-muted)]" />
                 <span>{contract.professionalSnapshot.fullName}</span>
               </div>
               {contract.professionalSnapshot.companyName && (
-                <div className="text-xs text-neutral-600">
+                <div className="text-xs text-[var(--color-text-secondary)]">
                   Entity/Title: {contract.professionalSnapshot.companyName}
                 </div>
               )}
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-[var(--color-text-secondary)]">
                 Jurisdiction: {contract.professionalSnapshot.country}
               </div>
             </div>
@@ -202,35 +201,35 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
         </div>
 
         {/* Commercial Summary Banner */}
-        <div className="p-4 rounded-lg bg-neutral-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-5 rounded-[var(--radius-button)] bg-[var(--color-primary)] text-[var(--color-primary-text)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 tabular-nums">
           <div>
-            <span className="text-xs text-neutral-400 uppercase tracking-wider block">
+            <span className="text-xs font-medium text-[#D6D3CD] uppercase tracking-wider block">
               Total Contract Consideration
             </span>
-            <span className="text-2xl font-bold">{totalAmountFormatted}</span>
+            <span className="text-2xl font-bold font-sans">{totalAmountFormatted}</span>
           </div>
 
-          <div className="flex items-center gap-6 text-xs text-neutral-300">
+          <div className="flex flex-wrap items-center gap-6 text-xs text-[#D6D3CD]">
             <div>
-              <span className="text-neutral-400 block">
+              <span className="block">
                 Phase 1 ({contract.proposalSnapshot.commercialTerms.phase1Percentage ?? 50}% Staged Payment Hold)
               </span>
-              <span className="font-semibold text-white">{phase1Formatted}</span>
+              <span className="font-semibold text-sm text-white">{phase1Formatted}</span>
             </div>
-            <div className="w-px h-8 bg-neutral-800" />
+            <div className="hidden sm:block w-px h-8 bg-white/15" />
             <div>
-              <span className="text-neutral-400 block">
+              <span className="block">
                 Phase 2 ({contract.proposalSnapshot.commercialTerms.phase2Percentage ?? 50}% Final Balance)
               </span>
-              <span className="font-semibold text-white">{phase2Formatted}</span>
+              <span className="font-semibold text-sm text-white">{phase2Formatted}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Contract Legal Clauses */}
-      <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 sm:p-8 space-y-6">
-        <h2 className="text-lg font-semibold text-neutral-900 border-b border-neutral-200 pb-3">
+      <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 sm:p-8 space-y-6">
+        <h2 className="typo-section-heading text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-3">
           Terms & Conditions of Services
         </h2>
 
@@ -238,12 +237,12 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
           {contract.legalSections.map((sec) => (
             <div key={sec.id} className="space-y-2">
               <div className="flex items-baseline gap-2">
-                <span className="font-mono text-xs font-semibold text-neutral-500">
+                <span className="font-sans text-xs font-semibold tabular-nums text-[var(--color-text-secondary)]">
                   {sec.sectionNumber}
                 </span>
-                <h3 className="text-sm font-semibold text-neutral-900">{sec.title}</h3>
+                <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{sec.title}</h3>
               </div>
-              <div className="text-xs text-neutral-700 leading-relaxed whitespace-pre-line bg-neutral-50/50 p-3.5 rounded border border-neutral-100 font-sans">
+              <div className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed whitespace-pre-line bg-[var(--color-surface-secondary)] p-4 rounded-[var(--radius-button)] font-sans">
                 {sec.content}
               </div>
             </div>
@@ -252,34 +251,34 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
       </div>
 
       {/* Schedule A: Deliverables & Milestones Snapshot */}
-      <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 sm:p-8 space-y-4">
-        <h2 className="text-lg font-semibold text-neutral-900 border-b border-neutral-200 pb-3">
+      <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 sm:p-8 space-y-4">
+        <h2 className="typo-section-heading text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-3 tabular-nums">
           Schedule A: Scope & Milestones (Accepted Proposal Snapshot v{contract.proposalVersion})
         </h2>
 
         <div className="space-y-4">
-          <div className="text-xs text-neutral-700 bg-neutral-50 p-4 rounded-lg border border-neutral-200">
-            <strong className="block mb-1 text-neutral-900">Agreed Scope Summary:</strong>
+          <div className="text-xs text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] p-4 rounded-[var(--radius-button)] leading-relaxed">
+            <strong className="block mb-1 text-[var(--color-text-primary)]">Agreed Scope Summary</strong>
             {contract.proposalSnapshot.scopeSummary}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {contract.proposalSnapshot.deliverables.map((del) => (
-              <div key={del.id} className="p-4 rounded-lg border border-neutral-200 bg-white">
+              <div key={del.id} className="p-4 rounded-[var(--radius-button)] border border-[var(--color-border)] bg-[var(--color-surface)]">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="w-5 h-5 rounded-full bg-neutral-900 text-white text-[10px] font-bold flex items-center justify-center">
+                  <span className="w-5 h-5 rounded-full bg-[var(--color-primary)] text-[var(--color-primary-text)] text-[10px] font-bold tabular-nums flex items-center justify-center shrink-0">
                     {del.phase}
                   </span>
-                  <span className="text-xs font-semibold text-neutral-900">{del.title}</span>
+                  <span className="text-xs font-semibold text-[var(--color-text-primary)]">{del.title}</span>
                 </div>
-                <p className="text-xs text-neutral-600 mb-3">{del.description}</p>
-                <div className="text-[11px] font-semibold text-neutral-700 uppercase mb-1">
+                <p className="text-xs text-[var(--color-text-secondary)] mb-3 leading-relaxed">{del.description}</p>
+                <div className="text-[11px] font-semibold text-[var(--color-text-primary)] uppercase tracking-wider mb-1">
                   Acceptance Criteria
                 </div>
                 <ul className="space-y-1">
                   {del.acceptanceCriteria.map((c, i) => (
-                    <li key={i} className="text-xs text-neutral-600 flex items-start gap-1.5">
-                      <span className="text-emerald-600 font-bold">✓</span>
+                    <li key={i} className="text-xs text-[var(--color-text-secondary)] flex items-start gap-1.5">
+                      <span className="text-[var(--color-success)] font-bold">✓</span>
                       <span>{c}</span>
                     </li>
                   ))}
@@ -291,18 +290,18 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
       </div>
 
       {/* Electronic Execution & Signatures Section */}
-      <div className="bg-white rounded-xl border-2 border-neutral-900 shadow-md p-6 sm:p-8 space-y-6">
-        <div className="border-b border-neutral-200 pb-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-neutral-900 flex items-center gap-2">
-              <Lock className="w-5 h-5 text-neutral-800" />
+      <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border-strong)] shadow-[var(--shadow-card)] p-6 sm:p-8 space-y-6">
+        <div className="border-b border-[var(--color-border)] pb-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="typo-section-heading text-[var(--color-text-primary)] flex items-center gap-2">
+              <Lock className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
               <span>Electronic Signatures & Verification</span>
             </h2>
-            <span className="text-xs font-mono text-neutral-500">
+            <span className="text-xs font-sans font-medium tabular-nums text-[var(--color-text-secondary)]">
               Envelope ID: {contract.eSignature.envelopeId}
             </span>
           </div>
-          <p className="text-xs text-neutral-600 mt-1">
+          <p className="text-[13px] text-[var(--color-text-secondary)] mt-1.5 leading-relaxed">
             Signatures recorded in development mode simulate electronic execution for review and testing. In production, this workflow connects to a certified external electronic signature provider.
           </p>
         </div>
@@ -311,14 +310,14 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Client Signer Box */}
           <div
-            className={`p-5 rounded-lg border-2 ${
+            className={`p-5 rounded-[var(--radius-button)] border ${
               isClientSigned
-                ? 'border-emerald-300 bg-emerald-50/50'
-                : 'border-dashed border-neutral-300 bg-neutral-50'
+                ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)]'
+                : 'border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-secondary)]'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <span className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">
                 Client Signatory
               </span>
               {isClientSigned ? (
@@ -334,11 +333,11 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
 
             {isClientSigned ? (
               <div className="space-y-2">
-                <div className="font-serif italic text-xl text-neutral-900 border-b border-emerald-200 pb-2">
+                <div className="font-serif font-semibold text-xl text-[var(--color-text-primary)] border-b border-[var(--color-success-border)] pb-2 break-words">
                   {clientSigner?.typedSignature || clientSigner?.name}
                 </div>
-                <div className="text-xs text-neutral-600 space-y-0.5 font-mono">
-                  <div>Signer: {clientSigner?.name}</div>
+                <div className="text-xs text-[var(--color-text-secondary)] space-y-0.5 font-sans tabular-nums">
+                  <div>Signer: <span className="font-medium text-[var(--color-text-primary)]">{clientSigner?.name}</span></div>
                   <div>
                     Timestamp:{' '}
                     {new Date(clientSigner!.signedAt!).toLocaleString(undefined, {
@@ -347,28 +346,28 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
                     })}
                   </div>
                   <div>Sim-Code: {clientSigner?.verificationCode}</div>
-                  <div className="text-[10px] text-neutral-400">Address: {clientSigner?.ipAddress}</div>
+                  <div>Address: {clientSigner?.ipAddress}</div>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-6 text-xs text-neutral-500 space-y-1">
-                <Clock className="w-6 h-6 text-neutral-400 mx-auto mb-1" />
-                <p className="font-medium text-neutral-700">Awaiting signature from Client</p>
-                <p className="text-neutral-400">{clientSigner?.name}</p>
+              <div className="text-center py-6 text-xs text-[var(--color-text-secondary)] space-y-1">
+                <Clock className="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1" />
+                <p className="font-medium text-[var(--color-text-primary)]">Awaiting signature from Client</p>
+                <p>{clientSigner?.name}</p>
               </div>
             )}
           </div>
 
           {/* Specialist Signer Box */}
           <div
-            className={`p-5 rounded-lg border-2 ${
+            className={`p-5 rounded-[var(--radius-button)] border ${
               isProfSigned
-                ? 'border-emerald-300 bg-emerald-50/50'
-                : 'border-dashed border-neutral-300 bg-neutral-50'
+                ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)]'
+                : 'border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-secondary)]'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <span className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">
                 Specialist Signatory
               </span>
               {isProfSigned ? (
@@ -384,11 +383,11 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
 
             {isProfSigned ? (
               <div className="space-y-2">
-                <div className="font-serif italic text-xl text-neutral-900 border-b border-emerald-200 pb-2">
+                <div className="font-serif font-semibold text-xl text-[var(--color-text-primary)] border-b border-[var(--color-success-border)] pb-2 break-words">
                   {profSigner?.typedSignature || profSigner?.name}
                 </div>
-                <div className="text-xs text-neutral-600 space-y-0.5 font-mono">
-                  <div>Signer: {profSigner?.name}</div>
+                <div className="text-xs text-[var(--color-text-secondary)] space-y-0.5 font-sans tabular-nums">
+                  <div>Signer: <span className="font-medium text-[var(--color-text-primary)]">{profSigner?.name}</span></div>
                   <div>
                     Timestamp:{' '}
                     {new Date(profSigner!.signedAt!).toLocaleString(undefined, {
@@ -397,14 +396,14 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
                     })}
                   </div>
                   <div>Sim-Code: {profSigner?.verificationCode}</div>
-                  <div className="text-[10px] text-neutral-400">Address: {profSigner?.ipAddress}</div>
+                  <div>Address: {profSigner?.ipAddress}</div>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-6 text-xs text-neutral-500 space-y-1">
-                <Clock className="w-6 h-6 text-neutral-400 mx-auto mb-1" />
-                <p className="font-medium text-neutral-700">Awaiting signature from Specialist</p>
-                <p className="text-neutral-400">{profSigner?.name}</p>
+              <div className="text-center py-6 text-xs text-[var(--color-text-secondary)] space-y-1">
+                <Clock className="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1" />
+                <p className="font-medium text-[var(--color-text-primary)]">Awaiting signature from Specialist</p>
+                <p>{profSigner?.name}</p>
               </div>
             )}
           </div>
@@ -412,9 +411,9 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
 
         {/* Signature Action Box (for current user) */}
         {canSign && (
-          <div className="p-5 rounded-lg bg-neutral-50 border border-neutral-200 space-y-4 mt-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-neutral-900">
+          <div className="p-5 sm:p-6 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] space-y-4 mt-6">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="typo-card-title text-[var(--color-text-primary)]">
                 Execute Signature as {isClient ? 'Client' : isProfessional ? 'Specialist' : 'Authorized Signatory'}
               </h3>
               <Badge variant="warning" size="sm">
@@ -422,12 +421,12 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
               </Badge>
             </div>
 
-            <p className="text-xs text-neutral-600 bg-amber-50/70 p-3 rounded border border-amber-200">
+            <p className="text-xs text-[var(--color-warning-text)] bg-[var(--color-warning-bg)] p-3.5 rounded-[var(--radius-button)] border border-[var(--color-warning-border)] leading-relaxed">
               <strong>Development Notice:</strong> Typing your name below simulates electronic signature execution via AlongbyDevelopmentSignatureAdapter. In a production environment, this triggers an external certified e-signature envelope via DocuSign or HelloSign.
             </p>
 
             {errorMsg && (
-              <div className="p-3 rounded bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center gap-2">
+              <div className="p-3.5 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-center gap-2 font-medium">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{errorMsg}</span>
               </div>
@@ -439,16 +438,16 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
                   type="checkbox"
                   checked={agreedTerms}
                   onChange={(e) => setAgreedTerms(e.target.checked)}
-                  className="mt-1 h-4 w-4 text-neutral-900 rounded border-neutral-300 focus:ring-neutral-900"
+                  className="mt-1 h-4 w-4 accent-[var(--color-primary)] rounded border-[var(--color-border-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                 />
-                <span className="text-xs text-neutral-700 leading-relaxed">
+                <span className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
                   I acknowledge and approve the terms of this Master Services Agreement ({contract.contractNumber})
                   and all incorporated Schedules, including the staged payment protection terms. I acknowledge that my typed signature below is recorded under development simulation.
                 </span>
               </label>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
                   Type Your Full Legal Name [Dev Simulation]
                 </label>
                 <input
@@ -456,7 +455,7 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
                   value={typedSignature}
                   onChange={(e) => setTypedSignature(e.target.value)}
                   placeholder={currentUserSigner?.name || 'e.g. Jane Doe'}
-                  className="w-full max-w-md px-3 py-2 text-base font-serif border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-900 focus:outline-none"
+                  className="w-full max-w-md px-3.5 py-2.5 min-h-[40px] font-sans text-sm font-normal text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] placeholder:text-[var(--color-text-muted)] focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] focus:outline-none"
                 />
               </div>
 
@@ -465,7 +464,6 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
                   variant="primary"
                   onClick={handleSign}
                   disabled={isSigning || !agreedTerms || !typedSignature.trim()}
-                  className="shadow-sm"
                 >
                   {isSigning ? 'Recording Test Signature...' : 'Execute Test Signature (Dev Simulation)'}
                 </Button>
@@ -476,14 +474,14 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
 
         {/* Fully Signed Next Steps Banner */}
         {isFullySigned && (
-          <div className="p-5 rounded-lg bg-emerald-50 border border-emerald-300 space-y-2">
+          <div className="p-5 rounded-[var(--radius-button)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] space-y-2">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-              <h3 className="text-sm font-bold text-emerald-900">
+              <CheckCircle2 className="w-5 h-5 text-[var(--color-success-text)] flex-shrink-0" />
+              <h3 className="text-sm font-bold text-[var(--color-success-text)]">
                 Agreement Fully Executed by Both Parties
               </h3>
             </div>
-            <p className="text-xs text-emerald-800 leading-relaxed">
+            <p className="text-xs text-[var(--color-success-text)] leading-relaxed">
               Master Services Contract {contract.contractNumber} has been countersigned by both Client and Specialist.
               In accordance with platform governance, the project state is now <strong>awaiting_deposit</strong>.
               Execution kickoff will commence immediately upon Phase 1 staged payment deposit funding (Phase 6).
@@ -492,11 +490,12 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
         )}
 
         {/* Audit Trail Drawer Toggle */}
-        <div className="pt-4 border-t border-neutral-200">
+        <div className="pt-4 border-t border-[var(--color-border)]">
           <button
             type="button"
+            aria-expanded={showAuditTrail}
             onClick={() => setShowAuditTrail(!showAuditTrail)}
-            className="flex items-center gap-1.5 text-xs font-medium text-neutral-600 hover:text-neutral-900"
+            className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
           >
             <History className="w-3.5 h-3.5" />
             <span>
@@ -506,21 +505,21 @@ export const ContractDocumentView: React.FC<ContractDocumentViewProps> = ({
           </button>
 
           {showAuditTrail && (
-            <div className="mt-3 p-4 rounded-lg bg-neutral-900 text-neutral-200 font-mono text-xs space-y-2">
-              <div className="text-neutral-400 text-[11px] pb-1 border-b border-neutral-800">
+            <div className="mt-3 p-4 rounded-[var(--radius-button)] bg-[var(--color-primary)] text-[#E5E3DF] font-sans tabular-nums text-xs space-y-2">
+              <div className="text-[#A8A39D] text-[11px] pb-1.5 border-b border-white/10 break-all">
                 Document Hash: {contract.documentFingerprint}
               </div>
               {contract.eSignature.auditLog.map((entry, idx) => (
-                <div key={idx} className="space-y-0.5 border-b border-neutral-800/60 pb-1.5">
-                  <div className="text-neutral-400 text-[10px]">
+                <div key={idx} className="space-y-0.5 border-b border-white/10 pb-1.5 last:border-b-0">
+                  <div className="text-[#A8A39D] text-[11px]">
                     [{new Date(entry.timestamp).toISOString()}] — {entry.action}
                   </div>
-                  <div className="text-emerald-400">
+                  <div className="text-[#A7F3D0] font-medium">
                     {entry.actor} ({entry.actorRole})
                   </div>
-                  {entry.details && <div className="text-neutral-300">{entry.details}</div>}
+                  {entry.details && <div className="text-[#E5E3DF]">{entry.details}</div>}
                   {entry.ipAddress && (
-                    <div className="text-neutral-500 text-[10px]">Host: {entry.ipAddress}</div>
+                    <div className="text-[#A8A39D] text-[11px]">Host: {entry.ipAddress}</div>
                   )}
                 </div>
               ))}

@@ -25,18 +25,11 @@ import {
   Star,
   Check,
   X,
-  FileText,
   AlertCircle,
   Sparkles,
   ExternalLink,
-  ChevronRight,
-  Info,
-  HelpCircle,
   ArrowRight,
-  Send,
-  Building2,
   MapPin,
-  Globe,
 } from 'lucide-react';
 
 export const ClientMatchesPage: React.FC = () => {
@@ -83,6 +76,19 @@ export const ClientMatchesPage: React.FC = () => {
     loadData();
   }, [projectId]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (candidateToSelect && !selecting) {
+        setCandidateToSelect(null);
+      } else if (inspectCandidate) {
+        setInspectCandidate(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [candidateToSelect, inspectCandidate, selecting]);
+
   const handleConfirmSelection = async () => {
     if (!project || !candidateToSelect || !currentUser) return;
     try {
@@ -122,7 +128,7 @@ export const ClientMatchesPage: React.FC = () => {
       <DashboardLayout role="client">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-sm text-stone-500 font-sans">
+          <p className="mt-4 text-sm text-[var(--color-text-secondary)] font-sans">
             Curating your personalized professional presentation...
           </p>
         </div>
@@ -183,25 +189,27 @@ export const ClientMatchesPage: React.FC = () => {
         <div className="max-w-4xl mx-auto space-y-6">
           <Link
             to={`/client/projects/${project.id}`}
-            className="inline-flex items-center text-xs font-medium text-stone-500 hover:text-stone-900 transition-colors"
+            className="inline-flex items-center text-[13px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors rounded-[var(--radius-button)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
           >
             <ArrowLeft className="w-4 h-4 mr-1.5" />
             Back to Project Brief
           </Link>
 
-          <Card className="p-8 text-center space-y-4 border-stone-200 bg-white">
-            <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center text-stone-700 mx-auto">
+          <Card className="p-8 text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-[var(--color-surface-secondary)] flex items-center justify-center text-[var(--color-text-primary)] mx-auto">
               <Sparkles className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl font-serif text-stone-900">
+            <h2 className="typo-section-heading text-[var(--color-text-primary)]">
               We are currently vetting and curating your matches
             </h2>
-            <p className="text-sm text-stone-600 max-w-lg mx-auto font-sans leading-relaxed">
-              Our curation team is currently vetting professional responses, checking real-time capacity, and verifying customized quotes for "<strong>{project.title}</strong>".
+            <p className="text-sm text-[var(--color-text-secondary)] max-w-lg mx-auto font-sans leading-relaxed">
+              Our curation team is currently vetting professional responses, checking real-time capacity, and verifying customized quotes for "<strong className="text-[var(--color-text-primary)]">{project.title}</strong>".
             </p>
-            <div className="p-4 bg-stone-50 rounded-xl max-w-md mx-auto border border-stone-200 text-xs text-stone-600 text-left space-y-2">
-              <span className="font-semibold text-stone-800 block">The Alongby Difference:</span>
-              <p>You won't receive a generic public marketplace directory with hundreds of cold pitches. Instead, you'll receive a tailored, side-by-side comparison of 2–3 verified specialists with guaranteed availability and fixed commercial terms.</p>
+            <div className="p-4 bg-[var(--color-surface-secondary)] rounded-[var(--radius-card)] max-w-md mx-auto text-xs text-[var(--color-text-secondary)] text-left space-y-1.5">
+              <span className="font-semibold text-[var(--color-text-primary)] block">The Alongby Difference</span>
+              <p className="leading-relaxed">
+                You won't receive a generic public marketplace directory with hundreds of cold pitches. Instead, you'll receive a tailored, side-by-side comparison of 2–3 verified specialists with guaranteed availability and fixed commercial terms.
+              </p>
             </div>
             <div className="pt-2">
               <Link to={`/client/projects/${project.id}`}>
@@ -224,35 +232,35 @@ export const ClientMatchesPage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-8 pb-12">
         {/* Navigation & Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <Link
               to={`/client/projects/${project.id}`}
-              className="inline-flex items-center text-xs font-medium text-stone-500 hover:text-stone-900 transition-colors mb-2"
+              className="inline-flex items-center text-[13px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-2 rounded-[var(--radius-button)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
             >
               <ArrowLeft className="w-4 h-4 mr-1.5" />
               Back to Project Brief
             </Link>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-serif text-stone-900 tracking-tight">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="typo-page-title text-[var(--color-text-primary)]">
                 Curated Professional Matches
               </h1>
               {isSelectionMade ? (
                 <Badge variant="success" size="md">
-                  <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                   Professional Selected
                 </Badge>
               ) : (
-                <Badge variant="outline" size="md">
+                <Badge variant="outline" size="md" className="tabular-nums">
                   {shortlist.candidates.length} Vetted Specialists
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-stone-600 font-sans mt-1">
-              Review and compare quotes from verified specialists hand-selected for "<strong>{project.title}</strong>".
+            <p className="text-sm text-[var(--color-text-secondary)] font-sans mt-1.5 leading-relaxed">
+              Review and compare quotes from verified specialists hand-selected for "<strong className="font-semibold text-[var(--color-text-primary)]">{project.title}</strong>".
             </p>
           </div>
 
-          <Link to={`/client/projects/${project.id}`}>
+          <Link to={`/client/projects/${project.id}`} className="shrink-0 w-fit">
             <Button variant="outline" size="sm">
               Project Overview
             </Button>
@@ -261,24 +269,38 @@ export const ClientMatchesPage: React.FC = () => {
 
         {/* Notifications / Alerts */}
         {successMsg && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+          <div
+            role="status"
+            className="p-4 bg-[var(--color-success-bg)] border border-[var(--color-success-border)] rounded-[var(--radius-card)] text-sm text-[var(--color-success-text)] flex items-center justify-between gap-3"
+          >
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-5 h-5 shrink-0" />
               <span>{successMsg}</span>
             </div>
-            <button onClick={() => setSuccessMsg(null)} className="text-emerald-600 hover:text-emerald-800 text-xs">
+            <button
+              type="button"
+              onClick={() => setSuccessMsg(null)}
+              className="text-xs font-medium underline shrink-0 cursor-pointer"
+            >
               Dismiss
             </button>
           </div>
         )}
 
         {errorMsg && (
-          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+          <div
+            role="alert"
+            className="p-4 bg-[var(--color-error-bg)] border border-[var(--color-error-border)] rounded-[var(--radius-card)] text-sm text-[var(--color-error-text)] flex items-center justify-between gap-3"
+          >
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="w-5 h-5 shrink-0" />
               <span>{errorMsg}</span>
             </div>
-            <button onClick={() => setErrorMsg(null)} className="text-rose-600 hover:text-rose-800 text-xs">
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="text-xs font-medium underline shrink-0 cursor-pointer"
+            >
               Dismiss
             </button>
           </div>
@@ -286,22 +308,22 @@ export const ClientMatchesPage: React.FC = () => {
 
         {/* Selection Banner if Selection Made */}
         {isSelectionMade && (
-          <Card className="p-6 border-emerald-300 bg-emerald-50/70 shadow-sm">
+          <Card className="p-6 border-[var(--color-success-border)] bg-[var(--color-success-bg)]">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  <h2 className="font-serif text-lg font-medium text-emerald-950">
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 text-[var(--color-success-text)]">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <h2 className="typo-section-heading text-[var(--color-text-primary)]">
                     Professional Selection Confirmed
                   </h2>
                 </div>
-                <p className="text-xs text-emerald-800 font-sans max-w-2xl leading-relaxed">
+                <p className="text-[13px] text-[var(--color-success-text)] font-sans max-w-2xl leading-relaxed">
                   You selected{' '}
-                  <strong>
+                  <strong className="font-semibold text-[var(--color-text-primary)]">
                     {selection?.selectionSnapshot?.professionalName || 'the specialist'}
                   </strong>{' '}
                   for a total commercial proposal of{' '}
-                  <strong>
+                  <strong className="font-semibold tabular-nums text-[var(--color-text-primary)]">
                     {selection?.selectionSnapshot
                       ? `${(selection.selectionSnapshot.amountMinor / 100).toLocaleString()} ${selection.selectionSnapshot.currency}`
                       : 'the submitted quote'}
@@ -310,11 +332,14 @@ export const ClientMatchesPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
                 <Link to={`/client/projects/${project.id}/proposal`}>
-                  <Button variant="primary" size="sm">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    rightIcon={<ArrowRight className="w-4 h-4" />}
+                  >
                     Review Commercial Proposal
-                    <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Button>
                 </Link>
               </div>
@@ -325,7 +350,7 @@ export const ClientMatchesPage: React.FC = () => {
         {/* Curated 2–3 Candidates Comparison Deck */}
         <div
           className={`grid grid-cols-1 ${
-            shortlist.candidates.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'
+            shortlist.candidates.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'
           } gap-6 items-stretch`}
         >
           {shortlist.candidates.map((cand, idx) => {
@@ -335,137 +360,134 @@ export const ClientMatchesPage: React.FC = () => {
             return (
               <Card
                 key={cand.professionalId}
-                className={`p-6 flex flex-col justify-between transition-all relative ${
+                className={`p-6 flex flex-col justify-between transition-colors ${
                   isSelected
-                    ? 'border-emerald-600 ring-2 ring-emerald-500/20 bg-emerald-50/10'
+                    ? 'border-[var(--color-success)] ring-1 ring-[var(--color-success)] bg-[var(--color-surface)]'
                     : isRec
-                    ? 'border-amber-400/80 bg-white shadow-md'
-                    : 'border-stone-200 bg-white hover:border-stone-300 shadow-sm'
+                    ? 'border-[var(--color-primary)] bg-[var(--color-surface)]'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-strong)]'
                 }`}
               >
-                {/* Ribbon for Recommended or Selected */}
-                {isSelected ? (
-                  <div className="absolute -top-3 left-6">
-                    <span className="bg-emerald-700 text-white text-[11px] font-medium px-3 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
-                      <Check className="w-3 h-3" />
-                      Selected Partner
-                    </span>
-                  </div>
-                ) : isRec ? (
-                  <div className="absolute -top-3 left-6">
-                    <span className="bg-stone-900 text-amber-300 text-[11px] font-medium px-3 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
-                      <Star className="w-3 h-3 fill-amber-300 text-amber-300" />
-                      Alongby Recommended
-                    </span>
-                  </div>
-                ) : null}
-
                 <div className="space-y-5">
+                  {/* Integrated Status Row (no floating pill ribbons) */}
+                  <div className="flex items-center justify-between gap-2 pb-3 border-b border-[var(--color-border)]">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)] tabular-nums">
+                      Option {idx + 1} of {shortlist.candidates.length}
+                    </span>
+
+                    {isSelected ? (
+                      <Badge variant="success" size="sm">
+                        <Check className="w-3 h-3" />
+                        Selected Partner
+                      </Badge>
+                    ) : isRec ? (
+                      <Badge variant="warning" size="sm">
+                        <Star className="w-3 h-3 fill-current" />
+                        Alongby Recommended
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" size="sm">
+                        <ShieldCheck className="w-3 h-3 text-[var(--color-success)]" />
+                        Verified
+                      </Badge>
+                    )}
+                  </div>
+
                   {/* Professional Header */}
-                  <div className="pt-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="w-12 h-12 rounded-full bg-stone-100 border border-stone-200 text-stone-800 flex items-center justify-center font-serif text-lg flex-shrink-0">
+                  <div>
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-11 h-11 rounded-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] flex items-center justify-center font-sans font-semibold text-base shrink-0">
                         {cand.professional.displayName?.charAt(0) || 'P'}
                       </div>
-                      <div className="flex flex-col items-end">
-                        <Badge variant="outline" size="sm">
-                          <ShieldCheck className="w-3 h-3 mr-1 text-emerald-600" />
-                          Verified
-                        </Badge>
-                        <span className="text-[11px] text-stone-400 font-sans mt-1">
-                          Option {idx + 1} of {shortlist.candidates.length}
-                        </span>
+                      <div className="min-w-0">
+                        <h3 className="typo-card-title text-[var(--color-text-primary)] break-words">
+                          {cand.professional.displayName}
+                        </h3>
+                        <p className="text-[13px] text-[var(--color-text-secondary)] font-medium font-sans mt-0.5 truncate">
+                          {cand.professional.professionalTitle}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="mt-3">
-                      <h3 className="text-xl font-serif text-stone-900 font-medium tracking-tight">
-                        {cand.professional.displayName}
-                      </h3>
-                      <p className="text-xs text-stone-500 font-sans mt-0.5">
-                        {cand.professional.professionalTitle}
-                      </p>
-                      <div className="flex items-center gap-3 text-[11px] text-stone-400 font-sans mt-1.5 flex-wrap">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {cand.professional.country}
-                        </span>
-                        <span>•</span>
-                        <span>{cand.professional.yearsOfExperience}+ yrs exp</span>
-                        {cand.professional.completedProjectCount ? (
-                          <>
-                            <span>•</span>
-                            <span>{cand.professional.completedProjectCount} projects</span>
-                          </>
-                        ) : null}
-                      </div>
+                    <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] tabular-nums font-sans mt-3 flex-wrap">
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="w-3 h-3 shrink-0" />
+                        {cand.professional.country}
+                      </span>
+                      <span aria-hidden="true">·</span>
+                      <span>{cand.professional.yearsOfExperience}+ yrs exp</span>
+                      {cand.professional.completedProjectCount ? (
+                        <>
+                          <span aria-hidden="true">·</span>
+                          <span>{cand.professional.completedProjectCount} projects</span>
+                        </>
+                      ) : null}
                     </div>
                   </div>
 
-                  {/* Why We Matched You (Clean, natural explanation, strictly NO raw scores) */}
-                  <div className="p-3.5 bg-stone-50 rounded-xl border border-stone-100 text-xs space-y-1.5">
-                    <span className="font-semibold text-stone-900 flex items-center gap-1.5 text-xs">
-                      <Sparkles className="w-3.5 h-3.5 text-stone-600" />
-                      Why we matched you:
+                  {/* Why We Matched You (Clean muted block without nested border) */}
+                  <div className="p-3.5 bg-[var(--color-surface-secondary)] rounded-[var(--radius-button)] text-[13px] space-y-1.5">
+                    <span className="font-semibold text-[var(--color-text-primary)] flex items-center gap-1.5 text-xs">
+                      <Sparkles className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />
+                      Why we matched you
                     </span>
-                    <p className="text-stone-600 leading-relaxed font-sans">
+                    <p className="text-[var(--color-text-secondary)] leading-relaxed font-sans">
                       {cand.clientSafeMatchReason}
                     </p>
                   </div>
 
                   {/* Recommendation Rationale if provided */}
                   {isRec && cand.recommendationRationale && (
-                    <div className="p-3 bg-amber-50/70 border border-amber-200/70 rounded-xl text-xs text-amber-900">
-                      <span className="font-semibold block mb-0.5">Curator Note:</span>
-                      <p className="text-amber-800">{cand.recommendationRationale}</p>
+                    <div className="p-3 bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] rounded-[var(--radius-button)] text-xs text-[var(--color-warning-text)]">
+                      <span className="font-semibold block mb-0.5">Curator Note</span>
+                      <p className="leading-relaxed">{cand.recommendationRationale}</p>
                     </div>
                   )}
 
-                  {/* Commercial Quote Summary */}
-                  <div className="p-4 bg-stone-50/50 rounded-xl border border-stone-200/70 space-y-3">
-                    <div className="flex items-baseline justify-between border-b border-stone-200 pb-2">
-                      <span className="text-xs text-stone-500 font-sans uppercase tracking-wider">
-                        Total Commercial Quote
+                  {/* Commercial Quote Summary (Flat editorial section separated by hairline) */}
+                  <div className="pt-4 border-t border-[var(--color-border)] space-y-3">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-[0.06em]">
+                        Commercial Quote
                       </span>
                       <div className="text-right">
-                        <span className="text-xl font-serif font-semibold text-stone-900">
+                        <span className="text-xl font-sans font-bold tabular-nums text-[var(--color-text-primary)]">
                           {(cand.quote.amountMinor / 100).toLocaleString()} {cand.quote.currency}
                         </span>
                         {cand.quote.quoteType === 'alternative' && (
-                          <span className="text-[10px] text-amber-700 font-medium block">
-                            (Custom Alternative Scope)
+                          <span className="text-[11px] text-[var(--color-warning-text)] font-medium block">
+                            Custom Alternative Scope
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-xs text-stone-600 font-sans">
+                    <div className="grid grid-cols-2 gap-2 text-xs text-[var(--color-text-secondary)] font-sans">
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-stone-400" />
+                        <Calendar className="w-3.5 h-3.5 text-[var(--color-text-secondary)] shrink-0" />
                         <span>
                           Starts:{' '}
-                          <strong className="text-stone-800">
+                          <strong className="font-semibold tabular-nums text-[var(--color-text-primary)]">
                             {cand.quote.proposedStartDate || 'On confirmation'}
                           </strong>
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-stone-400" />
+                        <Clock className="w-3.5 h-3.5 text-[var(--color-text-secondary)] shrink-0" />
                         <span>
                           Timeline:{' '}
-                          <strong className="text-stone-800">
+                          <strong className="font-semibold tabular-nums text-[var(--color-text-primary)]">
                             {cand.quote.estimatedDurationDays} days
                           </strong>
                         </span>
                       </div>
                     </div>
 
-                    {/* Highlights bullets */}
                     {cand.keyMatchHighlights && cand.keyMatchHighlights.length > 0 && (
-                      <div className="pt-1 space-y-1">
+                      <div className="pt-1 space-y-1.5">
                         {cand.keyMatchHighlights.map((hl, i) => (
-                          <div key={i} className="flex items-start gap-1.5 text-xs text-stone-600 font-sans">
-                            <Check className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                          <div key={i} className="flex items-start gap-1.5 text-xs text-[var(--color-text-secondary)] font-sans">
+                            <Check className="w-3.5 h-3.5 text-[var(--color-success)] shrink-0 mt-0.5" />
                             <span>{hl}</span>
                           </div>
                         ))}
@@ -475,17 +497,19 @@ export const ClientMatchesPage: React.FC = () => {
 
                   {/* Included Deliverables preview */}
                   {cand.quote.includedItems && cand.quote.includedItems.length > 0 && (
-                    <div className="space-y-1.5 text-xs font-sans">
-                      <span className="font-semibold text-stone-800 block">Scope Inclusions:</span>
-                      <ul className="space-y-1 text-stone-600">
+                    <div className="pt-4 border-t border-[var(--color-border)] space-y-1.5 text-xs font-sans">
+                      <span className="font-semibold text-[var(--color-text-primary)] block">
+                        Scope Inclusions
+                      </span>
+                      <ul className="space-y-1 text-[var(--color-text-secondary)]">
                         {cand.quote.includedItems.slice(0, 3).map((item, i) => (
                           <li key={i} className="flex items-start gap-1.5">
-                            <span className="text-stone-400 font-mono">•</span>
+                            <span className="text-[var(--color-text-muted)]" aria-hidden="true">·</span>
                             <span className="line-clamp-1">{item}</span>
                           </li>
                         ))}
                         {cand.quote.includedItems.length > 3 && (
-                          <li className="text-[11px] text-stone-400 font-medium pl-3">
+                          <li className="text-xs text-[var(--color-text-secondary)] font-medium tabular-nums pl-3">
                             + {cand.quote.includedItems.length - 3} more deliverables
                           </li>
                         )}
@@ -495,11 +519,11 @@ export const ClientMatchesPage: React.FC = () => {
                 </div>
 
                 {/* Card Action Footer */}
-                <div className="pt-6 mt-6 border-t border-stone-200 space-y-2">
+                <div className="pt-5 mt-6 border-t border-[var(--color-border)] space-y-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full text-xs"
+                    className="w-full"
                     onClick={() => setInspectCandidate(cand)}
                   >
                     View Full Proposal & Portfolio
@@ -515,8 +539,8 @@ export const ClientMatchesPage: React.FC = () => {
                       Select {cand.professional.displayName.split(' ')[0]}
                     </Button>
                   ) : isSelected ? (
-                    <div className="p-2 bg-emerald-100/70 text-emerald-800 rounded-lg text-center text-xs font-medium flex items-center justify-center gap-1.5">
-                      <Check className="w-4 h-4 text-emerald-600" />
+                    <div className="p-2.5 bg-[var(--color-success-bg)] border border-[var(--color-success-border)] text-[var(--color-success-text)] rounded-[var(--radius-button)] text-center text-xs font-semibold flex items-center justify-center gap-1.5">
+                      <Check className="w-4 h-4 shrink-0" />
                       Confirmed Selection
                     </div>
                   ) : null}
@@ -528,38 +552,47 @@ export const ClientMatchesPage: React.FC = () => {
 
         {/* Detailed Inspection Modal */}
         {inspectCandidate && (
-          <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
-            <Card className="max-w-3xl w-full p-6 sm:p-8 bg-white shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-[#171717]/45 flex items-center justify-center p-4 z-50">
+            <div
+              className="fixed inset-0"
+              onClick={() => setInspectCandidate(null)}
+              aria-hidden="true"
+            />
+            <div
+              role="dialog"
+              aria-modal="true"
+              className="relative z-10 max-w-3xl w-full bg-[var(--color-surface)] rounded-[var(--radius-modal)] border border-[var(--color-border)] shadow-[var(--shadow-overlay)] max-h-[90vh] flex flex-col overflow-hidden"
+            >
               {/* Modal Header */}
-              <div className="flex items-start justify-between border-b border-stone-200 pb-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-full bg-stone-100 border border-stone-200 text-stone-800 flex items-center justify-center font-serif text-2xl flex-shrink-0">
+              <div className="flex items-start justify-between gap-4 p-6 border-b border-[var(--color-border)]">
+                <div className="flex items-start gap-4 min-w-0">
+                  <div className="w-12 h-12 rounded-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] flex items-center justify-center font-sans font-semibold text-lg shrink-0">
                     {inspectCandidate.professional.displayName?.charAt(0) || 'P'}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="text-2xl font-serif text-stone-900 font-medium">
+                      <h2 className="typo-section-heading text-[var(--color-text-primary)] break-words">
                         {inspectCandidate.professional.displayName}
                       </h2>
                       <Badge variant="outline" size="sm">
-                        <ShieldCheck className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                        <ShieldCheck className="w-3.5 h-3.5 text-[var(--color-success)]" />
                         Verified Specialist
                       </Badge>
                       {inspectCandidate.isRecommended && (
                         <Badge variant="warning" size="sm">
-                          <Star className="w-3 h-3 mr-1 fill-amber-500 text-amber-500" />
+                          <Star className="w-3 h-3 fill-current" />
                           Recommended
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-stone-600 font-sans mt-0.5">
-                      {inspectCandidate.professional.professionalTitle} • {inspectCandidate.professional.country} ({inspectCandidate.professional.timezone})
+                    <p className="text-sm text-[var(--color-text-secondary)] font-sans mt-0.5">
+                      {inspectCandidate.professional.professionalTitle} · {inspectCandidate.professional.country} ({inspectCandidate.professional.timezone})
                     </p>
-                    <div className="flex items-center gap-3 text-xs text-stone-400 font-sans mt-1">
+                    <div className="flex items-center gap-2.5 text-xs text-[var(--color-text-secondary)] tabular-nums font-sans mt-1 flex-wrap">
                       <span>{inspectCandidate.professional.yearsOfExperience}+ Years Experience</span>
                       {inspectCandidate.professional.languages && (
                         <>
-                          <span>•</span>
+                          <span aria-hidden="true">·</span>
                           <span>Languages: {inspectCandidate.professional.languages.join(', ')}</span>
                         </>
                       )}
@@ -568,185 +601,218 @@ export const ClientMatchesPage: React.FC = () => {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setInspectCandidate(null)}
-                  className="p-1.5 text-stone-400 hover:text-stone-700 rounded-lg hover:bg-stone-100 transition-colors"
+                  aria-label="Close inspection dialog"
+                  className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-[var(--radius-button)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Professional Bio */}
-              {inspectCandidate.professional.shortBio && (
-                <div className="space-y-1.5 text-xs text-stone-700 font-sans">
-                  <span className="font-semibold text-stone-900 block">About Specialist:</span>
-                  <p className="leading-relaxed">{inspectCandidate.professional.shortBio}</p>
-                </div>
-              )}
-
-              {/* Skills & Core Disciplines */}
-              {inspectCandidate.professional.skills && inspectCandidate.professional.skills.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-xs font-semibold text-stone-900 block font-sans">Core Skills & Tools:</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {inspectCandidate.professional.skills.map((skill, i) => (
-                      <Badge key={i} variant="outline" size="sm">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Why We Matched You Narrative */}
-              <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 text-xs space-y-2">
-                <span className="font-semibold text-stone-900 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-stone-600" />
-                  Curator Match Evaluation:
-                </span>
-                <p className="text-stone-600 leading-relaxed font-sans">
-                  {inspectCandidate.clientSafeMatchReason}
-                </p>
-                {inspectCandidate.recommendationRationale && (
-                  <p className="text-amber-800 pt-1 font-medium">
-                    Curator Note: {inspectCandidate.recommendationRationale}
-                  </p>
-                )}
-              </div>
-
-              {/* Commercial Terms & Quote Details */}
-              <div className="p-5 bg-stone-50 rounded-xl border border-stone-200 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-stone-200 pb-3">
-                  <div>
-                    <h3 className="text-base font-serif font-medium text-stone-900">
-                      Commercial Proposal & Schedule
-                    </h3>
-                    <span className="text-xs text-stone-500 font-sans">
-                      Fixed-scope proposal prepared for your project
+              {/* Scrollable Modal Body */}
+              <div className="p-6 space-y-6 overflow-y-auto">
+                {/* Professional Bio */}
+                {inspectCandidate.professional.shortBio && (
+                  <div className="space-y-1.5 text-sm text-[var(--color-text-secondary)] font-sans">
+                    <span className="text-xs font-semibold text-[var(--color-text-primary)] block">
+                      About Specialist
                     </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-serif font-bold text-stone-900">
-                      {(inspectCandidate.quote.amountMinor / 100).toLocaleString()}{' '}
-                      {inspectCandidate.quote.currency}
-                    </span>
-                    {inspectCandidate.quote.quoteType === 'alternative' && (
-                      <span className="text-xs text-amber-700 font-medium block">
-                        (Custom Alternative Scope)
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-stone-700 font-sans">
-                  <div className="p-3 bg-white rounded-lg border border-stone-200">
-                    <span className="text-stone-400 block mb-0.5">Kickoff Readiness</span>
-                    <span className="font-medium text-stone-900">
-                      {inspectCandidate.quote.proposedStartDate || 'Upon agreement signing'}
-                    </span>
-                  </div>
-                  <div className="p-3 bg-white rounded-lg border border-stone-200">
-                    <span className="text-stone-400 block mb-0.5">Estimated Duration</span>
-                    <span className="font-medium text-stone-900">
-                      {inspectCandidate.quote.estimatedDurationDays} calendar days
-                    </span>
-                  </div>
-                  <div className="p-3 bg-white rounded-lg border border-stone-200">
-                    <span className="text-stone-400 block mb-0.5">Revision Rounds</span>
-                    <span className="font-medium text-stone-900">
-                      {inspectCandidate.quote.revisionsIncluded} rounds included
-                    </span>
-                  </div>
-                </div>
-
-                {/* Scope Summary */}
-                <div className="space-y-1 text-xs text-stone-700 font-sans">
-                  <span className="font-semibold text-stone-900 block">Scope Summary:</span>
-                  <p className="leading-relaxed bg-white p-3 rounded-lg border border-stone-200">
-                    {inspectCandidate.quote.scopeSummary}
-                  </p>
-                </div>
-
-                {/* Inclusions & Exclusions */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
-                  {inspectCandidate.quote.includedItems && inspectCandidate.quote.includedItems.length > 0 && (
-                    <div className="space-y-1.5">
-                      <span className="font-semibold text-emerald-800 flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        Explicitly Included:
-                      </span>
-                      <ul className="space-y-1 text-stone-600 bg-white p-3 rounded-lg border border-stone-200">
-                        {inspectCandidate.quote.includedItems.map((inc, i) => (
-                          <li key={i} className="flex items-start gap-1.5">
-                            <span className="text-emerald-500 font-mono">✓</span>
-                            <span>{inc}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {inspectCandidate.quote.excludedItems && inspectCandidate.quote.excludedItems.length > 0 && (
-                    <div className="space-y-1.5">
-                      <span className="font-semibold text-stone-700 flex items-center gap-1.5">
-                        <X className="w-3.5 h-3.5 text-stone-400" />
-                        Explicitly Excluded:
-                      </span>
-                      <ul className="space-y-1 text-stone-600 bg-white p-3 rounded-lg border border-stone-200">
-                        {inspectCandidate.quote.excludedItems.map((exc, i) => (
-                          <li key={i} className="flex items-start gap-1.5">
-                            <span className="text-stone-400 font-mono">✕</span>
-                            <span>{exc}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-
-                {/* Alternative Explanation if provided */}
-                {inspectCandidate.quote.alternativeExplanation && (
-                  <div className="p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs space-y-1">
-                    <span className="font-semibold text-amber-900 block">Alternative Proposal Rationale:</span>
-                    <p className="text-amber-800 leading-relaxed">
-                      {inspectCandidate.quote.alternativeExplanation}
-                    </p>
+                    <p className="leading-relaxed">{inspectCandidate.professional.shortBio}</p>
                   </div>
                 )}
-              </div>
 
-              {/* Portfolio / Relevant Past Work Items */}
-              {inspectCandidate.professional.portfolioItems &&
-                inspectCandidate.professional.portfolioItems.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="font-serif text-base font-medium text-stone-900">
-                      Featured Past Work
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      {inspectCandidate.professional.portfolioItems.map((item, i) => (
-                        <div key={i} className="p-3 bg-stone-50 rounded-lg border border-stone-200 space-y-1.5">
-                          <div className="flex items-baseline justify-between">
-                            <span className="font-medium text-stone-900">{item.title}</span>
-                            {item.year && <span className="text-stone-400 font-mono">{item.year}</span>}
-                          </div>
-                          <p className="text-stone-600 leading-relaxed line-clamp-2">{item.description}</p>
-                          {item.liveUrl && (
-                            <a
-                              href={item.liveUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-stone-800 hover:text-stone-950 font-medium inline-flex items-center gap-1 mt-1"
-                            >
-                              View Live Work <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
-                        </div>
+                {/* Skills & Core Disciplines */}
+                {inspectCandidate.professional.skills && inspectCandidate.professional.skills.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-xs font-semibold text-[var(--color-text-primary)] block font-sans">
+                      Core Skills & Tools
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {inspectCandidate.professional.skills.map((skill, i) => (
+                        <span
+                          key={i}
+                          className="px-2.5 py-1 rounded-[6px] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs font-medium"
+                        >
+                          {skill}
+                        </span>
                       ))}
                     </div>
                   </div>
                 )}
 
+                {/* Why We Matched You Narrative */}
+                <div className="p-4 bg-[var(--color-surface-secondary)] rounded-[var(--radius-card)] text-[13px] space-y-2">
+                  <span className="font-semibold text-[var(--color-text-primary)] flex items-center gap-1.5 text-xs">
+                    <Sparkles className="w-4 h-4 text-[var(--color-text-secondary)]" />
+                    Curator Match Evaluation
+                  </span>
+                  <p className="text-[var(--color-text-secondary)] leading-relaxed font-sans">
+                    {inspectCandidate.clientSafeMatchReason}
+                  </p>
+                  {inspectCandidate.recommendationRationale && (
+                    <p className="text-[var(--color-warning-text)] pt-1 font-medium">
+                      Curator Note: {inspectCandidate.recommendationRationale}
+                    </p>
+                  )}
+                </div>
+
+                {/* Commercial Terms & Quote Details */}
+                <div className="pt-4 border-t border-[var(--color-border)] space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pb-3 border-b border-[var(--color-border)]">
+                    <div>
+                      <h3 className="typo-card-title text-[var(--color-text-primary)]">
+                        Commercial Proposal & Schedule
+                      </h3>
+                      <span className="text-xs text-[var(--color-text-secondary)] font-sans">
+                        Fixed-scope proposal prepared for your project
+                      </span>
+                    </div>
+                    <div className="text-left sm:text-right">
+                      <span className="text-2xl font-sans font-bold tabular-nums text-[var(--color-text-primary)]">
+                        {(inspectCandidate.quote.amountMinor / 100).toLocaleString()}{' '}
+                        {inspectCandidate.quote.currency}
+                      </span>
+                      {inspectCandidate.quote.quoteType === 'alternative' && (
+                        <span className="text-xs text-[var(--color-warning-text)] font-medium block">
+                          Custom Alternative Scope
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-sans">
+                    <div className="p-3 bg-[var(--color-surface-secondary)] rounded-[var(--radius-button)]">
+                      <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                        Kickoff Readiness
+                      </span>
+                      <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">
+                        {inspectCandidate.quote.proposedStartDate || 'Upon agreement signing'}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-[var(--color-surface-secondary)] rounded-[var(--radius-button)]">
+                      <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                        Estimated Duration
+                      </span>
+                      <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">
+                        {inspectCandidate.quote.estimatedDurationDays} calendar days
+                      </span>
+                    </div>
+                    <div className="p-3 bg-[var(--color-surface-secondary)] rounded-[var(--radius-button)]">
+                      <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                        Revision Rounds
+                      </span>
+                      <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">
+                        {inspectCandidate.quote.revisionsIncluded} rounds included
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Scope Summary */}
+                  <div className="space-y-1.5 text-[13px] text-[var(--color-text-secondary)] font-sans">
+                    <span className="text-xs font-semibold text-[var(--color-text-primary)] block">
+                      Scope Summary
+                    </span>
+                    <p className="leading-relaxed bg-[var(--color-surface-secondary)] p-3.5 rounded-[var(--radius-button)] text-[var(--color-text-primary)]">
+                      {inspectCandidate.quote.scopeSummary}
+                    </p>
+                  </div>
+
+                  {/* Inclusions & Exclusions */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans pt-1">
+                    {inspectCandidate.quote.includedItems && inspectCandidate.quote.includedItems.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="font-semibold text-[var(--color-success-text)] flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-[var(--color-success)]" />
+                          Explicitly Included
+                        </span>
+                        <ul className="space-y-1.5 text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] p-3.5 rounded-[var(--radius-button)]">
+                          {inspectCandidate.quote.includedItems.map((inc, i) => (
+                            <li key={i} className="flex items-start gap-1.5">
+                              <span className="text-[var(--color-success)] font-semibold">✓</span>
+                              <span>{inc}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {inspectCandidate.quote.excludedItems && inspectCandidate.quote.excludedItems.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="font-semibold text-[var(--color-text-primary)] flex items-center gap-1.5">
+                          <X className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />
+                          Explicitly Excluded
+                        </span>
+                        <ul className="space-y-1.5 text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] p-3.5 rounded-[var(--radius-button)]">
+                          {inspectCandidate.quote.excludedItems.map((exc, i) => (
+                            <li key={i} className="flex items-start gap-1.5">
+                              <span className="text-[var(--color-text-muted)] font-semibold">✕</span>
+                              <span>{exc}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Alternative Explanation if provided */}
+                  {inspectCandidate.quote.alternativeExplanation && (
+                    <div className="p-3.5 bg-[var(--color-warning-bg)] rounded-[var(--radius-button)] border border-[var(--color-warning-border)] text-xs space-y-1">
+                      <span className="font-semibold text-[var(--color-warning-text)] block">
+                        Alternative Proposal Rationale
+                      </span>
+                      <p className="text-[var(--color-warning-text)] leading-relaxed">
+                        {inspectCandidate.quote.alternativeExplanation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Portfolio / Relevant Past Work Items */}
+                {inspectCandidate.professional.portfolioItems &&
+                  inspectCandidate.professional.portfolioItems.length > 0 && (
+                    <div className="pt-4 border-t border-[var(--color-border)] space-y-3">
+                      <h4 className="typo-card-title text-[var(--color-text-primary)]">
+                        Featured Past Work
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        {inspectCandidate.professional.portfolioItems.map((item, i) => (
+                          <div
+                            key={i}
+                            className="p-3.5 bg-[var(--color-surface-secondary)] rounded-[var(--radius-button)] space-y-1.5"
+                          >
+                            <div className="flex items-baseline justify-between gap-2">
+                              <span className="font-semibold text-[var(--color-text-primary)]">
+                                {item.title}
+                              </span>
+                              {item.year && (
+                                <span className="text-[var(--color-text-secondary)] tabular-nums">
+                                  {item.year}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">
+                              {item.description}
+                            </p>
+                            {item.liveUrl && (
+                              <a
+                                href={item.liveUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[var(--color-text-primary)] hover:underline font-semibold inline-flex items-center gap-1 pt-0.5"
+                              >
+                                View Live Work <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+              </div>
+
               {/* Modal Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-stone-200">
+              <div className="flex items-center justify-between gap-3 p-5 sm:px-6 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
                 <Button
                   variant="outline"
                   size="sm"
@@ -768,70 +834,89 @@ export const ClientMatchesPage: React.FC = () => {
                   </Button>
                 )}
               </div>
-            </Card>
+            </div>
           </div>
         )}
 
         {/* Selection Confirmation Modal */}
         {candidateToSelect && (
-          <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <Card className="max-w-lg w-full p-6 sm:p-8 bg-white shadow-2xl space-y-5">
-              <div className="flex items-center gap-3 border-b border-stone-200 pb-4">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800">
+          <div className="fixed inset-0 bg-[#171717]/45 flex items-center justify-center p-4 z-50">
+            <div
+              className="fixed inset-0"
+              onClick={() => {
+                if (!selecting) setCandidateToSelect(null);
+              }}
+              aria-hidden="true"
+            />
+            <div
+              role="dialog"
+              aria-modal="true"
+              className="relative z-10 max-w-lg w-full bg-[var(--color-surface)] rounded-[var(--radius-modal)] border border-[var(--color-border)] shadow-[var(--shadow-overlay)] p-6 sm:p-8 space-y-5 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center gap-3 border-b border-[var(--color-border)] pb-4">
+                <div className="w-10 h-10 rounded-full bg-[var(--color-success-bg)] border border-[var(--color-success-border)] flex items-center justify-center text-[var(--color-success-text)] shrink-0">
                   <Check className="w-5 h-5" />
                 </div>
-                <div>
-                  <h3 className="font-serif text-xl font-medium text-stone-900">
+                <div className="min-w-0">
+                  <h3 className="typo-section-heading text-[var(--color-text-primary)]">
                     Confirm Professional Selection
                   </h3>
-                  <p className="text-xs text-stone-500 font-sans">
+                  <p className="text-xs text-[var(--color-text-secondary)] font-sans truncate">
                     Finalize your chosen partner for {project.title}
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-4 text-xs text-stone-700 font-sans leading-relaxed">
+              <div className="space-y-4 text-[13px] text-[var(--color-text-secondary)] font-sans leading-relaxed">
                 <p>
-                  You are selecting <strong>{candidateToSelect.professional.displayName}</strong> as your verified specialist partner.
+                  You are selecting{' '}
+                  <strong className="font-semibold text-[var(--color-text-primary)]">
+                    {candidateToSelect.professional.displayName}
+                  </strong>{' '}
+                  as your verified specialist partner.
                 </p>
 
-                <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-stone-500">Fixed Proposal Amount:</span>
-                    <span className="font-serif text-lg font-bold text-stone-900">
+                <div className="p-4 bg-[var(--color-surface-secondary)] rounded-[var(--radius-card)] space-y-2.5 text-xs">
+                  <div className="flex justify-between items-baseline gap-2">
+                    <span className="text-[var(--color-text-secondary)] font-medium">
+                      Fixed Proposal Amount
+                    </span>
+                    <span className="font-sans text-lg font-bold tabular-nums text-[var(--color-text-primary)]">
                       {(candidateToSelect.quote.amountMinor / 100).toLocaleString()}{' '}
                       {candidateToSelect.quote.currency}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-stone-500">Estimated Turnaround:</span>
-                    <span className="font-medium text-stone-800">
+                  <div className="flex justify-between gap-2">
+                    <span className="text-[var(--color-text-secondary)]">Estimated Turnaround</span>
+                    <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">
                       {candidateToSelect.quote.estimatedDurationDays} days
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-stone-500">Commencement:</span>
-                    <span className="font-medium text-stone-800">
+                  <div className="flex justify-between gap-2">
+                    <span className="text-[var(--color-text-secondary)]">Commencement</span>
+                    <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">
                       {candidateToSelect.quote.proposedStartDate || 'Upon agreement signing'}
                     </span>
                   </div>
 
                   {candidateToSelect.quote.scopeSummary && (
-                    <div className="pt-2 border-t border-stone-200">
-                      <span className="text-stone-500 font-medium block mb-1">Scope of Work:</span>
-                      <p className="bg-white p-2.5 rounded-lg border border-stone-200 text-stone-700 leading-relaxed max-h-24 overflow-y-auto">
+                    <div className="pt-2.5 border-t border-[var(--color-border)]">
+                      <span className="text-[var(--color-text-secondary)] font-medium block mb-1">
+                        Scope of Work
+                      </span>
+                      <p className="text-[var(--color-text-primary)] leading-relaxed max-h-24 overflow-y-auto">
                         {candidateToSelect.quote.scopeSummary}
                       </p>
                     </div>
                   )}
                 </div>
 
-                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 space-y-1">
-                  <span className="font-semibold block flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                    What happens next:
+                <div className="p-3.5 bg-[var(--color-success-bg)] rounded-[var(--radius-card)] border border-[var(--color-success-border)] text-[var(--color-success-text)] space-y-1.5 text-xs">
+                  <span className="font-semibold flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 shrink-0" />
+                    What happens next
                   </span>
-                  <ul className="list-disc list-inside text-[11px] space-y-0.5 text-emerald-800">
+                  <ul className="list-disc list-inside space-y-1">
                     <li>The specialist is immediately notified of your selection.</li>
                     <li>The Alongby team prepares your formal project agreement with milestone protection.</li>
                     <li>No payment is charged right now. Staged deposits apply only upon contract signing.</li>
@@ -839,7 +924,7 @@ export const ClientMatchesPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-200">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--color-border)]">
                 <Button
                   variant="outline"
                   size="sm"
@@ -857,10 +942,11 @@ export const ClientMatchesPage: React.FC = () => {
                   Confirm Selection
                 </Button>
               </div>
-            </Card>
+            </div>
           </div>
         )}
       </div>
     </DashboardLayout>
   );
 };
+

@@ -41,7 +41,7 @@ function AppContent() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <div className="flex flex-col min-h-screen bg-[var(--color-bg-app)] text-[var(--color-text-primary)] selection:bg-[var(--color-primary)] selection:text-[var(--color-primary-text)]">
       <Navbar onOpenAuth={handleOpenAuth} />
 
       <div className="flex-1">

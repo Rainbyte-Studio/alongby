@@ -25,14 +25,14 @@ export const StepFeatures: React.FC<StepFeaturesProps> = ({ brief, onChange }) =
   return (
     <div className="space-y-6">
       <div>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-700 text-xs font-medium mb-2">
-          <Sparkles className="w-3.5 h-3.5 text-neutral-500" />
-          <span>Service: {currentService?.name || 'General'}</span>
+        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] mb-2">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>{currentService?.name || 'General'}</span>
         </div>
-        <h2 className="text-xl font-serif font-bold text-neutral-950 tracking-tight">
+        <h2 className="typo-section-heading text-[var(--color-text-primary)]">
           What features & deliverables are needed?
         </h2>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1.5 text-sm text-[var(--color-text-secondary)] leading-relaxed">
           Select the capabilities and modules required. Don't worry if you're not sure about everything—proposals will refine this during scope validation.
         </p>
       </div>
@@ -46,35 +46,36 @@ export const StepFeatures: React.FC<StepFeaturesProps> = ({ brief, onChange }) =
               key={feature.id}
               type="button"
               onClick={() => handleToggleFeature(feature.id)}
-              className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
+              aria-pressed={isSelected}
+              className={`text-left p-4 rounded-[var(--radius-card)] border transition-colors cursor-pointer flex items-start justify-between gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                 isSelected
-                  ? 'border-neutral-950 bg-neutral-50 ring-2 ring-neutral-950/10 shadow-xs'
-                  : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/50'
+                  ? 'border-[var(--color-primary)] bg-[var(--color-surface-secondary)] ring-1 ring-[var(--color-primary)]'
+                  : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-secondary)]/50'
               }`}
             >
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-neutral-950">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[13.5px] font-semibold text-[var(--color-text-primary)]">
                     {feature.name}
                   </span>
                   {feature.recommended && (
-                    <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
-                      Standard
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--color-warning-text)]">
+                      · Standard
                     </span>
                   )}
                 </div>
                 {feature.description && (
-                  <p className="text-[11px] text-neutral-500 mt-0.5">
+                  <p className="text-xs text-[var(--color-text-secondary)] mt-0.5 leading-relaxed">
                     {feature.description}
                   </p>
                 )}
               </div>
 
               <div
-                className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
+                className={`w-4 h-4 rounded-[4px] mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
                   isSelected
-                    ? 'bg-neutral-950 text-white'
-                    : 'border border-neutral-300 bg-white'
+                    ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)]'
+                    : 'border border-[var(--color-border-strong)] bg-[var(--color-surface)]'
                 }`}
               >
                 {isSelected && <Check className="w-3 h-3" />}

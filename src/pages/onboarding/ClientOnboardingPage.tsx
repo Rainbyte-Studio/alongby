@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Card } from '../../components/ui/Card';
-import { ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
+import { ArrowRight, AlertCircle } from 'lucide-react';
 
 const COMMON_COUNTRIES = [
   { value: '', label: 'Select your country' },
@@ -110,25 +110,24 @@ export const ClientOnboardingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[85vh] bg-[var(--color-bg-app)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl w-full">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 text-neutral-800 text-xs font-medium mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-neutral-500" />
-            <span>Step 1 of 1: Client Profile</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold font-serif tracking-tight text-neutral-900">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)] tabular-nums mb-2.5">
+            Step 1 of 1 · Client Profile
+          </p>
+          <h1 className="typo-page-title text-[var(--color-text-primary)]">
             Welcome to Alongby
           </h1>
-          <p className="mt-2 text-sm text-neutral-500 max-w-md mx-auto leading-relaxed">
+          <p className="mt-2 text-sm sm:text-[15px] text-[var(--color-text-secondary)] max-w-md mx-auto leading-relaxed">
             Tell us about yourself and your organization so our curation team can match you with the right professionals.
           </p>
         </div>
 
-        <Card className="p-8">
+        <Card className="p-6 sm:p-8">
           {error && (
-            <div className="mb-6 p-3 rounded-md bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="mb-6 p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[var(--color-error)]" />
               <span>{error}</span>
             </div>
           )}
@@ -174,14 +173,14 @@ export const ClientOnboardingPage: React.FC = () => {
               />
             </div>
 
-            <div className="pt-4 border-t border-neutral-100 flex items-center justify-end">
+            <div className="pt-4 border-t border-[var(--color-border)] flex items-center justify-end">
               <Button
                 type="submit"
                 variant="primary"
                 isLoading={isSubmitting}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
-                Complete & Go to Dashboard
+                Complete &amp; Go to Dashboard
               </Button>
             </div>
           </form>

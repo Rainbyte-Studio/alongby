@@ -135,7 +135,7 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
           aria-label="Draft options"
           aria-expanded={menuOpen}
           aria-haspopup="true"
-          className="p-1.5 rounded-md text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 active:bg-neutral-200 border border-transparent hover:border-neutral-200 transition-colors focus:outline-none focus:ring-1 focus:ring-neutral-400 cursor-pointer"
+          className="p-2 rounded-[var(--radius-button)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] border border-transparent hover:border-[var(--color-border)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] cursor-pointer"
         >
           <MoreVertical className="w-4 h-4" />
         </button>
@@ -144,24 +144,24 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
           <div
             role="menu"
             aria-orientation="vertical"
-            className="absolute right-0 mt-1.5 w-44 origin-top-right rounded-lg bg-white shadow-lg border border-neutral-200 py-1 z-30 focus:outline-none text-xs"
+            className="absolute right-0 mt-1.5 w-44 origin-top-right rounded-[var(--radius-button)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] py-1 z-30 focus:outline-none text-[13px] font-medium"
           >
             <button
               type="button"
               role="menuitem"
               onClick={handleOpenRename}
-              className="w-full px-3.5 py-2 text-left text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950 flex items-center gap-2 transition-colors cursor-pointer"
+              className="w-full px-3.5 py-2 text-left text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] flex items-center gap-2 transition-colors cursor-pointer"
             >
-              <Edit3 className="w-3.5 h-3.5 text-neutral-500" />
+              <Edit3 className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />
               <span>Rename Draft</span>
             </button>
             <button
               type="button"
               role="menuitem"
               onClick={handleOpenDelete}
-              className="w-full px-3.5 py-2 text-left text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors cursor-pointer border-t border-neutral-100"
+              className="w-full px-3.5 py-2 text-left text-[var(--color-error-text)] hover:bg-[var(--color-error-bg)] flex items-center gap-2 transition-colors cursor-pointer border-t border-[var(--color-border)]"
             >
-              <Trash2 className="w-3.5 h-3.5 text-red-600" />
+              <Trash2 className="w-3.5 h-3.5 text-[var(--color-error)]" />
               <span>Delete Draft</span>
             </button>
           </div>
@@ -177,7 +177,7 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
         title="Rename draft"
         maxWidth="sm"
       >
-        <form onSubmit={handleSaveRename} className="p-6 space-y-4">
+        <form onSubmit={handleSaveRename} className="space-y-4">
           <Input
             id={`rename-draft-${project.id}`}
             label="Project Name"
@@ -194,7 +194,7 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
             helperText="Provide a clear, descriptive name (3–120 characters)."
           />
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-100">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--color-border)]">
             <Button
               type="button"
               variant="outline"
@@ -227,24 +227,24 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
         description="This draft and its saved project brief will be permanently deleted. This action cannot be undone."
         maxWidth="sm"
       >
-        <div className="p-6 space-y-4">
+        <div className="space-y-4">
           {deleteError && (
-            <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-[var(--color-error-text)] text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[var(--color-error)]" />
               <span>{deleteError}</span>
             </div>
           )}
 
-          <div className="text-xs text-neutral-600 bg-neutral-50 p-3 rounded-lg border border-neutral-200">
-            <span className="font-semibold text-neutral-900 block truncate">
+          <div className="text-[13px] text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] p-3.5 rounded-[var(--radius-button)] border border-[var(--color-border)]">
+            <span className="font-semibold text-[var(--color-text-primary)] block truncate">
               {project.title || 'Untitled Project Brief'}
             </span>
-            <span className="text-neutral-500 block mt-0.5">
+            <span className="text-xs text-[var(--color-text-secondary)] block mt-0.5">
               Status: Draft in progress
             </span>
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-100">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--color-border)]">
             <Button
               type="button"
               variant="outline"

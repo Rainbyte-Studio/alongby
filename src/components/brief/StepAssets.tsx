@@ -40,10 +40,10 @@ export const StepAssets: React.FC<StepAssetsProps> = ({ brief, onChange }) => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-serif font-bold text-neutral-950 tracking-tight">
+        <h2 className="typo-section-heading text-[var(--color-text-primary)]">
           What assets or materials do you already have?
         </h2>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1.5 text-sm text-[var(--color-text-secondary)] leading-relaxed tabular-nums">
           Letting practitioners know what already exists prevents redundant scoping and accelerates kickoff. You will also be able to upload reference files in step 8.
         </p>
       </div>
@@ -57,21 +57,22 @@ export const StepAssets: React.FC<StepAssetsProps> = ({ brief, onChange }) => {
               key={asset.id}
               type="button"
               onClick={() => handleToggleAsset(asset.id)}
-              className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+              aria-pressed={isSelected}
+              className={`text-left p-4 rounded-[var(--radius-card)] border transition-colors cursor-pointer flex items-center justify-between gap-3 min-h-[52px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                 isSelected
-                  ? 'border-neutral-950 bg-neutral-50 ring-2 ring-neutral-950/10 shadow-xs'
-                  : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/50'
+                  ? 'border-[var(--color-primary)] bg-[var(--color-surface-secondary)] ring-1 ring-[var(--color-primary)]'
+                  : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-secondary)]/50'
               }`}
             >
-              <span className="text-xs font-semibold text-neutral-900">
+              <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">
                 {asset.name}
               </span>
 
               <div
-                className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors ${
+                className={`w-4 h-4 rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${
                   isSelected
-                    ? 'bg-neutral-950 text-white'
-                    : 'border border-neutral-300 bg-white'
+                    ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)]'
+                    : 'border border-[var(--color-border-strong)] bg-[var(--color-surface)]'
                 }`}
               >
                 {isSelected && <Check className="w-3 h-3" />}

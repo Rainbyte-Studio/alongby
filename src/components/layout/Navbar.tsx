@@ -42,29 +42,29 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xs border-b border-neutral-200/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Logo */}
-        <div className="flex items-center gap-8">
+    <header className="sticky top-0 z-40 bg-[var(--color-surface)]/95 backdrop-blur-xs border-b border-[var(--color-border)]">
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-6">
+        {/* Brand Logo + Public Links */}
+        <div className="flex items-center gap-6 lg:gap-8 min-w-0 shrink-0">
           <Link
             to="/"
-            className="flex items-center text-neutral-950 hover:opacity-85 transition-opacity cursor-pointer py-1"
+            className="flex items-center text-[var(--color-text-primary)] hover:opacity-85 transition-opacity cursor-pointer py-1 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
             aria-label="alongby home"
           >
             <AlongbyWordmark size="md" />
           </Link>
 
           {/* Public links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-neutral-600">
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[var(--color-text-secondary)] whitespace-nowrap">
             <Link
               to="/#how-it-works"
-              className="hover:text-neutral-900 transition-colors"
+              className="hover:text-[var(--color-text-primary)] transition-colors whitespace-nowrap shrink-0"
             >
               How It Works
             </Link>
             <Link
               to="/#principles"
-              className="hover:text-neutral-900 transition-colors"
+              className="hover:text-[var(--color-text-primary)] transition-colors whitespace-nowrap shrink-0"
             >
               Our Philosophy
             </Link>
@@ -72,29 +72,31 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
         </div>
 
         {/* Right side controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink-0">
           {currentUser && userProfile ? (
-            <div className="flex items-center gap-3">
-              {/* Dev Role Switcher for Phase 1 verification & testing */}
+            <div className="flex items-center gap-1.5 sm:gap-2.5">
+              {/* Dev Role Switcher for testing */}
               <div className="relative">
                 <button
+                  type="button"
                   onClick={() => setDevMenuOpen(!devMenuOpen)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-neutral-200 text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 min-h-[36px] rounded-[var(--radius-button)] border border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                   title="Dev Tool: Switch user role for testing"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" />
-                  <span className="capitalize">{userProfile.role}</span>
-                  <ChevronDown className="w-3 h-3 text-neutral-400" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[var(--color-text-muted)] shrink-0" />
+                  <span className="capitalize hidden xs:inline sm:inline">{userProfile.role}</span>
+                  <ChevronDown className="w-3 h-3 text-[var(--color-text-muted)] shrink-0" />
                 </button>
 
                 {devMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-1.5 z-50">
-                    <div className="px-3 py-1 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider border-b border-neutral-100 mb-1">
-                      Dev Role Switcher
+                  <div className="absolute right-0 mt-2 w-48 bg-[var(--color-surface)] rounded-[var(--radius-card)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] py-1.5 z-50">
+                    <div className="px-3 py-1.5 text-xs font-medium text-[var(--color-text-muted)] border-b border-[var(--color-border)] mb-1">
+                      Switch Role
                     </div>
                     {(['client', 'professional', 'admin'] as UserRole[]).map((r) => (
                       <button
                         key={r}
+                        type="button"
                         onClick={async () => {
                           await setRoleForDev(r);
                           setDevMenuOpen(false);
@@ -102,11 +104,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                           else if (r === 'professional') navigate('/professional');
                           else if (r === 'admin') navigate('/admin');
                         }}
-                        className="w-full text-left px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-100 flex items-center justify-between capitalize"
+                        className="w-full text-left px-3 py-2 text-xs font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] flex items-center justify-between capitalize cursor-pointer"
                       >
                         <span>{r}</span>
                         {userProfile.role === r && (
-                          <Check className="w-3.5 h-3.5 text-neutral-900" />
+                          <Check className="w-3.5 h-3.5 text-[var(--color-primary)]" />
                         )}
                       </button>
                     ))}
@@ -119,13 +121,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 <Button
                   variant={location.pathname === getDashboardPath() ? 'secondary' : 'outline'}
                   size="sm"
+                  className="px-2.5 sm:px-3.5"
                 >
                   Dashboard
                 </Button>
               </Link>
 
               {userProfile.role === 'professional' && (
-                <Link to="/professional/opportunities">
+                <Link to="/professional/opportunities" className="hidden sm:inline-flex">
                   <Button
                     variant={location.pathname.startsWith('/professional/opportunities') ? 'secondary' : 'ghost'}
                     size="sm"
@@ -136,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
               )}
 
               {userProfile.role === 'client' && (
-                <Link to="/client/projects">
+                <Link to="/client/projects" className="hidden sm:inline-flex">
                   <Button
                     variant={location.pathname.startsWith('/client/projects') ? 'secondary' : 'ghost'}
                     size="sm"
@@ -150,11 +153,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
               <NotificationBell />
 
               {/* User display */}
-              <div className="hidden sm:flex flex-col items-end text-right">
-                <span className="text-xs font-semibold text-neutral-900 leading-tight">
+              <div className="hidden md:flex flex-col items-end text-right pl-1">
+                <span className="text-xs font-semibold text-[var(--color-text-primary)] leading-tight max-w-[140px] truncate">
                   {userProfile.displayName || currentUser.email?.split('@')[0]}
                 </span>
-                <Badge variant={roleBadgeVariants[userProfile.role]} size="sm">
+                <Badge variant={roleBadgeVariants[userProfile.role]} size="sm" className="mt-0.5 capitalize">
                   {userProfile.role}
                 </Badge>
               </div>
@@ -165,17 +168,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 size="sm"
                 onClick={signOut}
                 title="Sign out"
-                className="text-neutral-500 hover:text-neutral-900"
+                aria-label="Sign out"
+                className="px-2 sm:px-2.5"
               >
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5 sm:gap-2.5">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onOpenAuth?.('signin')}
+                className="px-2.5 sm:px-3.5"
               >
                 Sign In
               </Button>
@@ -191,6 +196,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="primary"
                 size="sm"
                 onClick={() => onOpenAuth?.('signup', 'client')}
+                className="px-3 sm:px-4"
               >
                 Start a Project
               </Button>

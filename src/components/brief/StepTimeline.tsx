@@ -6,7 +6,7 @@ import {
   TimelineFlexibility,
 } from '../../types';
 import { Input } from '../ui/Input';
-import { Calendar, Clock, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface StepTimelineProps {
   brief: ProjectBrief;
@@ -67,17 +67,17 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-serif font-bold text-neutral-950 tracking-tight">
+        <h2 className="typo-section-heading text-[var(--color-text-primary)]">
           When would you like to get started?
         </h2>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1.5 text-sm text-[var(--color-text-secondary)] leading-relaxed">
           Alongby matches verified practitioners whose verified capacity matches your targeted timeframe.
         </p>
       </div>
 
       {/* Section 1: Preferred Start */}
       <div className="space-y-3">
-        <label className="block text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+        <label className="block font-sans text-[13px] font-semibold text-[var(--color-text-primary)] tabular-nums">
           1. Preferred Start
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -88,17 +88,18 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
                 key={opt.id}
                 type="button"
                 onClick={() => updateTimeline({ preferredStart: opt.id })}
-                className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                aria-pressed={isSelected}
+                className={`text-left p-4 rounded-[var(--radius-card)] border transition-colors cursor-pointer flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                   isSelected
-                    ? 'border-neutral-950 bg-neutral-50 ring-2 ring-neutral-950/10 shadow-xs'
-                    : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/50'
+                    ? 'border-[var(--color-primary)] bg-[var(--color-surface-secondary)] ring-1 ring-[var(--color-primary)]'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-secondary)]/50'
                 }`}
               >
                 <div>
-                  <div className="text-xs font-semibold text-neutral-950 mb-0.5">
+                  <div className="text-[13px] font-semibold text-[var(--color-text-primary)] mb-0.5 tabular-nums">
                     {opt.label}
                   </div>
-                  <div className="text-[11px] text-neutral-500">
+                  <div className="text-xs text-[var(--color-text-secondary)] leading-snug">
                     {opt.description}
                   </div>
                 </div>
@@ -124,8 +125,8 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
       </div>
 
       {/* Section 2: Desired Completion */}
-      <div className="space-y-3 pt-6 border-t border-neutral-100">
-        <label className="block text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+      <div className="space-y-3 pt-6 border-t border-[var(--color-border)]">
+        <label className="block font-sans text-[13px] font-semibold text-[var(--color-text-primary)] tabular-nums">
           2. Desired Duration / Completion
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -136,17 +137,18 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
                 key={opt.id}
                 type="button"
                 onClick={() => updateTimeline({ desiredCompletion: opt.id })}
-                className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                aria-pressed={isSelected}
+                className={`text-left p-4 rounded-[var(--radius-card)] border transition-colors cursor-pointer flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                   isSelected
-                    ? 'border-neutral-950 bg-neutral-50 ring-2 ring-neutral-950/10 shadow-xs'
-                    : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/50'
+                    ? 'border-[var(--color-primary)] bg-[var(--color-surface-secondary)] ring-1 ring-[var(--color-primary)]'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-secondary)]/50'
                 }`}
               >
                 <div>
-                  <div className="text-xs font-semibold text-neutral-950 mb-0.5">
+                  <div className="text-[13px] font-semibold text-[var(--color-text-primary)] mb-0.5 tabular-nums">
                     {opt.label}
                   </div>
-                  <div className="text-[11px] text-neutral-500">
+                  <div className="text-xs text-[var(--color-text-secondary)] leading-snug">
                     {opt.description}
                   </div>
                 </div>
@@ -171,7 +173,10 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
         )}
 
         {hasDateConflict && (
-          <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center gap-2">
+          <div
+            role="alert"
+            className="p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-center gap-2"
+          >
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>Target completion date cannot be earlier than your chosen start date.</span>
           </div>
@@ -179,8 +184,8 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
       </div>
 
       {/* Section 3: Timeline Flexibility */}
-      <div className="space-y-3 pt-6 border-t border-neutral-100">
-        <label className="block text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+      <div className="space-y-3 pt-6 border-t border-[var(--color-border)]">
+        <label className="block font-sans text-[13px] font-semibold text-[var(--color-text-primary)] tabular-nums">
           3. How flexible is this timeline?
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -191,16 +196,17 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
                 key={opt.id}
                 type="button"
                 onClick={() => updateTimeline({ flexibility: opt.id })}
-                className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
+                aria-pressed={isSelected}
+                className={`text-left p-4 rounded-[var(--radius-card)] border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                   isSelected
-                    ? 'border-neutral-950 bg-neutral-50 ring-2 ring-neutral-950/10 shadow-xs'
-                    : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/50'
+                    ? 'border-[var(--color-primary)] bg-[var(--color-surface-secondary)] ring-1 ring-[var(--color-primary)]'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-secondary)]/50'
                 }`}
               >
-                <div className="text-xs font-semibold text-neutral-950 mb-0.5">
+                <div className="text-[13px] font-semibold text-[var(--color-text-primary)] mb-0.5">
                   {opt.label}
                 </div>
-                <div className="text-[11px] text-neutral-500">
+                <div className="text-xs text-[var(--color-text-secondary)] leading-snug">
                   {opt.description}
                 </div>
               </button>

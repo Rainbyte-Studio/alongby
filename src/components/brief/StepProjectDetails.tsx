@@ -42,10 +42,10 @@ export const StepProjectDetails: React.FC<StepProjectDetailsProps> = ({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-serif font-bold text-neutral-950 tracking-tight">
+        <h2 className="typo-section-heading text-[var(--color-text-primary)]">
           Project details & context
         </h2>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1.5 text-sm text-[var(--color-text-secondary)] leading-relaxed">
           Provide essential context about your business, the challenge, and what a successful outcome looks like.
         </p>
       </div>
@@ -136,11 +136,11 @@ export const StepProjectDetails: React.FC<StepProjectDetailsProps> = ({
       </div>
 
       {/* Project Goals */}
-      <div className="pt-4 border-t border-neutral-100">
-        <label className="block text-xs font-semibold text-neutral-800 uppercase tracking-wider mb-2">
+      <div className="pt-5 border-t border-[var(--color-border)]">
+        <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1">
           Primary Project Goals (Select all that apply)
         </label>
-        <p className="text-xs text-neutral-500 mb-3">
+        <p className="text-xs text-[var(--color-text-secondary)] mb-3 leading-relaxed">
           Identifying your core drivers helps Alongby prioritize matching practitioners with proven domain case studies.
         </p>
 
@@ -152,10 +152,11 @@ export const StepProjectDetails: React.FC<StepProjectDetailsProps> = ({
                 key={goal.id}
                 type="button"
                 onClick={() => handleToggleGoal(goal.id)}
-                className={`text-left px-3.5 py-2.5 rounded-lg border text-xs flex items-center justify-between transition-all cursor-pointer ${
+                aria-pressed={isChecked}
+                className={`text-left px-3.5 py-2.5 rounded-[var(--radius-button)] border text-[13px] flex items-center justify-between gap-2 transition-colors cursor-pointer min-h-[42px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                   isChecked
-                    ? 'border-neutral-900 bg-neutral-900 text-white font-medium shadow-xs'
-                    : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50'
+                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-text)] font-semibold'
+                    : 'border-[var(--color-border-strong)] bg-[var(--color-surface)] text-[var(--color-text-primary)] font-medium hover:bg-[var(--color-surface-secondary)]'
                 }`}
               >
                 <span>{goal.name}</span>

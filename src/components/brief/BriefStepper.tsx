@@ -35,36 +35,36 @@ export const BriefStepper: React.FC<BriefStepperProps> = ({
   onRetrySave,
 }) => {
   return (
-    <div className="w-full bg-white border-b border-neutral-200">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3">
-        {/* Top bar with step counter and autosave badge */}
-        <div className="flex items-center justify-between mb-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-neutral-900">
+    <div className="w-full bg-[var(--color-surface)] border-b border-[var(--color-border)]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3.5">
+        {/* Top bar with step counter and autosave status */}
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3 text-[13px]">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-semibold text-[var(--color-text-primary)] tabular-nums whitespace-nowrap">
               Step {currentStep} of {BRIEF_STEPS.length}
             </span>
-            <span className="text-neutral-400">•</span>
-            <span className="text-neutral-600">
+            <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+            <span className="text-[var(--color-text-secondary)] font-medium truncate">
               {BRIEF_STEPS[currentStep - 1]?.label}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {saveStatus === 'saving' && (
-              <span className="inline-flex items-center gap-1.5 text-neutral-500 animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              <span className="inline-flex items-center gap-1.5 text-[var(--color-text-secondary)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-warning)]" />
                 Saving…
               </span>
             )}
             {saveStatus === 'saved' && (
-              <span className="inline-flex items-center gap-1.5 text-neutral-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="inline-flex items-center gap-1.5 text-[var(--color-text-secondary)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" />
                 Draft saved
               </span>
             )}
             {saveStatus === 'error' && (
-              <span className="inline-flex items-center gap-1.5 text-rose-600 font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+              <span className="inline-flex items-center gap-1.5 text-[var(--color-error-text)] font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-error)]" />
                 Couldn’t save changes
                 {onRetrySave && (
                   <button
@@ -73,7 +73,7 @@ export const BriefStepper: React.FC<BriefStepperProps> = ({
                       e.stopPropagation();
                       onRetrySave();
                     }}
-                    className="ml-1 underline hover:text-rose-700 font-semibold cursor-pointer focus:outline-hidden"
+                    className="ml-1 underline hover:text-[var(--color-text-primary)] font-semibold cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
                   >
                     Retry
                   </button>
@@ -86,10 +86,10 @@ export const BriefStepper: React.FC<BriefStepperProps> = ({
         {/* Stepper bar */}
         <nav aria-label="Project Brief Progress" className="relative">
           {/* Progress track background */}
-          <div className="absolute top-3.5 left-0 right-0 h-0.5 bg-neutral-200 -z-0 hidden md:block" />
+          <div className="absolute top-3.5 left-0 right-0 h-0.5 bg-[var(--color-border)] -z-0 hidden md:block" />
           {/* Active progress fill */}
           <div
-            className="absolute top-3.5 left-0 h-0.5 bg-neutral-900 transition-all duration-300 hidden md:block -z-0"
+            className="absolute top-3.5 left-0 h-0.5 bg-[var(--color-primary)] transition-all duration-300 hidden md:block -z-0"
             style={{
               width: `${((currentStep - 1) / (BRIEF_STEPS.length - 1)) * 100}%`,
             }}
@@ -108,29 +108,29 @@ export const BriefStepper: React.FC<BriefStepperProps> = ({
                     type="button"
                     disabled={!isAccessible}
                     onClick={() => onSelectStep(step.number)}
-                    className={`group flex flex-col items-center focus:outline-hidden ${
-                      isAccessible ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
+                    className={`group flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 rounded-md ${
+                      isAccessible ? 'cursor-pointer' : 'cursor-not-allowed opacity-55'
                     }`}
                   >
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold tabular-nums transition-colors ${
                         isCurrent
-                          ? 'bg-neutral-950 text-white ring-4 ring-neutral-100 shadow-xs'
+                          ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] ring-4 ring-[var(--color-surface-secondary)]'
                           : isCompleted
-                          ? 'bg-neutral-800 text-white hover:bg-neutral-950'
-                          : 'bg-white border border-neutral-300 text-neutral-500 group-hover:border-neutral-400'
+                          ? 'bg-[#303030] text-white hover:bg-[var(--color-primary)]'
+                          : 'bg-[var(--color-surface)] border border-[var(--color-border-strong)] text-[var(--color-text-secondary)] group-hover:border-[var(--color-text-muted)]'
                       }`}
                     >
                       {isCompleted ? <Check className="w-3.5 h-3.5" /> : step.number}
                     </div>
 
                     <span
-                      className={`mt-1 text-[11px] font-medium hidden lg:block tracking-tight text-center ${
+                      className={`mt-1.5 text-xs font-medium hidden lg:block text-center whitespace-nowrap ${
                         isCurrent
-                          ? 'text-neutral-950 font-semibold'
+                          ? 'text-[var(--color-text-primary)] font-semibold'
                           : isCompleted
-                          ? 'text-neutral-700'
-                          : 'text-neutral-400'
+                          ? 'text-[var(--color-text-secondary)]'
+                          : 'text-[var(--color-text-muted)]'
                       }`}
                     >
                       {step.shortLabel}

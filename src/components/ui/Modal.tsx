@@ -38,7 +38,7 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/40 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#171717]/45">
       <div
         className="fixed inset-0"
         onClick={onClose}
@@ -47,29 +47,30 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         role="dialog"
         aria-modal="true"
-        className={`relative z-10 w-full ${widthClasses[maxWidth]} bg-white rounded-xl shadow-xl border border-neutral-200 overflow-hidden flex flex-col max-h-[90vh]`}
+        className={`relative z-10 w-full ${widthClasses[maxWidth]} bg-[var(--color-surface)] rounded-[var(--radius-modal)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] overflow-hidden flex flex-col max-h-[90vh]`}
       >
-        <div className="flex items-start justify-between p-6 border-b border-neutral-100">
-          <div>
-            <h3 className="text-lg font-semibold text-neutral-900 tracking-tight">
+        <div className="flex items-start justify-between gap-4 p-5 sm:p-6 border-b border-[var(--color-border)]">
+          <div className="min-w-0">
+            <h3 className="text-lg sm:text-xl font-serif font-semibold text-[var(--color-text-primary)] tracking-tight leading-snug break-words">
               {title}
             </h3>
             {description && (
-              <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
+              <p className="mt-1.5 text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
                 {description}
               </p>
             )}
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-neutral-400 hover:text-neutral-600 p-1 rounded-md transition-colors"
+            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] p-2 rounded-[var(--radius-button)] transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto">{children}</div>
+        <div className="p-5 sm:p-6 overflow-y-auto">{children}</div>
       </div>
     </div>
   );

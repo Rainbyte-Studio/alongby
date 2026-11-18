@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { projectService } from '../../services/projectService';
 import { taxonomyService } from '../../services/taxonomyService';
 import { shortlistService } from '../../services/shortlistService';
-import { getClientProjectStatusDisplay, formatTimelineOption, formatActivityDisplay } from '../../utils/statusMapping';
+import { formatTimelineOption, formatActivityDisplay } from '../../utils/statusMapping';
 import { Project, ProjectBriefSnapshot, ActivityEvent, PublishedShortlist } from '../../types';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Button } from '../../components/ui/Button';
@@ -13,10 +13,8 @@ import { Card } from '../../components/ui/Card';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import {
   ArrowLeft,
-  Calendar,
   Clock,
   Euro,
-  FileCheck,
   Paperclip,
   CheckCircle2,
   Layers,
@@ -25,6 +23,9 @@ import {
   Download,
   AlertCircle,
   ArrowRight,
+  Compass,
+  FileText,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const ProjectDetailPage: React.FC = () => {
@@ -86,7 +87,7 @@ export const ProjectDetailPage: React.FC = () => {
       <DashboardLayout title="Project Details">
         <div className="py-24 flex flex-col items-center justify-center">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-xs text-neutral-500">Loading project details…</p>
+          <p className="mt-4 text-xs text-[var(--color-text-secondary)]">Loading project details…</p>
         </div>
       </DashboardLayout>
     );
@@ -96,11 +97,11 @@ export const ProjectDetailPage: React.FC = () => {
     return (
       <DashboardLayout title="Project Details">
         <div className="max-w-md mx-auto py-16 text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-[var(--color-error-text)] flex items-center justify-center mx-auto">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-base font-bold text-neutral-900">{error || 'Project not found'}</h2>
-          <p className="text-xs text-neutral-500">
+          <h2 className="typo-section-heading text-[var(--color-text-primary)]">{error || 'Project not found'}</h2>
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
             The project you are trying to access does not exist or you do not have permission to view it.
           </p>
           <Button variant="outline" onClick={() => navigate('/client/projects')}>
@@ -116,7 +117,6 @@ export const ProjectDetailPage: React.FC = () => {
   const projectType = service?.projectTypes.find((pt) => pt.id === project.projectTypeId);
   const allFeatures = taxonomyService.getFeaturesForService(project.serviceId);
   const allAssets = taxonomyService.getExistingAssets();
-  const goals = taxonomyService.getProjectGoals();
   const budgetRange = taxonomyService
     .getBudgetRanges('EUR')
     .find((r) => r.id === brief.budget?.selectedRangeId);
@@ -124,13 +124,14 @@ export const ProjectDetailPage: React.FC = () => {
   const isDraft = project.status === 'draft';
   const isSubmitted = project.status === 'submitted';
   const candidateCount = shortlist?.candidates?.length || 0;
+  void snapshots;
 
   return (
     <DashboardLayout
       title={project.title || (isDraft ? 'Untitled Project Brief' : 'Project Details')}
       subtitle={`Created on ${new Date(project.createdAt).toLocaleDateString()}`}
       action={
-        <div className="flex items-center gap-2">
+        <div className="flex items-center flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -175,39 +176,39 @@ export const ProjectDetailPage: React.FC = () => {
       }
     >
       <div className="space-y-8">
-        {/* Calm Lifecycle Status Banner */}
+        {/* Waiting / Matching Status Banner (Calm surface — not competing with CTA banners) */}
         {(isSubmitted || project.status === 'matching' || project.status === 'budget_review') && (
-          <Card className="p-6 bg-neutral-900 text-white border-neutral-800">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    Project Status: Matching in Progress
-                  </span>
+          <Card className="p-6 border-[var(--color-border-strong)] bg-[var(--color-surface)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-info-text)]">
+                  <Compass className="w-3.5 h-3.5 shrink-0" />
+                  <span>Matching in Progress</span>
                 </div>
-                <h2 className="text-lg font-serif font-bold text-white">
+                <h2 className="typo-section-heading text-[var(--color-text-primary)]">
                   We're finding the right professionals
                 </h2>
-                <p className="text-xs text-neutral-300 max-w-2xl leading-relaxed">
+                <p className="text-[13px] text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
                   Your brief was submitted on{' '}
-                  {project.submittedAt
-                    ? new Date(project.submittedAt).toLocaleDateString()
-                    : 'today'}
+                  <span className="tabular-nums font-medium text-[var(--color-text-primary)]">
+                    {project.submittedAt
+                      ? new Date(project.submittedAt).toLocaleDateString()
+                      : 'today'}
+                  </span>
                   . Alongby is reviewing your requirements and finding professionals who match your project.
                 </p>
               </div>
 
-              <div className="shrink-0 flex flex-col sm:items-end gap-1">
+              <div className="shrink-0 flex flex-col sm:items-end gap-1.5">
                 <div
-                  className="px-3 py-1.5 rounded-lg bg-neutral-800 text-neutral-300 text-xs flex items-center gap-1.5 border border-neutral-700"
+                  className="px-3 py-1.5 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs inline-flex items-center gap-1.5 border border-[var(--color-border)] w-fit"
                   title="Your submitted brief is locked while we find the right professionals."
                 >
-                  <Lock className="w-3.5 h-3.5 text-neutral-400" />
+                  <Lock className="w-3.5 h-3.5 text-[var(--color-text-secondary)] shrink-0" />
                   <span className="font-medium">Brief locked</span>
                 </div>
-                <span className="text-[11px] text-neutral-400 max-w-[220px] text-left sm:text-right leading-tight">
-                  Your submitted brief is locked while we find the right professionals.
+                <span className="text-xs text-[var(--color-text-secondary)] max-w-[240px] text-left sm:text-right leading-snug">
+                  Brief editing is locked while specialists review your scope.
                 </span>
               </div>
             </div>
@@ -215,55 +216,52 @@ export const ProjectDetailPage: React.FC = () => {
         )}
 
         {(project.status === 'awaiting_professional_responses' || project.status === 'shortlist_review') && (
-          <Card className="p-6 bg-neutral-900 text-white border-neutral-800">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    Project Status: Matching in Progress
-                  </span>
+          <Card className="p-6 border-[var(--color-border-strong)] bg-[var(--color-surface)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-warning-text)]">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  <span>Matching in Progress</span>
                 </div>
-                <h2 className="text-lg font-serif font-bold text-white">
+                <h2 className="typo-section-heading text-[var(--color-text-primary)]">
                   Professionals are reviewing your project
                 </h2>
-                <p className="text-xs text-neutral-300 max-w-2xl leading-relaxed">
+                <p className="text-[13px] text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
                   Matched professionals have been invited to review your project brief. We will notify you once responses have been curated.
                 </p>
               </div>
 
-              <div className="shrink-0 flex flex-col sm:items-end gap-1">
+              <div className="shrink-0 flex flex-col sm:items-end gap-1.5">
                 <div
-                  className="px-3 py-1.5 rounded-lg bg-neutral-800 text-neutral-300 text-xs flex items-center gap-1.5 border border-neutral-700"
+                  className="px-3 py-1.5 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs inline-flex items-center gap-1.5 border border-[var(--color-border)] w-fit"
                   title="Your submitted brief is locked while we find the right professionals."
                 >
-                  <Lock className="w-3.5 h-3.5 text-neutral-400" />
+                  <Lock className="w-3.5 h-3.5 text-[var(--color-text-secondary)] shrink-0" />
                   <span className="font-medium">Brief locked</span>
                 </div>
-                <span className="text-[11px] text-neutral-400 max-w-[220px] text-left sm:text-right leading-tight">
-                  Your submitted brief is locked while we find the right professionals.
+                <span className="text-xs text-[var(--color-text-secondary)] max-w-[240px] text-left sm:text-right leading-snug">
+                  Brief editing is locked while specialists prepare quotes.
                 </span>
               </div>
             </div>
           </Card>
         )}
 
+        {/* Primary Action Banner: Curated Matches Ready */}
         {project.status === 'shortlist_ready' && (
-          <Card className="p-6 bg-stone-950 text-white border-stone-800 shadow-md">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
-                    Curated Matches Ready
-                  </span>
+          <Card className="p-6 bg-[var(--color-primary)] text-white border-[var(--color-primary)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[#C5DBD3]">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Curated Matches Ready</span>
                 </div>
-                <h2 className="text-xl font-serif font-bold text-white">
+                <h2 className="typo-section-heading text-white">
                   Your curated professional shortlist is ready
                 </h2>
-                <p className="text-xs text-stone-300 max-w-2xl leading-relaxed">
+                <p className="text-[13px] text-[#E8E5E0] max-w-2xl leading-relaxed">
                   {candidateCount > 0 ? (
-                    <span className="text-white font-medium">
+                    <span className="text-white font-semibold tabular-nums">
                       {candidateCount === 1
                         ? '1 professional is ready to compare.'
                         : `${candidateCount} professionals are ready to compare.`}{' '}
@@ -278,7 +276,6 @@ export const ProjectDetailPage: React.FC = () => {
                   <Button
                     variant="white"
                     size="md"
-                    className="font-semibold text-stone-900 bg-white hover:bg-stone-100 shadow-sm"
                     rightIcon={<ArrowRight className="w-4 h-4" />}
                   >
                     View Your Matches
@@ -289,32 +286,31 @@ export const ProjectDetailPage: React.FC = () => {
           </Card>
         )}
 
+        {/* Confirmed State: Professional Selected */}
         {project.status === 'professional_selected' && (
-          <Card className="p-6 bg-emerald-900 text-white border-emerald-800 shadow-md">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">
-                    Professional selected
-                  </span>
+          <Card className="p-6 bg-[var(--color-success-bg)] border-[var(--color-success-border)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-success-text)]">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Professional Selected</span>
                 </div>
-                <h2 className="text-xl font-serif font-bold text-white">
+                <h2 className="typo-section-heading text-[var(--color-text-primary)]">
                   Selection Confirmed
                 </h2>
-                <p className="text-xs text-emerald-100 max-w-2xl leading-relaxed">
+                <p className="text-[13px] text-[var(--color-success-text)] max-w-2xl leading-relaxed">
                   Next, we'll prepare the final project proposal based on the selected scope, timeline and price.
                 </p>
               </div>
 
-              <div className="shrink-0 flex items-center gap-3">
+              <div className="shrink-0 flex items-center flex-wrap gap-2.5">
                 <Link to={`/client/projects/${project.id}/matches`}>
-                  <Button variant="outline" size="sm" className="bg-transparent text-white border-emerald-400/50 hover:bg-emerald-800">
+                  <Button variant="outline" size="sm">
                     View Matches
                   </Button>
                 </Link>
                 <Link to={`/client/projects/${project.id}/proposal`}>
-                  <Button variant="white" size="sm" className="font-medium" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                  <Button variant="primary" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
                     Review Proposal
                   </Button>
                 </Link>
@@ -323,29 +319,31 @@ export const ProjectDetailPage: React.FC = () => {
           </Card>
         )}
 
+        {/* Primary Action Banner: Commercial Proposal Pending */}
         {project.status === 'proposal_pending' && (
-          <Card className="p-6 bg-sky-950 text-white border-sky-800 shadow-md">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-sky-400">
-                    Commercial Proposal Pending
-                  </span>
+          <Card className="p-6 bg-[var(--color-primary)] text-white border-[var(--color-primary)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[#C8D4E4]">
+                  <FileText className="w-3.5 h-3.5 shrink-0" />
+                  <span>Commercial Proposal Pending</span>
                 </div>
-                <h2 className="text-xl font-serif font-bold text-white">
+                <h2 className="typo-section-heading text-white">
                   Commercial Proposal Ready for Review
                 </h2>
-                <p className="text-xs text-sky-200 max-w-2xl leading-relaxed">
+                <p className="text-[13px] text-[#E8E5E0] max-w-2xl leading-relaxed">
                   The formal proposal detailing deliverables, milestone splits, and revision terms is pending mutual signoff before contract execution.
                 </p>
               </div>
 
-              <div className="shrink-0 flex items-center gap-2">
+              <div className="shrink-0">
                 <Link to={`/client/projects/${project.id}/proposal`}>
-                  <Button variant="primary" size="md" className="bg-white text-sky-950 hover:bg-sky-50 font-medium">
+                  <Button
+                    variant="white"
+                    size="md"
+                    rightIcon={<ArrowRight className="w-4 h-4" />}
+                  >
                     Review & Accept Proposal
-                    <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Button>
                 </Link>
               </div>
@@ -353,31 +351,33 @@ export const ProjectDetailPage: React.FC = () => {
           </Card>
         )}
 
+        {/* Primary Action Banner: Master Agreement Pending Signatures */}
         {(project.status === 'proposal_accepted' ||
           project.status === 'contract_pending' ||
           project.status === 'awaiting_signatures') && (
-          <Card className="p-6 bg-stone-900 text-white border-stone-800 shadow-md">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-                    Master Agreement Pending
-                  </span>
+          <Card className="p-6 bg-[var(--color-primary)] text-white border-[var(--color-primary)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[#E8D2B5]">
+                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                  <span>Master Agreement Pending</span>
                 </div>
-                <h2 className="text-xl font-serif font-bold text-white">
+                <h2 className="typo-section-heading text-white">
                   Master Services Agreement Awaiting Signature
                 </h2>
-                <p className="text-xs text-stone-300 max-w-2xl leading-relaxed">
+                <p className="text-[13px] text-[#E8E5E0] max-w-2xl leading-relaxed">
                   The proposal was formally accepted. Complete electronic execution under EU eIDAS and US ESIGN standards.
                 </p>
               </div>
 
-              <div className="shrink-0 flex items-center gap-2">
+              <div className="shrink-0">
                 <Link to={`/client/projects/${project.id}/contract`}>
-                  <Button variant="primary" size="md" className="bg-white text-stone-950 hover:bg-stone-100 font-medium">
+                  <Button
+                    variant="white"
+                    size="md"
+                    rightIcon={<ArrowRight className="w-4 h-4" />}
+                  >
                     Review & Sign Contract
-                    <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Button>
                 </Link>
               </div>
@@ -385,27 +385,26 @@ export const ProjectDetailPage: React.FC = () => {
           </Card>
         )}
 
+        {/* Confirmed State: Contract Executed / Awaiting Deposit */}
         {project.status === 'awaiting_deposit' && (
-          <Card className="p-6 bg-emerald-950 text-white border-emerald-800 shadow-md">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
-                    Contract Fully Executed
-                  </span>
+          <Card className="p-6 bg-[var(--color-success-bg)] border-[var(--color-success-border)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-success-text)]">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Contract Fully Executed</span>
                 </div>
-                <h2 className="text-xl font-serif font-bold text-white">
+                <h2 className="typo-section-heading text-[var(--color-text-primary)]">
                   Awaiting Phase 1 Initial Deposit
                 </h2>
-                <p className="text-xs text-emerald-200 max-w-2xl leading-relaxed">
+                <p className="text-[13px] text-[var(--color-success-text)] max-w-2xl leading-relaxed tabular-nums">
                   Both parties have completed electronic signatures. The agreement is legally binding. Project work will activate upon funding Phase 1 initial deposit (50% upfront deposit).
                 </p>
               </div>
 
-              <div className="shrink-0 flex items-center gap-2">
+              <div className="shrink-0">
                 <Link to={`/client/projects/${project.id}/contract`}>
-                  <Button variant="outline" size="sm" className="bg-transparent text-white border-white/40 hover:bg-white/10">
+                  <Button variant="outline" size="sm">
                     View Signed Contract
                   </Button>
                 </Link>
@@ -415,18 +414,19 @@ export const ProjectDetailPage: React.FC = () => {
         )}
 
         {isDraft && (
-          <Card className="p-5 bg-amber-50/70 border-amber-200/80 flex items-center justify-between">
-            <div>
-              <h3 className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-0.5">
+          <Card className="p-5 bg-[var(--color-warning-bg)] border-[var(--color-warning-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="text-xs font-semibold text-[var(--color-warning-text)] uppercase tracking-[0.06em] mb-1">
                 Draft in Progress
               </h3>
-              <p className="text-xs text-amber-800">
+              <p className="text-[13px] text-[var(--color-warning-text)] leading-relaxed">
                 This project has not yet been submitted. Resume editing to complete the brief and enter the curation queue.
               </p>
             </div>
             <Button
               variant="primary"
               size="sm"
+              className="w-fit"
               onClick={() => navigate(`/client/projects/new?draftId=${project.id}`)}
             >
               Continue Brief
@@ -435,51 +435,51 @@ export const ProjectDetailPage: React.FC = () => {
         )}
 
         {/* Two Column Layout: Brief Summary & Activity Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Brief Content (2 cols) */}
           <div className="lg:col-span-2 space-y-6">
             {/* Essential Meta Card */}
-            <Card className="p-6 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-neutral-100">
-                <div className="flex items-center gap-2">
-                  {isDraft && (
-                    <Badge variant="warning">Draft</Badge>
-                  )}
-                  {service && (
-                    <Badge variant="neutral">{service.name}</Badge>
-                  )}
-                  {projectType && (
-                    <span className="text-xs text-neutral-500 font-medium">
-                      • {projectType.name}
-                    </span>
-                  )}
-                </div>
+            <Card className="p-6 space-y-5">
+              <div className="flex flex-wrap items-center gap-2 pb-4 border-b border-[var(--color-border)]">
+                {isDraft && <Badge variant="warning">Draft</Badge>}
+                {service && <Badge variant="neutral">{service.name}</Badge>}
+                {projectType && (
+                  <span className="text-xs text-[var(--color-text-secondary)] font-medium">
+                    · {projectType.name}
+                  </span>
+                )}
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-neutral-900 mb-1">
+                <h3 className="typo-card-title text-[var(--color-text-primary)] mb-2">
                   Project Description
                 </h3>
-                <p className="text-xs text-neutral-700 leading-relaxed whitespace-pre-wrap">
+                <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed whitespace-pre-wrap">
                   {brief.description}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-[13px]">
                 {brief.businessName && (
                   <div>
-                    <span className="text-neutral-400 block mb-0.5">Business Name</span>
-                    <span className="font-medium text-neutral-900">{brief.businessName}</span>
+                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                      Business Name
+                    </span>
+                    <span className="font-medium text-[var(--color-text-primary)] break-words">
+                      {brief.businessName}
+                    </span>
                   </div>
                 )}
                 {brief.existingUrl && (
                   <div>
-                    <span className="text-neutral-400 block mb-0.5">Existing URL</span>
+                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                      Existing URL
+                    </span>
                     <a
                       href={brief.existingUrl.startsWith('http') ? brief.existingUrl : `https://${brief.existingUrl}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-medium text-neutral-900 underline truncate block"
+                      className="font-medium text-[var(--color-text-primary)] underline decoration-[var(--color-border-strong)] underline-offset-2 truncate block hover:opacity-80"
                     >
                       {brief.existingUrl}
                     </a>
@@ -487,8 +487,12 @@ export const ProjectDetailPage: React.FC = () => {
                 )}
                 {brief.targetAudience && (
                   <div className="sm:col-span-2">
-                    <span className="text-neutral-400 block mb-0.5">Target Audience</span>
-                    <span className="font-medium text-neutral-900">{brief.targetAudience}</span>
+                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                      Target Audience
+                    </span>
+                    <span className="font-medium text-[var(--color-text-primary)]">
+                      {brief.targetAudience}
+                    </span>
                   </div>
                 )}
               </div>
@@ -497,8 +501,8 @@ export const ProjectDetailPage: React.FC = () => {
             {/* Features & Deliverables */}
             <Card className="p-6 space-y-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-neutral-600" />
-                <h3 className="text-sm font-semibold text-neutral-900">
+                <Sparkles className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0" />
+                <h3 className="typo-card-title text-[var(--color-text-primary)]">
                   Required Features & Scope
                 </h3>
               </div>
@@ -510,7 +514,7 @@ export const ProjectDetailPage: React.FC = () => {
                     return (
                       <span
                         key={fId}
-                        className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-800 text-xs font-medium"
+                        className="px-2.5 py-1 rounded-[6px] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs font-medium"
                       >
                         {fId === 'other' && brief.customFeatures ? brief.customFeatures : f?.name || fId}
                       </span>
@@ -518,15 +522,17 @@ export const ProjectDetailPage: React.FC = () => {
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-neutral-500">General scope, open to proposal definition.</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">
+                  General scope, open to proposal definition.
+                </p>
               )}
             </Card>
 
             {/* Existing Assets */}
             <Card className="p-6 space-y-3">
               <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-neutral-600" />
-                <h3 className="text-sm font-semibold text-neutral-900">
+                <Layers className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0" />
+                <h3 className="typo-card-title text-[var(--color-text-primary)]">
                   Existing Client Assets
                 </h3>
               </div>
@@ -538,7 +544,7 @@ export const ProjectDetailPage: React.FC = () => {
                     return (
                       <span
                         key={aId}
-                        className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-800 text-xs font-medium"
+                        className="px-2.5 py-1 rounded-[6px] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs font-medium"
                       >
                         {aId === 'other' && brief.customAssets ? brief.customAssets : a?.name || aId}
                       </span>
@@ -546,7 +552,9 @@ export const ProjectDetailPage: React.FC = () => {
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-neutral-500">Starting from scratch (no existing assets).</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">
+                  Starting from scratch (no existing assets).
+                </p>
               )}
             </Card>
 
@@ -554,16 +562,18 @@ export const ProjectDetailPage: React.FC = () => {
             {(brief.additionalDetails || (brief.attachments && brief.attachments.length > 0)) && (
               <Card className="p-6 space-y-4">
                 <div className="flex items-center gap-2">
-                  <Paperclip className="w-4 h-4 text-neutral-600" />
-                  <h3 className="text-sm font-semibold text-neutral-900">
+                  <Paperclip className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0" />
+                  <h3 className="typo-card-title text-[var(--color-text-primary)]">
                     Notes & Attachments
                   </h3>
                 </div>
 
                 {brief.additionalDetails && (
                   <div>
-                    <span className="text-xs text-neutral-400 block mb-1">Additional Notes</span>
-                    <p className="text-xs text-neutral-700 whitespace-pre-wrap leading-relaxed">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">
+                      Additional Notes
+                    </span>
+                    <p className="text-sm text-[var(--color-text-primary)] whitespace-pre-wrap leading-relaxed">
                       {brief.additionalDetails}
                     </p>
                   </div>
@@ -571,21 +581,21 @@ export const ProjectDetailPage: React.FC = () => {
 
                 {brief.attachments && brief.attachments.length > 0 && (
                   <div className="space-y-2 pt-2">
-                    <span className="text-xs text-neutral-400 block">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)] tabular-nums block">
                       Uploaded Documents ({brief.attachments.length})
                     </span>
-                    <div className="divide-y divide-neutral-100 border border-neutral-200 rounded-lg overflow-hidden bg-white">
+                    <div className="divide-y divide-[var(--color-border)] border border-[var(--color-border)] rounded-[var(--radius-button)] overflow-hidden bg-[var(--color-surface)]">
                       {brief.attachments.map((att) => (
                         <div
                           key={att.fileId}
-                          className="p-3 flex items-center justify-between text-xs"
+                          className="p-3 flex items-center justify-between gap-2 text-xs"
                         >
-                          <div className="flex items-center gap-2 truncate">
-                            <Paperclip className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                            <span className="font-medium text-neutral-900 truncate">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Paperclip className="w-3.5 h-3.5 text-[var(--color-text-secondary)] shrink-0" />
+                            <span className="font-medium text-[var(--color-text-primary)] truncate">
                               {att.name}
                             </span>
-                            <span className="text-neutral-400 text-[11px] shrink-0">
+                            <span className="text-[var(--color-text-secondary)] text-xs tabular-nums shrink-0">
                               ({(att.size / 1024).toFixed(0)} KB)
                             </span>
                           </div>
@@ -595,7 +605,7 @@ export const ProjectDetailPage: React.FC = () => {
                               href={att.downloadUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-neutral-700 hover:text-neutral-950 font-medium underline flex items-center gap-1 shrink-0 ml-2"
+                              className="text-[var(--color-text-primary)] hover:underline font-semibold inline-flex items-center gap-1 shrink-0"
                             >
                               <Download className="w-3 h-3" /> Download
                             </a>
@@ -615,48 +625,54 @@ export const ProjectDetailPage: React.FC = () => {
             <Card className="p-6 space-y-5">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Euro className="w-4 h-4 text-neutral-500" />
-                  <h4 className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                  <Euro className="w-4 h-4 text-[var(--color-text-secondary)]" />
+                  <h4 className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-[0.06em]">
                     Indicative Budget
                   </h4>
                 </div>
-                <div className="text-xl font-serif font-bold text-neutral-950">
+                <div className="text-xl font-sans font-bold tabular-nums text-[var(--color-text-primary)] break-words">
                   {brief.budget?.budgetType === 'unsure'
                     ? 'I am not sure'
                     : budgetRange?.label || '€2,000 – €3,500'}
                 </div>
-                <p className="text-[11px] text-neutral-400 mt-1">
+                <p className="text-xs text-[var(--color-text-secondary)] mt-1">
                   Your budget range
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-neutral-100">
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-4 h-4 text-neutral-500" />
-                  <h4 className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+              <div className="pt-4 border-t border-[var(--color-border)]">
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="w-4 h-4 text-[var(--color-text-secondary)]" />
+                  <h4 className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-[0.06em]">
                     Project Timeline
                   </h4>
                 </div>
-                <div className="space-y-2 text-xs">
+                <div className="space-y-3 text-[13px]">
                   <div>
-                    <span className="text-neutral-400 block">Preferred Start:</span>
-                    <span className="font-medium text-neutral-800">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)] block">
+                      Preferred Start
+                    </span>
+                    <span className="font-medium text-[var(--color-text-primary)] tabular-nums">
                       {brief.timeline?.preferredStart === 'specific_date' && brief.timeline.startDate
                         ? `Target: ${brief.timeline.startDate}`
                         : formatTimelineOption(brief.timeline?.preferredStart || 'asap')}
                     </span>
                   </div>
                   <div>
-                    <span className="text-neutral-400 block">Desired Completion:</span>
-                    <span className="font-medium text-neutral-800">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)] block">
+                      Desired Completion
+                    </span>
+                    <span className="font-medium text-[var(--color-text-primary)] tabular-nums">
                       {brief.timeline?.desiredCompletion === 'specific_date' && brief.timeline.completionDate
                         ? `Deadline: ${brief.timeline.completionDate}`
                         : formatTimelineOption(brief.timeline?.desiredCompletion || 'flexible')}
                     </span>
                   </div>
                   <div>
-                    <span className="text-neutral-400 block">Flexibility:</span>
-                    <span className="font-medium text-neutral-800">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)] block">
+                      Flexibility
+                    </span>
+                    <span className="font-medium text-[var(--color-text-primary)]">
                       {formatTimelineOption(brief.timeline?.flexibility || 'somewhat_flexible')}
                     </span>
                   </div>
@@ -666,26 +682,29 @@ export const ProjectDetailPage: React.FC = () => {
 
             {/* Real Activity Timeline Card */}
             <Card className="p-6">
-              <h4 className="text-xs font-semibold text-neutral-800 uppercase tracking-wider mb-4">
+              <h4 className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-[0.06em] mb-4">
                 Activity History
               </h4>
 
               {activities.length === 0 ? (
-                <p className="text-xs text-neutral-400">No activity recorded yet.</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">No activity recorded yet.</p>
               ) : (
-                <div className="relative pl-4 border-l-2 border-neutral-100 space-y-4">
+                <div className="relative pl-5 space-y-5 before:content-[''] before:absolute before:left-[3px] before:top-1.5 before:bottom-1.5 before:w-px before:bg-[var(--color-border)]">
                   {activities.map((act) => (
                     <div key={act.id} className="relative">
-                      <span className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-neutral-900 ring-4 ring-white" />
-                      <div className="text-xs font-semibold text-neutral-900">
+                      <span
+                        className="absolute -left-[20px] top-1.5 w-[7px] h-[7px] rounded-full bg-[var(--color-primary)] ring-4 ring-[var(--color-surface)]"
+                        aria-hidden="true"
+                      />
+                      <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">
                         {formatActivityDisplay(act.title)}
                       </div>
                       {act.description && (
-                        <div className="text-[11px] text-neutral-500 mt-0.5">
+                        <div className="text-xs text-[var(--color-text-secondary)] mt-0.5 leading-relaxed">
                           {formatActivityDisplay(act.description)}
                         </div>
                       )}
-                      <div className="text-[10px] text-neutral-400 mt-1">
+                      <div className="text-xs text-[var(--color-text-secondary)] tabular-nums mt-1">
                         {new Date(act.createdAt).toLocaleString()}
                       </div>
                     </div>
@@ -699,3 +718,4 @@ export const ProjectDetailPage: React.FC = () => {
     </DashboardLayout>
   );
 };
+

@@ -123,15 +123,15 @@ export const ClientProjectsPage: React.FC = () => {
     >
       {/* Success Notification Banner */}
       {successToast && (
-        <div className="mb-6 p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between shadow-xs">
+        <div className="mb-6 p-3.5 rounded-[var(--radius-button)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] text-[var(--color-success-text)] text-xs font-medium flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-[var(--color-success)] shrink-0" />
             <span>{successToast}</span>
           </div>
           <button
             type="button"
             onClick={() => setSuccessToast(null)}
-            className="text-emerald-600 hover:text-emerald-900 text-xs font-semibold cursor-pointer"
+            className="text-[var(--color-success-text)] hover:text-[var(--color-text-primary)] text-xs font-semibold cursor-pointer shrink-0"
           >
             Dismiss
           </button>
@@ -139,33 +139,36 @@ export const ClientProjectsPage: React.FC = () => {
       )}
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 mb-6 border-b border-neutral-200 pb-2">
+      <div className="flex flex-wrap items-center gap-2 mb-6 border-b border-[var(--color-border)] pb-3">
         <button
+          type="button"
           onClick={() => setActiveTab('all')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
+          className={`px-3.5 min-h-[38px] rounded-[var(--radius-button)] text-[13px] font-medium tabular-nums cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] whitespace-nowrap ${
             activeTab === 'all'
-              ? 'bg-neutral-900 text-white'
-              : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+              ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)]'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)]'
           }`}
         >
           All ({projects.length})
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('draft')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
+          className={`px-3.5 min-h-[38px] rounded-[var(--radius-button)] text-[13px] font-medium tabular-nums cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] whitespace-nowrap ${
             activeTab === 'draft'
-              ? 'bg-neutral-900 text-white'
-              : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+              ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)]'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)]'
           }`}
         >
           Drafts ({projects.filter((p) => p.status === 'draft').length})
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('submitted')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
+          className={`px-3.5 min-h-[38px] rounded-[var(--radius-button)] text-[13px] font-medium tabular-nums cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] whitespace-nowrap ${
             activeTab === 'submitted'
-              ? 'bg-neutral-900 text-white'
-              : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+              ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)]'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)]'
           }`}
         >
           Submitted ({projects.filter((p) => p.status !== 'draft').length})
@@ -174,8 +177,7 @@ export const ClientProjectsPage: React.FC = () => {
 
       {loading ? (
         <div className="py-20 flex flex-col items-center justify-center">
-          <LoadingSpinner size="md" />
-          <p className="mt-3 text-xs text-neutral-500">Loading your projects…</p>
+          <LoadingSpinner size="md" label="Loading your projects…" />
         </div>
       ) : filteredProjects.length === 0 ? (
         <EmptyState
@@ -200,43 +202,46 @@ export const ClientProjectsPage: React.FC = () => {
             return (
               <Card
                 key={project.id}
-                className="p-6 transition-all hover:border-neutral-300 flex flex-col md:flex-row md:items-center justify-between gap-6"
+                className="p-5 sm:p-6 transition-colors hover:border-[var(--color-border-strong)] flex flex-col md:flex-row md:items-center justify-between gap-5"
               >
                 <div className="space-y-2 flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs">
                     {getStatusBadge(project.status)}
                     {service && (
-                      <span className="text-xs px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 font-medium">
-                        {service.name}
-                      </span>
+                      <>
+                        <span className="font-medium text-[var(--color-text-primary)]">
+                          {service.name}
+                        </span>
+                        <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                      </>
                     )}
-                    <span className="text-xs text-neutral-400">
+                    <span className="text-[var(--color-text-muted)] tabular-nums">
                       {isDraft ? 'Draft updated' : 'Submitted'}:{' '}
                       {new Date(project.updatedAt || project.createdAt).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-neutral-950 truncate">
+                  <h3 className="typo-card-title text-[var(--color-text-primary)] break-words">
                     {project.title || 'Untitled Project Brief'}
                   </h3>
 
-                  <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed">
+                  <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2 leading-relaxed">
                     {project.brief?.description || 'No description provided yet.'}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-600 pt-1">
-                    <span className="flex items-center gap-1.5">
-                      <Euro className="w-3.5 h-3.5 text-neutral-400" />
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[13px] text-[var(--color-text-secondary)] pt-1">
+                    <span className="flex items-center gap-1.5 font-semibold text-[var(--color-text-primary)] tabular-nums">
+                      <Euro className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                       {formatBudget(project)}
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                    <span className="flex items-center gap-1.5 tabular-nums">
+                      <Calendar className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                       {formatTimeline(project)}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-neutral-100">
+                <div className="flex flex-wrap items-center gap-2 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-[var(--color-border)]">
                   {isDraft ? (
                     <div className="flex items-center gap-1.5">
                       <Button
@@ -254,7 +259,7 @@ export const ClientProjectsPage: React.FC = () => {
                       />
                     </div>
                   ) : project.status === 'shortlist_ready' ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -272,7 +277,7 @@ export const ClientProjectsPage: React.FC = () => {
                       </Button>
                     </div>
                   ) : project.status === 'professional_selected' ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"

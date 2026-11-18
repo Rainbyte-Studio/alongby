@@ -38,7 +38,7 @@ export const DiscardChangesModal: React.FC<DiscardChangesModalProps> = ({
           variant="primary"
           size="sm"
           onClick={onDiscard}
-          className="w-full sm:w-auto bg-neutral-900 hover:bg-neutral-800 text-white"
+          className="w-full sm:w-auto"
         >
           Discard Changes
         </Button>

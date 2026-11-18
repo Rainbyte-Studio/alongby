@@ -17,9 +17,7 @@ import {
   Users,
   FolderKanban,
   CheckCircle2,
-  XCircle,
   Clock,
-  Sparkles,
   MapPin,
   ArrowRight,
   Euro,
@@ -28,7 +26,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 export const AdminDashboardPage: React.FC = () => {
-  const { currentUser, userProfile, refreshData } = useAuth();
+  const { currentUser, refreshData } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'professionals' | 'projects' | 'audit'>('professionals');
   const [professionals, setProfessionals] = useState<ProfessionalProfile[]>([]);
@@ -129,12 +127,12 @@ export const AdminDashboardPage: React.FC = () => {
       {/* PROFESSIONALS TAB */}
       {activeTab === 'professionals' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-neutral-900">
+              <h3 className="typo-section-heading text-[var(--color-text-primary)]">
                 Professional Verification Registry
               </h3>
-              <p className="text-xs text-neutral-500">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 Only verified professionals are eligible for algorithmic and curated matching scoring.
               </p>
             </div>
@@ -155,48 +153,50 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="space-y-4">
               {professionals.map((prof) => (
                 <Card key={prof.userId} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1.5 max-w-xl">
-                    <div className="flex items-center gap-2.5">
-                      <span className="font-bold text-neutral-900 text-sm">
+                  <div className="space-y-1.5 max-w-xl min-w-0">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <span className="typo-card-title text-[var(--color-text-primary)] break-words">
                         {prof.displayName}
                       </span>
                       {getStatusBadge(prof.verificationStatus)}
-                      <span className="text-xs text-neutral-400">
+                      <span className="text-xs text-[var(--color-text-muted)] tabular-nums">
                         {prof.yearsOfExperience}y exp
                       </span>
                     </div>
 
-                    <div className="text-xs font-medium text-neutral-700">
+                    <div className="text-[13px] font-medium text-[var(--color-text-secondary)]">
                       {prof.professionalTitle}
                     </div>
 
-                    <p className="text-xs text-neutral-500 line-clamp-2">
+                    <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2">
                       {prof.shortBio}
                     </p>
 
-                    <div className="flex flex-wrap gap-1 pt-1">
+                    <div className="flex flex-wrap gap-1.5 pt-1">
                       {prof.primaryServices?.map((s) => (
                         <span
                           key={s}
-                          className="text-[10px] px-2 py-0.5 rounded bg-neutral-100 text-neutral-600"
+                          className="text-xs px-2 py-0.5 rounded-[6px] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium"
                         >
                           {s}
                         </span>
                       ))}
                     </div>
 
-                    <div className="text-[11px] text-neutral-400 flex items-center gap-3 pt-1">
+                    <div className="text-xs text-[var(--color-text-muted)] flex flex-wrap items-center gap-2.5 pt-1">
                       <span className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-neutral-400" />
+                        <MapPin className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                         {prof.country} ({prof.timezone})
                       </span>
-                      <span>•</span>
-                      <span>Floor: €{(prof.minimumBudgetMinor / 100).toLocaleString()} EUR</span>
+                      <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                      <span className="font-semibold text-[var(--color-text-primary)] tabular-nums">
+                        Floor: €{(prof.minimumBudgetMinor / 100).toLocaleString()} EUR
+                      </span>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="shrink-0 flex items-center gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-neutral-100">
+                  <div className="shrink-0 flex items-center gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-[var(--color-border)]">
                     {prof.verificationStatus !== 'verified' ? (
                       <Button
                         variant="primary"
@@ -225,7 +225,7 @@ export const AdminDashboardPage: React.FC = () => {
                         size="sm"
                         isLoading={actionLoadingId === prof.userId}
                         onClick={() => handleUpdateStatus(prof.userId, 'rejected')}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="text-[var(--color-error-text)] hover:text-[var(--color-error-text)] hover:bg-[var(--color-error-bg)]"
                       >
                         Reject
                       </Button>
@@ -241,12 +241,12 @@ export const AdminDashboardPage: React.FC = () => {
       {/* MATCHING QUEUE TAB */}
       {activeTab === 'projects' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-neutral-900">
+              <h3 className="typo-section-heading text-[var(--color-text-primary)]">
                 Curated Matching Queue
               </h3>
-              <p className="text-xs text-neutral-500">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 Client project briefs submitted for algorithmic scoring and professional opportunity curation.
               </p>
             </div>
@@ -277,9 +277,9 @@ export const AdminDashboardPage: React.FC = () => {
                     key={proj.id}
                     className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
                   >
-                    <div className="space-y-1.5 max-w-xl">
-                      <div className="flex items-center gap-2.5">
-                        <span className="font-bold text-neutral-900 text-sm">
+                    <div className="space-y-1.5 max-w-xl min-w-0">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <span className="typo-card-title text-[var(--color-text-primary)] break-words">
                           {proj.title}
                         </span>
                         <Badge
@@ -298,43 +298,44 @@ export const AdminDashboardPage: React.FC = () => {
                           {proj.status.replace(/_/g, ' ')}
                         </Badge>
                         {service && (
-                          <span className="text-xs text-neutral-500 font-medium">
-                            • {service.name}
+                          <span className="text-xs text-[var(--color-text-muted)] font-medium">
+                            <span className="text-[var(--color-border-strong)] mr-1.5" aria-hidden="true">·</span>
+                            {service.name}
                           </span>
                         )}
                       </div>
 
-                      <div className="text-xs text-neutral-600">
-                        Client: <strong className="text-neutral-800">{proj.clientName || 'Client'}</strong>
+                      <div className="text-[13px] text-[var(--color-text-secondary)]">
+                        Client: <strong className="font-semibold text-[var(--color-text-primary)]">{proj.clientName || 'Client'}</strong>
                         {proj.clientCompanyName ? ` (${proj.clientCompanyName})` : ''}
                       </div>
 
-                      <p className="text-xs text-neutral-500 line-clamp-2">
+                      <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2">
                         {proj.brief.description || 'No description provided.'}
                       </p>
 
-                      <div className="text-[11px] text-neutral-400 flex flex-wrap items-center gap-3 pt-1">
-                        <span className="flex items-center gap-1">
-                          <Euro className="w-3 h-3 text-neutral-400" />
+                      <div className="text-xs text-[var(--color-text-muted)] flex flex-wrap items-center gap-2.5 pt-1">
+                        <span className="flex items-center gap-1 font-semibold text-[var(--color-text-primary)] tabular-nums">
+                          <Euro className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                           {proj.brief.budget.budgetType === 'unsure' ? (
                             'Unspecified budget'
                           ) : (
                             `€${((proj.brief.budget.minAmountMinor || 0) / 100).toLocaleString()} – €${((proj.brief.budget.maxAmountMinor || 0) / 100).toLocaleString()}`
                           )}
                         </span>
-                        <span>•</span>
+                        <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-neutral-400" />
+                          <Calendar className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                           Start: {proj.brief.timeline.preferredStart.replace(/_/g, ' ')}
                         </span>
-                        <span>•</span>
-                        <span>
+                        <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                        <span className="tabular-nums">
                           Updated: {new Date(proj.updatedAt).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
 
-                    <div className="shrink-0 flex items-center gap-2 border-t md:border-t-0 pt-3 md:pt-0 border-neutral-100">
+                    <div className="shrink-0 flex items-center gap-2 border-t md:border-t-0 pt-3 md:pt-0 border-[var(--color-border)]">
                       {isMatchingStage ? (
                         <Button
                           variant="primary"
@@ -367,18 +368,22 @@ export const AdminDashboardPage: React.FC = () => {
         <div className="max-w-2xl space-y-6">
           <Card className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <ShieldCheck className="w-5 h-5 text-emerald-600" />
-              <h3 className="text-base font-bold text-neutral-900">
+              <ShieldCheck className="w-5 h-5 text-[var(--color-success)] shrink-0" />
+              <h3 className="typo-section-heading text-[var(--color-text-primary)]">
                 Security & Administrative Enforcement
               </h3>
             </div>
-            <p className="text-xs text-neutral-500 leading-relaxed mb-4">
-              Alongby protects administrative privileges through backend Firestore Security Rules. Role definitions are verified against authenticated user profiles stored in <code className="bg-neutral-100 px-1 py-0.5 rounded text-neutral-800">users/&#123;uid&#125;</code>.
+            <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">
+              Alongby protects administrative privileges through backend Firestore Security Rules. Role definitions are verified against authenticated user profiles stored in{' '}
+              <span className="font-mono text-xs bg-[var(--color-surface-secondary)] border border-[var(--color-border)] px-1.5 py-0.5 rounded text-[var(--color-text-primary)]">
+                users/&#123;uid&#125;
+              </span>
+              .
             </p>
 
-            <div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200 text-xs space-y-2">
-              <div className="font-semibold text-neutral-800">Active Security Controls:</div>
-              <ul className="list-disc list-inside text-neutral-600 space-y-1">
+            <div className="p-4 rounded-[var(--radius-input)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[13px] space-y-2">
+              <div className="font-semibold text-[var(--color-text-primary)]">Active Security Controls:</div>
+              <ul className="list-disc list-inside text-[var(--color-text-secondary)] space-y-1">
                 <li>Non-admin clients cannot modify user roles or account statuses</li>
                 <li>Professionals cannot self-verify into the curated pool</li>
                 <li>Direct URL navigation is blocked by client-side and server-side rules</li>

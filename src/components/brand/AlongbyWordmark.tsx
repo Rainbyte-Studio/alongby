@@ -42,7 +42,7 @@ export const AlongbyWordmark: React.FC<AlongbyWordmarkProps> = ({
     <span
       className={`inline-flex items-center select-none font-normal tracking-normal leading-none overflow-visible text-neutral-950 antialiased ${sizeClass} ${className}`}
       style={{
-        fontFamily: "'Lobster', cursive",
+        fontFamily: "var(--font-logo, 'Lobster', cursive)",
         color: color || undefined,
       }}
       title="alongby"

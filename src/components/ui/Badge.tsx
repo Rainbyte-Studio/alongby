@@ -2,7 +2,7 @@ import React from 'react';
 
 export interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'neutral' | 'success' | 'warning' | 'info' | 'error';
+  variant?: 'neutral' | 'success' | 'warning' | 'info' | 'error' | 'danger' | 'outline';
   size?: 'sm' | 'md';
   className?: string;
 }
@@ -14,21 +14,23 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
 }) => {
   const variantStyles = {
-    neutral: 'bg-neutral-100 text-neutral-800 border-neutral-200',
-    success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    warning: 'bg-amber-50 text-amber-800 border-amber-200',
-    info: 'bg-sky-50 text-sky-800 border-sky-200',
-    error: 'bg-rose-50 text-rose-800 border-rose-200',
+    neutral: 'bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] border-[var(--color-border)]',
+    success: 'bg-[var(--color-success-bg)] text-[var(--color-success-text)] border-[var(--color-success-border)]',
+    warning: 'bg-[var(--color-warning-bg)] text-[var(--color-warning-text)] border-[var(--color-warning-border)]',
+    info: 'bg-[var(--color-info-bg)] text-[var(--color-info-text)] border-[var(--color-info-border)]',
+    error: 'bg-[var(--color-error-bg)] text-[var(--color-error-text)] border-[var(--color-error-border)]',
+    danger: 'bg-[var(--color-error-bg)] text-[var(--color-error-text)] border-[var(--color-error-border)]',
+    outline: 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border-strong)]',
   };
 
   const sizeStyles = {
-    sm: 'text-[11px] font-medium px-2 py-0.5 rounded',
-    md: 'text-xs font-medium px-2.5 py-1 rounded-md',
+    sm: 'text-xs font-medium px-2 py-0.5 rounded-md',
+    md: 'text-[13px] font-medium px-2.5 py-1 rounded-[var(--radius-button)]',
   };
 
   return (
     <span
-      className={`inline-flex items-center border leading-none tracking-normal whitespace-nowrap ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+      className={`inline-flex items-center font-sans border leading-snug tracking-normal whitespace-nowrap ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
     >
       {children}
     </span>

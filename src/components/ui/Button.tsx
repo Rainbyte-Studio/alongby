@@ -24,31 +24,28 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const isBusy = isLoading || loading;
   const baseClasses =
-    'inline-flex items-center justify-center font-medium transition-all duration-150 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer';
+    'inline-flex items-center justify-center font-sans font-semibold transition-colors duration-150 rounded-[var(--radius-button)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shrink-0 cursor-pointer';
 
   const variantClasses = {
     primary:
-      'bg-neutral-900 text-white hover:bg-neutral-800 active:bg-black focus:ring-neutral-900 shadow-xs',
+      'bg-[var(--color-primary)] text-[var(--color-primary-text)] hover:bg-[var(--color-primary-hover)] active:bg-black',
     secondary:
-      'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:bg-neutral-300 focus:ring-neutral-400',
+      'bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] hover:bg-[#E7E3DD] active:bg-[#DDD8D0] border border-[var(--color-border)]',
     outline:
-      'border border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-50 active:bg-neutral-100 focus:ring-neutral-400 shadow-xs',
+      'border border-[var(--color-border-strong)] bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] active:bg-[#EAE6DF]',
     ghost:
-      'text-neutral-700 hover:bg-neutral-100 active:bg-neutral-200 focus:ring-neutral-400',
+      'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] active:bg-[#EAE6DF]',
     destructive:
-      'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-600 shadow-xs',
+      'bg-[var(--color-error)] text-white hover:bg-[var(--color-error-hover)] active:bg-[#8A3232] focus-visible:ring-[var(--color-error)]',
     white:
-      'bg-white text-stone-900 hover:bg-stone-100 active:bg-stone-200 focus:ring-white shadow-xs font-semibold',
+      'bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] active:bg-[#EAE6DF] border border-[var(--color-border)]',
   };
 
-  // Button horizontal padding must be exactly 2x vertical padding as per guidelines:
-  // sm: py-1.5 px-3 (12px px, 6px py)
-  // md: py-2.5 px-5 (20px px, 10px py)
-  // lg: py-3.5 px-7 (28px px, 14px py)
+  // Standardized button scale (13–14px Noto Sans 600) with consistent heights and 2:1 horizontal-to-vertical padding balance
   const sizeClasses = {
-    sm: 'text-xs py-1.5 px-3 gap-1.5',
-    md: 'text-sm py-2.5 px-5 gap-2',
-    lg: 'text-base py-3.5 px-7 gap-2.5',
+    sm: 'text-[13px] leading-5 py-1.5 px-3.5 gap-1.5 min-h-[36px]',
+    md: 'text-sm leading-5 py-2.5 px-5 gap-2 min-h-[40px]',
+    lg: 'text-sm leading-5 py-3 px-6 gap-2.5 min-h-[44px]',
   };
 
   return (

@@ -168,9 +168,9 @@ export const ProjectProposalPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <Link
             to={getBackRoute()}
-            className="inline-flex items-center text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
+            className="inline-flex items-center text-[13px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
           >
-            <ArrowLeft className="w-3.5 h-3.5 mr-1" />
+            <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
             <span>Back to {userProfile?.role === 'professional' ? 'Opportunities' : 'Project'}</span>
           </Link>
         </div>
@@ -178,21 +178,21 @@ export const ProjectProposalPage: React.FC = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <LoadingSpinner size="lg" />
-            <p className="text-sm text-neutral-500 mt-4">Loading commercial proposal...</p>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-4">Loading commercial proposal...</p>
           </div>
         ) : error ? (
-          <div className="p-6 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-sm flex items-start gap-3">
+          <div className="p-6 bg-[var(--color-error-bg)] border border-[var(--color-error-border)] rounded-[var(--radius-card)] text-[var(--color-error-text)] text-sm flex items-start gap-3">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold">Unable to display proposal</p>
-              <p className="mt-1 text-xs text-rose-700">{error}</p>
+              <p className="mt-1 text-[13px] opacity-90">{error}</p>
             </div>
           </div>
         ) : !proposal ? (
-          <div className="bg-white rounded-xl border border-neutral-200 p-12 text-center space-y-4">
-            <FileText className="w-12 h-12 text-neutral-400 mx-auto" />
-            <h3 className="text-lg font-semibold text-neutral-900">No Proposal Formulated Yet</h3>
-            <p className="text-sm text-neutral-500 max-w-md mx-auto">
+          <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] p-12 text-center space-y-4">
+            <FileText className="w-12 h-12 text-[var(--color-text-muted)] mx-auto" />
+            <h3 className="typo-section-heading text-[var(--color-text-primary)]">No Proposal Formulated Yet</h3>
+            <p className="text-sm text-[var(--color-text-secondary)] max-w-md mx-auto leading-relaxed">
               A commercial proposal has not been generated for this project yet. Proposals are created
               once a specialist is selected from the verified shortlist.
             </p>

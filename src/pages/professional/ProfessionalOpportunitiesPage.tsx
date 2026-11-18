@@ -140,67 +140,73 @@ export const ProfessionalOpportunitiesPage: React.FC = () => {
               return (
                 <Card
                   key={opp.id}
-                  className={`p-6 transition-all hover:border-neutral-300 ${
-                    opp.status === 'pending' ? 'border-neutral-400 shadow-xs' : ''
+                  className={`p-6 transition-colors ${
+                    opp.status === 'pending'
+                      ? 'border-[var(--color-border-strong)]'
+                      : 'hover:border-[var(--color-border-strong)]'
                   }`}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                     {/* Left details */}
-                    <div className="space-y-2.5 max-w-2xl">
+                    <div className="space-y-2.5 max-w-2xl min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         {getStatusBadge(opp.status)}
-                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-700 font-medium">
+                        <span className="text-xs font-semibold text-[var(--color-text-primary)]">
                           {snap.serviceName}
                         </span>
-                        <span className="text-xs text-neutral-400 font-medium">
-                          • {snap.projectTypeName}
+                        <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                        <span className="text-xs text-[var(--color-text-secondary)] font-medium">
+                          {snap.projectTypeName}
                         </span>
                         {snap.industryName && (
-                          <span className="text-xs text-neutral-400 font-medium">
-                            • {snap.industryName}
-                          </span>
+                          <>
+                            <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                            <span className="text-xs text-[var(--color-text-secondary)] font-medium">
+                              {snap.industryName}
+                            </span>
+                          </>
                         )}
                       </div>
 
-                      <h3 className="text-base font-bold text-neutral-900 font-serif">
+                      <h3 className="typo-card-title text-[var(--color-text-primary)] break-words">
                         {snap.title}
                       </h3>
 
-                      <p className="text-xs text-neutral-600 line-clamp-2 leading-relaxed">
+                      <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2 leading-relaxed">
                         {snap.description}
                       </p>
 
                       {/* Meta stats */}
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-500 pt-1">
-                        <span className="flex items-center gap-1 font-semibold text-neutral-800">
-                          <Euro className="w-3.5 h-3.5 text-neutral-400" />
+                      <div className="flex flex-wrap items-center gap-3 text-[13px] text-[var(--color-text-secondary)] pt-1">
+                        <span className="flex items-center gap-1.5 font-semibold text-[var(--color-text-primary)] tabular-nums">
+                          <Euro className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                           {snap.indicativeBudget.budgetType === 'unsure' ? (
                             'Unspecified indicative budget'
                           ) : (
                             `€${((snap.indicativeBudget.minAmountMinor || 0) / 100).toLocaleString()} – €${((snap.indicativeBudget.maxAmountMinor || 0) / 100).toLocaleString()} ${snap.indicativeBudget.currency}`
                           )}
                         </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                        <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                           Kickoff: {snap.timeline.preferredStart.replace(/_/g, ' ')}
                         </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                        <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                        <span className="flex items-center gap-1.5 tabular-nums">
+                          <Clock className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                           {daysLeft}
                         </span>
                       </div>
 
-                      {/* Why matched chips */}
+                      {/* Why matched reasons */}
                       {opp.matchReasons && opp.matchReasons.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 pt-1">
+                        <div className="flex flex-wrap gap-2 pt-1">
                           {opp.matchReasons.slice(0, 2).map((reason, idx) => (
                             <span
                               key={idx}
-                              className="text-[10px] px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-600 flex items-center gap-1"
+                              className="text-xs px-2.5 py-1 rounded-md bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-secondary)] inline-flex items-center gap-1.5"
                             >
-                              <Sparkles className="w-2.5 h-2.5 text-neutral-500" />
+                              <Sparkles className="w-3 h-3 text-[var(--color-text-muted)] shrink-0" />
                               {reason}
                             </span>
                           ))}
@@ -209,7 +215,7 @@ export const ProfessionalOpportunitiesPage: React.FC = () => {
                     </div>
 
                     {/* Right action */}
-                    <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 border-t lg:border-t-0 pt-4 lg:pt-0 border-neutral-100">
+                    <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 border-t lg:border-t-0 pt-4 lg:pt-0 border-[var(--color-border)]">
                       {isActionRequired ? (
                         <Button
                           variant="primary"

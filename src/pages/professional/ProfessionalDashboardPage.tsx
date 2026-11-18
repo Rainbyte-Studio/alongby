@@ -176,12 +176,12 @@ export const ProfessionalDashboardPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2 p-6 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                  <div className="flex flex-wrap items-center gap-2.5">
                     <Badge variant={verificationBadgeProps.variant} size="md">
                       {verificationBadgeProps.label}
                     </Badge>
-                    <span className="text-xs text-neutral-400">
+                    <span className="text-xs text-[var(--color-text-secondary)] tabular-nums">
                       {professionalProfile?.yearsOfExperience || 0} years experience
                     </span>
                   </div>
@@ -191,51 +191,51 @@ export const ProfessionalDashboardPage: React.FC = () => {
                     size="sm"
                     onClick={() => navigate('/professional/profile')}
                     leftIcon={<Edit3 className="w-3.5 h-3.5" />}
-                    className="text-xs h-7 py-1 px-2.5"
                   >
                     Edit Profile
                   </Button>
                 </div>
 
-                <h2 className="text-xl font-bold font-serif text-neutral-900 mb-1">
+                <h2 className="typo-card-title text-[var(--color-text-primary)] mb-1 break-words">
                   {profName}
                 </h2>
-                <p className="text-sm font-medium text-neutral-700 mb-3">
+                <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">
                   {professionalProfile?.professionalTitle || 'Professional Practitioner'}
                 </p>
 
-                <p className="text-xs text-neutral-600 leading-relaxed mb-4">
+                <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-5">
                   {professionalProfile?.shortBio || 'No biography entered.'}
                 </p>
 
-                {/* Services & Skills Tags */}
-                <div className="space-y-2 pt-3 border-t border-neutral-100">
-                  <div className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+                {/* Services & Skills */}
+                <div className="space-y-2 pt-4 border-t border-[var(--color-border)]">
+                  <div className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                     Primary Services
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {professionalProfile?.primaryServices?.map((s) => (
                       <span
                         key={s}
-                        className="px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 text-xs font-medium"
+                        className="px-2.5 py-1 rounded-md bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-xs font-medium"
                       >
                         {s}
                       </span>
-                    )) || <span className="text-xs text-neutral-400">None defined</span>}
+                    )) || <span className="text-xs text-[var(--color-text-secondary)]">None defined</span>}
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4 mt-4 text-xs text-neutral-500">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-neutral-400" />
+                <div className="flex flex-wrap items-center gap-3 mt-4 text-[13px] text-[var(--color-text-secondary)]">
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                     {professionalProfile?.country || 'Location unset'}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                  <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                     {professionalProfile?.timezone || 'Timezone unset'}
                   </span>
-                  <span className="text-neutral-300">•</span>
-                  <span>
+                  <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                  <span className="font-semibold text-[var(--color-text-primary)] tabular-nums">
                     Floor Budget: €
                     {((professionalProfile?.minimumBudgetMinor || 0) / 100).toLocaleString()}{' '}
                     EUR
@@ -243,9 +243,9 @@ export const ProfessionalDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-4 mt-6 border-t border-neutral-100 flex items-center justify-between text-xs">
-                <span className="text-neutral-500">Curation Pool Status:</span>
-                <span className="font-medium text-neutral-800">
+              <div className="pt-4 mt-6 border-t border-[var(--color-border)] flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="text-[var(--color-text-secondary)]">Curation Pool Status</span>
+                <span className="font-semibold text-[var(--color-text-primary)]">
                   {verificationStatus === 'verified'
                     ? 'Active in Curation Scoring'
                     : 'Awaiting Admin Verification'}
@@ -256,8 +256,8 @@ export const ProfessionalDashboardPage: React.FC = () => {
             {/* Current Live Availability Quick Card */}
             <Card className="p-6 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+                <div className="flex items-center justify-between gap-2 mb-5">
+                  <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                     Live Availability
                   </span>
                   <Button
@@ -271,24 +271,24 @@ export const ProfessionalDashboardPage: React.FC = () => {
 
                 <div className="space-y-4">
                   <div>
-                    <div className="text-xs text-neutral-500 mb-1">Status</div>
-                    <div className="capitalize font-semibold text-neutral-900 text-sm">
+                    <div className="text-xs font-medium text-[var(--color-text-secondary)] mb-1">Status</div>
+                    <div className="capitalize font-semibold text-[var(--color-text-primary)] text-sm">
                       {availStatus.replace('_', ' ')}
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-xs text-neutral-500 mb-1">Next Available Date</div>
-                    <div className="font-semibold text-neutral-900 text-sm flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4 text-neutral-400" />
+                    <div className="text-xs font-medium text-[var(--color-text-secondary)] mb-1">Next Available Date</div>
+                    <div className="font-semibold text-[var(--color-text-primary)] text-sm flex items-center gap-1.5 tabular-nums">
+                      <Calendar className="w-4 h-4 text-[var(--color-text-muted)]" />
                       <span>{nextDate}</span>
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-xs text-neutral-500 mb-1">Concurrent Capacity</div>
-                    <div className="font-semibold text-neutral-900 text-sm flex items-center gap-1.5">
-                      <Layers className="w-4 h-4 text-neutral-400" />
+                    <div className="text-xs font-medium text-[var(--color-text-secondary)] mb-1">Concurrent Capacity</div>
+                    <div className="font-semibold text-[var(--color-text-primary)] text-sm flex items-center gap-1.5 tabular-nums">
+                      <Layers className="w-4 h-4 text-[var(--color-text-muted)]" />
                       <span>
                         {availability?.currentActiveProjectCount || 0} / {maxProjects} Active Projects
                       </span>
@@ -297,7 +297,7 @@ export const ProfessionalDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="text-[11px] text-neutral-400 pt-4 border-t border-neutral-100">
+              <div className="text-xs text-[var(--color-text-secondary)] pt-4 mt-6 border-t border-[var(--color-border)]">
                 Matched only when capacity is open.
               </div>
             </Card>
@@ -305,7 +305,7 @@ export const ProfessionalDashboardPage: React.FC = () => {
 
           {/* Opportunities Functional Empty State */}
           <div className="space-y-3">
-            <h3 className="text-base font-bold text-neutral-900">
+            <h3 className="typo-section-heading text-[var(--color-text-primary)]">
               Private Project Opportunities
             </h3>
             <EmptyState
@@ -321,24 +321,24 @@ export const ProfessionalDashboardPage: React.FC = () => {
       {activeTab === 'availability' && (
         <div className="max-w-2xl">
           <Card className="p-6 sm:p-8">
-            <div className="mb-6 pb-4 border-b border-neutral-100">
-              <h3 className="text-lg font-bold font-serif text-neutral-900">
+            <div className="mb-6 pb-4 border-b border-[var(--color-border)]">
+              <h3 className="typo-section-heading text-[var(--color-text-primary)]">
                 Availability & Delivery Capacity
               </h3>
-              <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
+              <p className="mt-1 text-sm text-[var(--color-text-secondary)] leading-relaxed">
                 Configure your real-time availability. Alongby uses deterministic capacity matching to ensure you are never matched with projects when your schedule cannot accommodate them.
               </p>
             </div>
 
             {availSuccessMsg && (
-              <div className="mb-6 p-3 rounded-md bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <div className="mb-6 p-3.5 rounded-[var(--radius-button)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] text-xs text-[var(--color-success-text)] flex items-center gap-2 font-medium">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{availSuccessMsg}</span>
               </div>
             )}
 
             {availErrorMsg && (
-              <div className="mb-6 p-3 rounded-md bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
+              <div className="mb-6 p-3.5 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-center gap-2 font-medium">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{availErrorMsg}</span>
               </div>
@@ -361,6 +361,7 @@ export const ProfessionalDashboardPage: React.FC = () => {
                   required
                   value={nextDate}
                   onChange={(e) => setNextDate(e.target.value)}
+                  className="tabular-nums"
                   helperText="Earliest project kick-off date you can commit to"
                 />
 
@@ -372,11 +373,12 @@ export const ProfessionalDashboardPage: React.FC = () => {
                   required
                   value={maxProjects}
                   onChange={(e) => setMaxProjects(parseInt(e.target.value, 10) || 1)}
+                  className="tabular-nums"
                   helperText="Recommended 1–3 for focused high-touch delivery"
                 />
               </div>
 
-              <div className="pt-4 border-t border-neutral-100 flex items-center justify-end gap-3">
+              <div className="pt-4 border-t border-[var(--color-border)] flex items-center justify-end gap-3">
                 <Button
                   type="submit"
                   variant="primary"
@@ -394,12 +396,12 @@ export const ProfessionalDashboardPage: React.FC = () => {
       {/* OPPORTUNITIES TAB */}
       {activeTab === 'opportunities' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-neutral-900">
+              <h3 className="typo-section-heading text-[var(--color-text-primary)]">
                 Curated Project Opportunities
               </h3>
-              <p className="text-xs text-neutral-500">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 Private opportunities matched with your services, pricing baseline, and availability.
               </p>
             </div>
@@ -414,7 +416,7 @@ export const ProfessionalDashboardPage: React.FC = () => {
 
           {oppsLoading ? (
             <div className="py-12 flex justify-center">
-              <span className="text-xs text-neutral-500">Loading opportunities...</span>
+              <span className="text-xs text-[var(--color-text-secondary)]">Loading opportunities...</span>
             </div>
           ) : opportunities.length === 0 ? (
             <EmptyState
@@ -430,8 +432,8 @@ export const ProfessionalDashboardPage: React.FC = () => {
 
                 return (
                   <Card key={opp.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-1.5 max-w-xl">
-                      <div className="flex items-center gap-2">
+                    <div className="space-y-1.5 max-w-xl min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Badge
                           variant={
                             opp.status === 'pending'
@@ -447,44 +449,44 @@ export const ProfessionalDashboardPage: React.FC = () => {
                         >
                           {opp.status.replace(/_/g, ' ')}
                         </Badge>
-                        <span className="text-xs font-semibold text-neutral-800">
+                        <span className="text-xs font-semibold text-[var(--color-text-primary)]">
                           {snap.serviceName}
                         </span>
-                        <span className="text-xs text-neutral-400 font-medium">
-                          • {snap.projectTypeName}
+                        <span className="text-xs text-[var(--color-text-secondary)] font-medium">
+                          · {snap.projectTypeName}
                         </span>
                       </div>
 
-                      <h4 className="text-sm font-bold text-neutral-900 font-serif">
+                      <h4 className="typo-card-title text-[var(--color-text-primary)] break-words">
                         {snap.title}
                       </h4>
 
-                      <p className="text-xs text-neutral-500 line-clamp-2">
+                      <p className="text-sm text-[var(--color-text-secondary)] line-clamp-2">
                         {snap.description}
                       </p>
 
-                      <div className="text-[11px] text-neutral-400 flex flex-wrap items-center gap-3 pt-1">
-                        <span className="flex items-center gap-1 font-medium text-neutral-700">
-                          <Euro className="w-3 h-3 text-neutral-400" />
+                      <div className="text-xs text-[var(--color-text-secondary)] flex flex-wrap items-center gap-3 pt-1">
+                        <span className="flex items-center gap-1 font-semibold text-[var(--color-text-primary)] tabular-nums">
+                          <Euro className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                           {snap.indicativeBudget?.budgetType === 'unsure' ? (
                             'Unspecified budget'
                           ) : (
                             `€${((snap.indicativeBudget?.minAmountMinor || 0) / 100).toLocaleString()} – €${((snap.indicativeBudget?.maxAmountMinor || 0) / 100).toLocaleString()}`
                           )}
                         </span>
-                        <span>•</span>
+                        <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-neutral-400" />
+                          <Calendar className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                           Start: {snap.timeline?.preferredStart.replace(/_/g, ' ')}
                         </span>
-                        <span>•</span>
-                        <span>
+                        <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+                        <span className="tabular-nums">
                           Expires: {new Date(opp.expiresAt).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
 
-                    <div className="shrink-0 flex items-center gap-2 border-t md:border-t-0 pt-3 md:pt-0 border-neutral-100">
+                    <div className="shrink-0 flex items-center gap-2 border-t md:border-t-0 pt-3 md:pt-0 border-[var(--color-border)]">
                       <Button
                         variant={isActionRequired ? 'primary' : 'outline'}
                         size="sm"
