@@ -48,6 +48,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => media.removeListener(onChange);
   }, []);
 
+  // Keep appearance consistent when the user changes it in another tab.
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === STORAGE_KEY || event.key === null) {
+        setPreference(readTheme());
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   useEffect(() => {
     document.documentElement.dataset.theme = resolvedTheme;
     document.documentElement.style.colorScheme = resolvedTheme;
