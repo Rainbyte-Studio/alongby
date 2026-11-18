@@ -90,7 +90,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth }) => {
       {/* A focused first impression: message, explanation and two clear paths. */}
       <section className="bg-[var(--color-surface)] border-b border-[var(--color-border)] px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-4xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          <div className="lg:col-span-7 max-w-4xl">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-text-muted)] mb-6">
               A curated creative marketplace
             </p>
@@ -118,7 +119,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth }) => {
               </p>
             )}
           </div>
-          <div className="mt-20 sm:mt-28 pt-5 border-t border-[var(--color-border)] flex flex-wrap items-center gap-x-5 gap-y-2">
+          <div className="lg:col-span-5 w-full">
+            <div className="overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[#d6d2ca] aspect-[5/4] sm:aspect-[4/3] lg:aspect-[5/6]">
+              <img src="/images/editorial-hero.svg" alt="Sculptural arches and a sphere in a monochrome editorial composition" className="w-full h-full object-cover" width="960" height="1120" fetchPriority="high" />
+            </div>
+          </div>
+          </div>
+          <div className="mt-16 sm:mt-20 pt-5 border-t border-[var(--color-border)] flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="text-xs font-semibold text-[var(--color-text-primary)]">Expertise across</span>
             {DISCIPLINES.map((discipline) => (
               <span key={discipline} className="text-xs text-[var(--color-text-secondary)]">{discipline}</span>
@@ -159,11 +166,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth }) => {
               Tell us about your project once. Review suitable specialists, compare their experience and quotes, then move towards a clear proposal without sorting through endless pitches.
             </p>
           </div>
-          <div className="lg:col-span-5 lg:justify-self-end flex flex-col items-start gap-4">
+          <div className="lg:col-span-5 flex flex-col gap-7">
+            <div className="overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] aspect-[5/3] bg-[#d6d2ca]">
+              <img src="/images/editorial-clients.svg" alt="Abstract creative materials arranged in an editorial still life" loading="lazy" decoding="async" width="1000" height="780" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex flex-col items-start gap-4">
             <Button variant="primary" size="lg" onClick={handleClientEntry} rightIcon={<ArrowRight className="w-4 h-4" />}>
               {clientCtaLabel}
             </Button>
             <Link to="/for-clients" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)] underline underline-offset-4 hover:opacity-70">Explore the client experience <ArrowRight className="w-4 h-4" aria-hidden="true" /></Link>
+            </div>
           </div>
         </div>
       </section>
@@ -179,11 +191,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth }) => {
               Build a profile around your expertise and availability. Receive relevant project invitations, review the requirements and send a quote when the opportunity fits.
             </p>
           </div>
-          <div className="lg:col-span-5 lg:justify-self-end flex flex-col items-start gap-4">
+          <div className="lg:col-span-5 flex flex-col gap-7">
+            <div className="overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] aspect-[5/3] bg-[#d6d2ca]">
+              <img src="/images/editorial-professionals.svg" alt="Abstract creative studio with natural light and sculptural objects" loading="lazy" decoding="async" width="1000" height="780" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex flex-col items-start gap-4">
             <Button variant="outline" size="lg" onClick={handleProfessionalEntry} rightIcon={<ArrowRight className="w-4 h-4" />}>
               {professionalCtaLabel}
             </Button>
             <Link to="/for-professionals" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)] underline underline-offset-4 hover:opacity-70">Explore the professional experience <ArrowRight className="w-4 h-4" aria-hidden="true" /></Link>
+            </div>
           </div>
         </div>
       </section>
