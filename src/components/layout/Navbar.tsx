@@ -58,6 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
   const devMenuRef = useRef<HTMLDivElement>(null);
   const devTriggerRef = useRef<HTMLButtonElement>(null);
   const mobileToggleRef = useRef<HTMLButtonElement>(null);
+  const mobilePanelRef = useRef<HTMLDivElement>(null);
 
   const getDashboardPath = () => {
     if (!userProfile) return '/';
@@ -105,6 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
     document.body.style.overflow = 'hidden';
 
     const mediaQuery = window.matchMedia('(min-width: 1280px)');
+    const initialFocus = window.requestAnimationFrame(() => mobilePanelRef.current?.focus());
     const handleMediaChange = (e: MediaQueryListEvent) => {
       if (e.matches) {
         setMobileMenuOpen(false);
@@ -113,12 +115,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
     mediaQuery.addEventListener('change', handleMediaChange);
 
     return () => {
+      window.cancelAnimationFrame(initialFocus);
       delete document.documentElement.dataset.mobileNavOpen;
       document.body.style.position = previous.position;
       document.body.style.top = previous.top;
       document.body.style.width = previous.width;
       document.body.style.overflow = previous.overflow;
-      window.scrollTo(0, scrollY);
+      window.scrollTo({ top: scrollY, behavior: 'instant' });
       mediaQuery.removeEventListener('change', handleMediaChange);
     };
   }, [mobileMenuOpen]);
@@ -439,6 +442,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
           />
           <div
             id="alongby-mobile-nav"
+            ref={mobilePanelRef}
+            tabIndex={-1}
+            aria-label="Mobile navigation"
             className="xl:hidden relative z-40 border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5">
