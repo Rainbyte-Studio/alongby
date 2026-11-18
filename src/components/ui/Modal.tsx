@@ -38,7 +38,16 @@ export const Modal: React.FC<ModalProps> = ({
     if (!isOpen) return;
 
     previousFocusRef.current = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
+    const scrollY = window.scrollY;
+    const previous = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
 
     const rafId = window.requestAnimationFrame(() => {
@@ -61,7 +70,11 @@ export const Modal: React.FC<ModalProps> = ({
 
     return () => {
       window.cancelAnimationFrame(rafId);
-      document.body.style.overflow = previousOverflow;
+      document.body.style.position = previous.position;
+      document.body.style.top = previous.top;
+      document.body.style.width = previous.width;
+      document.body.style.overflow = previous.overflow;
+      window.scrollTo({ top: scrollY, behavior: 'auto' });
       const toRestore = previousFocusRef.current;
       if (toRestore && typeof toRestore.focus === 'function' && document.contains(toRestore)) {
         toRestore.focus();
@@ -137,7 +150,7 @@ export const Modal: React.FC<ModalProps> = ({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
-        className={`relative z-10 w-full ${widthClasses[maxWidth]} bg-[var(--color-surface)] rounded-[var(--radius-modal)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] overflow-hidden flex flex-col max-h-[90vh] focus:outline-none`}
+        className={`relative z-10 w-full ${widthClasses[maxWidth]} bg-[var(--color-surface)] rounded-[var(--radius-modal)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] overflow-hidden flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[90dvh] focus:outline-none`}
       >
         <div className="flex items-start justify-between gap-3 p-4 sm:p-6 border-b border-[var(--color-border)]">
           <div className="min-w-0">
@@ -167,7 +180,7 @@ export const Modal: React.FC<ModalProps> = ({
           </button>
         </div>
 
-        <div className="p-4 sm:p-6 overflow-y-auto font-sans">{children}</div>
+        <div className="min-h-0 p-4 sm:p-6 overflow-y-auto overscroll-contain font-sans">{children}</div>
 
         {footer && (
           <div className="px-4 py-3.5 sm:px-6 sm:py-4 border-t border-[var(--color-border)] bg-[var(--color-surface-secondary)]/50 flex flex-wrap items-center justify-end gap-2.5">
