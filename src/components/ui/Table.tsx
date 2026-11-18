@@ -15,7 +15,7 @@ export const Table: React.FC<TableProps> = ({
 }) => {
   return (
     <div
-      className={`w-full overflow-x-auto rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] ${containerClassName}`}
+      className={`w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] ${containerClassName}`}
     >
       <table
         className={`w-full border-collapse font-sans text-sm text-left text-[var(--color-text-primary)] ${className}`}

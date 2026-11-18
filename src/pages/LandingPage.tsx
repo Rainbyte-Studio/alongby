@@ -514,7 +514,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth }) => {
               aria-selected={activeJourney === 'client'}
               tabIndex={activeJourney === 'client' ? 0 : -1}
               onClick={() => setActiveJourney('client')}
-              className={`flex-1 py-2.5 px-2.5 text-xs sm:text-[13px] rounded-[6px] transition-colors cursor-pointer tabular-nums whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+              className={`flex-1 min-w-0 py-2.5 px-1.5 sm:px-2.5 text-[11px] sm:text-[13px] leading-snug rounded-[6px] transition-colors cursor-pointer tabular-nums whitespace-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                 activeJourney === 'client'
                   ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] font-semibold shadow-[var(--shadow-card)]'
                   : 'text-[var(--color-text-secondary)] font-medium hover:text-[var(--color-text-primary)]'

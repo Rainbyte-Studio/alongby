@@ -132,7 +132,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 </div>
 
                 {action && (
-                  <div className="shrink-0 flex flex-wrap items-center gap-2.5">
+                  <div className="w-full sm:w-auto min-w-0 flex flex-wrap items-center gap-2.5">
                     {action}
                   </div>
                 )}
