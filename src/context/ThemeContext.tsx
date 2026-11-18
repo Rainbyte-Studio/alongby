@@ -1,16 +1,80 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
 export type ThemePreference = 'light' | 'dark' | 'system';
-type Resolved = 'light' | 'dark';
-const Context = createContext<{theme:ThemePreference;resolvedTheme:Resolved;setTheme:(t:ThemePreference)=>void}|null>(null);
-const KEY='alongby-theme', QUERY='(prefers-color-scheme: dark)';
-function read():ThemePreference {try {const v=localStorage.getItem(KEY);return v==='light'||v==='dark'||v==='system'?v:'system'}catch{return 'system'}}
-export function ThemeProvider({children}:{children:React.ReactNode}){
- const [theme,setPreference]=useState<ThemePreference>(read);
- const [system,setSystem]=useState<Resolved>(()=>matchMedia(QUERY).matches?'dark':'light');
- const resolvedTheme=theme==='system'?system:theme;
- useEffect(()=>{const m=matchMedia(QUERY);const update=()=>setSystem(m.matches?'dark':'light');m.addEventListener('change',update);return()=>m.removeEventListener('change',update)},[]);
- useEffect(()=>{document.documentElement.dataset.theme=resolvedTheme;document.documentElement.style.colorScheme=resolvedTheme;const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',resolvedTheme==='dark'?'#141414':'#F8F7F5')},[resolvedTheme]);
- const setTheme=(value:ThemePreference)=>{setPreference(value);try{localStorage.setItem(KEY,value)}catch{}};
- return <Context.Provider value={{theme,resolvedTheme,setTheme}}>{children}</Context.Provider>
+type ResolvedTheme = 'light' | 'dark';
+
+interface ThemeContextValue {
+  theme: ThemePreference;
+  resolvedTheme: ResolvedTheme;
+  setTheme: (theme: ThemePreference) => void;
 }
-export function useTheme(){const v=useContext(Context);if(!v)throw new Error('ThemeProvider missing');return v}
+
+const ThemeContext = createContext<ThemeContextValue | null>(null);
+const STORAGE_KEY = 'alongby-theme';
+const SYSTEM_QUERY = '(prefers-color-scheme: dark)';
+
+function readTheme(): ThemePreference {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored === 'light' || stored === 'dark' || stored === 'system') return stored;
+  } catch {
+    // Storage can be blocked in private or embedded contexts.
+  }
+  return 'system';
+}
+
+function readSystemTheme(): ResolvedTheme {
+  return window.matchMedia?.(SYSTEM_QUERY).matches ? 'dark' : 'light';
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setPreference] = useState<ThemePreference>(readTheme);
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(readSystemTheme);
+  const resolvedTheme = theme === 'system' ? systemTheme : theme;
+
+  useEffect(() => {
+    const media = window.matchMedia?.(SYSTEM_QUERY);
+    if (!media) return;
+
+    const onChange = () => setSystemTheme(media.matches ? 'dark' : 'light');
+    onChange();
+
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', onChange);
+      return () => media.removeEventListener('change', onChange);
+    }
+    // Older Safari versions use the legacy MediaQueryList listener API.
+    media.addListener(onChange);
+    return () => media.removeListener(onChange);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = resolvedTheme;
+    document.documentElement.style.colorScheme = resolvedTheme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      'content',
+      resolvedTheme === 'dark' ? '#141414' : '#F8F7F5'
+    );
+  }, [resolvedTheme]);
+
+  const setTheme = (nextTheme: ThemePreference) => {
+    setPreference(nextTheme);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, nextTheme);
+    } catch {
+      // Keep the in-memory preference when persistence is unavailable.
+    }
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme(): ThemeContextValue {
+  const value = useContext(ThemeContext);
+  if (!value) throw new Error('useTheme must be used inside ThemeProvider');
+  return value;
+}
