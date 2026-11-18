@@ -104,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
     document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
 
-    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const mediaQuery = window.matchMedia('(min-width: 1280px)');
     const handleMediaChange = (e: MediaQueryListEvent) => {
       if (e.matches) {
         setMobileMenuOpen(false);
@@ -235,7 +235,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
       ref={headerRef}
       className="sticky top-0 z-40 bg-[var(--color-surface)] border-b border-[var(--color-border)] font-sans"
     >
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 xl:px-8 h-16 flex items-center justify-between gap-2 sm:gap-6">
         {/* Zone 1: Brand Wordmark + Desktop Navigation */}
         <div className="flex items-center gap-6 xl:gap-10 min-w-0 shrink-0">
           <Link
@@ -249,7 +249,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
           {currentUser && userProfile ? (
             <nav
               aria-label="Workspace navigation"
-              className="hidden lg:flex items-center gap-1 whitespace-nowrap"
+              className="hidden xl:flex items-center gap-1 whitespace-nowrap"
             >
               {workspaceLinks.map((item) => (
                 <Link
@@ -269,7 +269,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
           ) : (
             <nav
               aria-label="Primary navigation"
-              className="hidden lg:flex items-center gap-6 xl:gap-7 text-[13px] font-medium text-[var(--color-text-secondary)] whitespace-nowrap"
+              className="hidden xl:flex items-center gap-6 xl:gap-7 text-[13px] font-medium text-[var(--color-text-secondary)] whitespace-nowrap"
             >
               {PUBLIC_NAV_ITEMS.map((item) => {
                 const isActive =
@@ -298,7 +298,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
           {currentUser && userProfile ? (
             <>
               {/* Desktop Role Switcher (Dev / Evaluation) */}
-              <div className="relative hidden lg:block" ref={devMenuRef}>
+              <div className="relative hidden xl:block" ref={devMenuRef}>
                 <button
                   ref={devTriggerRef}
                   type="button"
@@ -341,8 +341,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 )}
               </div>
 
-              {/* Compact Dashboard Link on Small/Medium Screens (640–1023px) */}
-              <Link to={dashboardPath} className="hidden md:inline-flex lg:hidden">
+              {/* Compact Dashboard Link on Small/Medium Screens (768–1279px) */}
+              <Link to={dashboardPath} className="hidden md:inline-flex xl:hidden">
                 <Button
                   variant={location.pathname === dashboardPath ? 'secondary' : 'outline'}
                   size="sm"
@@ -355,7 +355,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
               <NotificationBell />
 
               {/* Desktop User Display */}
-              <div className="hidden xl:flex flex-col items-end text-right pl-1">
+              <div className="hidden 2xl:flex flex-col items-end text-right pl-1">
                 <span className="text-xs font-semibold text-[var(--color-text-primary)] leading-tight max-w-[140px] truncate">
                   {userProfile.displayName || currentUser.email?.split('@')[0]}
                 </span>
@@ -375,7 +375,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 onClick={signOut}
                 title="Sign out"
                 aria-label="Sign out"
-                className="hidden lg:inline-flex min-h-[40px] min-w-[40px]"
+                className="hidden xl:inline-flex min-h-[40px] min-w-[40px]"
               >
                 <LogOut className="w-4 h-4" aria-hidden="true" />
               </Button>
@@ -386,7 +386,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => onOpenAuth?.('signin')}
-                className="hidden lg:inline-flex"
+                className="hidden xl:inline-flex"
               >
                 Sign In
               </Button>
@@ -394,7 +394,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="outline"
                 size="sm"
                 onClick={() => onOpenAuth?.('signup', 'professional')}
-                className="hidden lg:inline-flex"
+                className="hidden xl:inline-flex"
               >
                 Join as Professional
               </Button>
@@ -402,15 +402,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="primary"
                 size="sm"
                 onClick={() => onOpenAuth?.('signup', 'client')}
-                className="hidden lg:inline-flex px-3 sm:px-4 text-xs sm:text-[13px]"
+                className="hidden xl:inline-flex px-3 sm:px-4 text-xs sm:text-[13px]"
               >
                 Start a Project
               </Button>
             </>
           )}
 
-          <div className="hidden lg:block"><ThemeSelector compact /></div>
-          {/* Responsive Navigation Toggle (<1024px) */}
+          <div className="hidden xl:block"><ThemeSelector compact /></div>
+          {/* Responsive Navigation Toggle (<1280px) */}
           <button
             ref={mobileToggleRef}
             type="button"
@@ -418,7 +418,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
             aria-expanded={mobileMenuOpen}
             aria-controls="alongby-mobile-nav"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            className="lg:hidden inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2 rounded-[var(--radius-button)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+            className="xl:hidden inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2 rounded-[var(--radius-button)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
           >
             {mobileMenuOpen ? (
               <X className="w-5 h-5" aria-hidden="true" />
@@ -429,17 +429,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
         </div>
       </div>
 
-      {/* Responsive Mobile & Tablet Navigation Drawer (<1024px) */}
+      {/* Responsive Mobile & Tablet Navigation Drawer (<1280px) */}
       {mobileMenuOpen && (
         <>
           <div
-            className="lg:hidden fixed inset-x-0 top-16 bottom-0 bg-[var(--color-backdrop)] z-30"
+            className="xl:hidden fixed inset-x-0 top-16 bottom-0 bg-[var(--color-backdrop)] z-30"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
           <div
             id="alongby-mobile-nav"
-            className="lg:hidden relative z-40 border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
+            className="xl:hidden relative z-40 border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5">
               {currentUser && userProfile ? (
