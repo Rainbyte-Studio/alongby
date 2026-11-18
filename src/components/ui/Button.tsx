@@ -45,7 +45,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses: Record<ButtonVariant, string> = {
       primary:
-        'bg-[var(--color-primary)] text-[var(--color-primary-text)] hover:bg-[var(--color-primary-hover)] active:bg-black border border-transparent',
+        'bg-[var(--color-primary)] text-[var(--color-primary-text)] hover:bg-[var(--color-primary-hover)] active:bg-[var(--color-primary-hover)] border border-transparent',
       secondary:
         'bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[var(--color-border-strong)] hover:bg-[var(--color-surface-secondary)] active:bg-[var(--color-surface-hover)]',
       outline:
