@@ -25,7 +25,7 @@
   /* Interactive Surface & State Tokens */
   --color-surface-hover: #EAE6DF;
   --color-surface-active: #E1DCD4;
-  --color-backdrop: rgba(23, 23, 23, 0.45);
+  --color-backdrop: rgba(23, 23, 23, 0.16);
   --color-disabled-bg: #F3F1EE;
   --color-disabled-text: #8A847E;
 
@@ -41,6 +41,7 @@
   --color-warning-border: #E8D2B5;
 
   --color-error: #B84C4C;
+  --color-error-button-text: #FFFFFF;
   --color-error-hover: #9E3C3C;
   --color-error-text: #933535;
   --color-error-bg: #FBECEC;
@@ -213,3 +214,22 @@
     scroll-behavior: auto !important;
   }
 }
+
+:root[data-theme="dark"] {
+ color-scheme:dark;
+ --color-bg-app:#141414;--color-surface:#202020;--color-surface-secondary:#292929;
+ --color-text-primary:#F5F3EF;--color-text-secondary:#B5B1AA;--color-text-muted:#A39E97;
+ --color-primary:#F5F3EF;--color-primary-text:#171717;--color-primary-hover:#E0DDD7;
+ --color-border:#383838;--color-border-strong:#505050;
+ --color-surface-hover:#353535;--color-surface-active:#424242;--color-backdrop:rgba(0,0,0,.24);
+ --color-disabled-bg:#292929;--color-disabled-text:#A39E97;
+ --color-success:#78B9A4;--color-success-text:#A3DDC8;--color-success-bg:#1E3930;--color-success-border:#386351;
+ --color-warning:#E3B275;--color-warning-text:#F3C994;--color-warning-bg:#3D3020;--color-warning-border:#695032;
+ --color-error-button-text:#171717;
+ --color-error:#E58B8B;--color-error-hover:#F1A1A1;--color-error-text:#FFB5B5;--color-error-bg:#432727;--color-error-border:#754242;
+ --color-info:#91B3E4;--color-info-text:#B6D0F2;--color-info-bg:#25364C;--color-info-border:#415D7D;
+ --shadow-card:0 1px 2px rgba(0,0,0,.14);--shadow-overlay:0 12px 32px rgba(0,0,0,.32);
+}
+html,body,#root{min-height:100%;background-color:var(--color-bg-app)}
+html{overscroll-behavior-y:none}
+html[data-mobile-nav-open="true"],html[data-mobile-nav-open="true"] body{overflow:hidden}

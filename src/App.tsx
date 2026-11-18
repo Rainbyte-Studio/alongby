@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
@@ -300,10 +301,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
       <AuthProvider>
         <AppContent />
       </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
