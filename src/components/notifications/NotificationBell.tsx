@@ -112,7 +112,7 @@ export const NotificationBell: React.FC = () => {
         <div
           role="dialog"
           aria-label="Notifications"
-          className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-[68px] sm:top-auto sm:mt-2 sm:w-96 bg-[var(--color-surface)] rounded-[var(--radius-modal)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] py-2 z-50 overflow-hidden font-sans"
+          className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-[calc(4rem+env(safe-area-inset-top,0px)+0.5rem)] sm:top-auto sm:mt-2 sm:w-96 bg-[var(--color-surface)] rounded-[var(--radius-modal)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] py-2 z-50 overflow-hidden font-sans"
         >
           <div className="px-4 py-2.5 border-b border-[var(--color-border)] flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export const NotificationBell: React.FC = () => {
             )}
           </div>
 
-          <div className="max-h-80 overflow-y-auto divide-y divide-[var(--color-border)]">
+          <div className="max-h-[min(20rem,calc(100dvh-10rem))] overflow-y-auto overscroll-contain divide-y divide-[var(--color-border)]">
             {loading && notifications.length === 0 ? (
               <div className="p-6 flex justify-center">
                 <LoadingSpinner size="sm" inline label="Loading notifications…" />
