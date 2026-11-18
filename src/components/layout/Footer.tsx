@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlongbyWordmark } from '../brand/AlongbyWordmark';
 import { useAuth } from '../../context/AuthContext';
-import { scrollToLandingSection } from './Navbar';
 
 interface FooterProps {
   onOpenAuth?: (
@@ -12,11 +11,11 @@ interface FooterProps {
 }
 
 const PLATFORM_LINKS = [
-  { id: 'how-it-works', label: 'How It Works', to: '/#how-it-works' },
-  { id: 'for-clients', label: 'For Clients', to: '/#for-clients' },
-  { id: 'for-professionals', label: 'For Professionals', to: '/#for-professionals' },
-  { id: 'principles', label: 'Our Philosophy', to: '/#principles' },
-  { id: 'transparency', label: 'Trust & Commercial Clarity', to: '/#transparency' },
+  { id: 'how-it-works', label: 'How It Works', to: '/how-it-works' },
+  { id: 'for-clients', label: 'For Clients', to: '/for-clients' },
+  { id: 'for-professionals', label: 'For Professionals', to: '/for-professionals' },
+  { id: 'principles', label: 'Our Approach', to: '/about' },
+  { id: 'transparency', label: 'Agreements & Transparency', to: '/how-it-works#agreements' },
 ] as const;
 
 const PRACTICE_DISCIPLINES = [
@@ -58,7 +57,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuth }) => {
               <AlongbyWordmark size="md" />
             </Link>
             <p className="text-[14px] text-[var(--color-text-secondary)] max-w-sm leading-relaxed">
-              Curated managed marketplace connecting organisations with vetted independent digital and creative specialists—from structured project brief to formal agreement.
+              A considered way to find digital and creative expertise, compare relevant offers and build agreements around clear project requirements.
             </p>
             <p className="text-xs text-[var(--color-text-muted)] pt-1">
               Curated · Managed · Transparent
@@ -78,7 +77,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuth }) => {
                 <li key={link.id}>
                   <Link
                     to={link.to}
-                    onClick={() => scrollToLandingSection(link.id)}
                     className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:underline hover:underline-offset-4 transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                   >
                     {link.label}
