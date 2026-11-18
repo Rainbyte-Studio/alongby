@@ -26,7 +26,7 @@ const sizeClasses = {
  * - Exact "alongby" in lowercase
  * - Authentic Lobster typeface (weight 400 regular) imported from Google Fonts
  * - Natural connected cursive typography with preserved tracking (no artificial letter spacing)
- * - Pure monochrome branding in black / near-black (no icons, symbols, badges, backgrounds, outlines, or shadows)
+ * - Theme-aware monochrome branding: dark in light mode, light in dark mode
  * - Slightly increased visual presence for distinct clarity in navigation
  * - Clear vertical alignment and generous clearance ensuring no clipping of 'g' and 'y' descenders
  * - Responsive sizing across mobile and desktop viewports
@@ -40,7 +40,7 @@ export const AlongbyWordmark: React.FC<AlongbyWordmarkProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center select-none font-normal tracking-normal leading-none overflow-visible text-neutral-950 antialiased ${sizeClass} ${className}`}
+      className={`inline-flex items-center select-none font-normal tracking-normal leading-none overflow-visible text-[var(--color-text-primary)] antialiased ${sizeClass} ${className}`}
       style={{
         fontFamily: "var(--font-logo, 'Lobster', cursive)",
         color: color || undefined,
