@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { UserRole } from '../../types';
 import { AlongbyWordmark } from '../brand/AlongbyWordmark';
+import { ThemeSelector } from '../ui/ThemeSelector';
 import { NotificationBell } from '../notifications/NotificationBell';
 
 interface NavbarProps {
@@ -95,7 +96,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
   useEffect(() => {
     if (!mobileMenuOpen) return;
 
-    const previousOverflow = document.body.style.overflow;
+    const scrollY = window.scrollY;
+    const previous = { position: document.body.style.position, top: document.body.style.top, width: document.body.style.width, overflow: document.body.style.overflow };
+    document.documentElement.dataset.mobileNavOpen = 'true';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
 
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
@@ -107,7 +113,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
     mediaQuery.addEventListener('change', handleMediaChange);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      delete document.documentElement.dataset.mobileNavOpen;
+      document.body.style.position = previous.position;
+      document.body.style.top = previous.top;
+      document.body.style.width = previous.width;
+      document.body.style.overflow = previous.overflow;
+      window.scrollTo(0, scrollY);
       mediaQuery.removeEventListener('change', handleMediaChange);
     };
   }, [mobileMenuOpen]);
@@ -331,7 +342,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
               </div>
 
               {/* Compact Dashboard Link on Small/Medium Screens (640–1023px) */}
-              <Link to={dashboardPath} className="hidden sm:inline-flex lg:hidden">
+              <Link to={dashboardPath} className="hidden md:inline-flex lg:hidden">
                 <Button
                   variant={location.pathname === dashboardPath ? 'secondary' : 'outline'}
                   size="sm"
@@ -375,7 +386,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => onOpenAuth?.('signin')}
-                className="hidden sm:inline-flex"
+                className="hidden lg:inline-flex"
               >
                 Sign In
               </Button>
@@ -383,7 +394,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="outline"
                 size="sm"
                 onClick={() => onOpenAuth?.('signup', 'professional')}
-                className="hidden md:inline-flex"
+                className="hidden lg:inline-flex"
               >
                 Join as Professional
               </Button>
@@ -391,13 +402,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 variant="primary"
                 size="sm"
                 onClick={() => onOpenAuth?.('signup', 'client')}
-                className="px-3 sm:px-4 text-xs sm:text-[13px]"
+                className="hidden lg:inline-flex px-3 sm:px-4 text-xs sm:text-[13px]"
               >
                 Start a Project
               </Button>
             </>
           )}
 
+          <div className="hidden lg:block"><ThemeSelector compact /></div>
           {/* Responsive Navigation Toggle (<1024px) */}
           <button
             ref={mobileToggleRef}
@@ -427,7 +439,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
           />
           <div
             id="alongby-mobile-nav"
-            className="lg:hidden relative z-40 border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] max-h-[calc(100vh-4rem)] overflow-y-auto"
+            className="lg:hidden relative z-40 border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5">
               {currentUser && userProfile ? (
@@ -592,6 +604,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                   </div>
                 </>
               )}
+              <div className="pt-4 border-t border-[var(--color-border)]"><div className="text-xs font-semibold text-[var(--color-text-muted)] mb-2">Appearance</div><ThemeSelector /></div>
             </div>
           </div>
         </>
