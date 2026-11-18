@@ -1,0 +1,6 @@
+{
+  "name": "Alongby",
+  "description": "A curated managed marketplace connecting clients with carefully matched digital and creative professionals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

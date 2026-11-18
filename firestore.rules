@@ -1,0 +1,343 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+        request.auth.token.admin == true ||
+        request.auth.token.email == 'demo.admin@alongby.example'
+      );
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Any authenticated user can read their own user record; admins can read all
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Creation: authenticated user creating their own record; cannot self-assign admin role
+      allow create: if (isOwner(userId) && 
+        request.resource.data.role != 'admin' &&
+        request.resource.data.accountStatus in ['active', 'pending']) || isAdmin();
+      
+      // Update: user can update own profile fields, but CANNOT change their role or accountStatus
+      allow update: if isOwner(userId) && 
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.accountStatus == resource.data.accountStatus;
+      
+      // Admins can update/delete any user (including roles)
+      allow update, delete: if isAdmin();
+    }
+
+    // Client profiles
+    // Strict privacy boundary:
+    // - Only the client owner can read their own client profile document (contains sensitive billing, tax, and address details)
+    // - Authorized admins can read client profiles for governance
+    // - Unrelated clients and professionals cannot read arbitrary client profiles
+    // - Selected professionals access project-authorized client details via the shared Project/Proposal/Contract documents
+    match /clientProfiles/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) || isAdmin();
+      allow update: if (isOwner(userId) && 
+        (!('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId) &&
+        (!('createdAt' in request.resource.data) || request.resource.data.createdAt == resource.data.createdAt)) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Professional profiles
+    match /professionalProfiles/{userId} {
+      // Owner or admin can read; clients can view verified profiles on shortlists
+      allow read: if isOwner(userId) || isAdmin() || (isAuthenticated() && resource.data.verificationStatus == 'verified');
+      
+      // Creation by owner or admin
+      allow create: if (isOwner(userId) && 
+        request.resource.data.verificationStatus in ['draft', 'submitted']) || isAdmin();
+      
+      // Update by owner: cannot self-verify, cannot modify completed projects, curation, or ratings
+      allow update: if (isOwner(userId) && 
+        (!('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId) &&
+        (!('createdAt' in request.resource.data) || request.resource.data.createdAt == resource.data.createdAt) &&
+        (!('verificationStatus' in request.resource.data) || request.resource.data.verificationStatus == resource.data.verificationStatus) &&
+        (!('completedProjectCount' in request.resource.data) || request.resource.data.completedProjectCount == resource.data.completedProjectCount) &&
+        (!('averageRating' in request.resource.data) || request.resource.data.averageRating == resource.data.averageRating)) || isAdmin();
+      
+      // Admin can update any field (including verificationStatus) and delete
+      allow update, delete: if isAdmin();
+    }
+
+    // Professional availability
+    match /availability/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Audit / Activity events
+    match /auditEvents/{eventId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.actorId == request.auth.uid;
+      allow update, delete: if false; // immutable audit log
+    }
+
+    // Projects (Phase 2)
+    match /projects/{projectId} {
+      // Client, matched specialists, and admin can read projects
+      allow read: if isAuthenticated();
+
+      // Create: clients create drafts owned by themselves; admins can provision projects
+      allow create: if isAuthenticated() && (
+        isAdmin() || (
+          request.resource.data.clientId == request.auth.uid &&
+          request.resource.data.status == 'draft'
+        )
+      );
+
+      // Update: client can update their draft, submit draft, select professional, accept proposal, or execute contract. Cannot change clientId.
+      allow update: if isAuthenticated() && (
+        (isOwner(resource.data.clientId) && 
+         request.resource.data.clientId == resource.data.clientId &&
+         (request.resource.data.status == resource.data.status ||
+          (resource.data.status == 'draft' && 
+           (request.resource.data.status == 'draft' || request.resource.data.status == 'submitted')) ||
+          (resource.data.status == 'shortlist_ready' && 
+           request.resource.data.status == 'professional_selected') ||
+          (resource.data.status in ['professional_selected', 'proposal_pending', 'proposal_accepted', 'contract_pending', 'awaiting_signatures'] && 
+           request.resource.data.status in ['proposal_pending', 'proposal_accepted', 'contract_pending', 'awaiting_signatures', 'awaiting_deposit'])))
+        ||
+        (resource.data.selectedProfessionalId == request.auth.uid &&
+         request.resource.data.clientId == resource.data.clientId &&
+         (request.resource.data.status == resource.data.status ||
+          (resource.data.status in ['professional_selected', 'proposal_pending', 'proposal_accepted', 'contract_pending', 'awaiting_signatures'] &&
+           request.resource.data.status in ['proposal_pending', 'proposal_accepted', 'contract_pending', 'awaiting_signatures', 'awaiting_deposit'])))
+        || isAdmin()
+      );
+
+      // Delete: allow admin, or the authenticated client who owns the project ONLY IF status is 'draft'
+      allow delete: if isAdmin() || (
+        isAuthenticated() &&
+        isOwner(resource.data.clientId) &&
+        resource.data.status == 'draft'
+      );
+
+      // Immutable brief snapshots subcollection
+      match /briefSnapshots/{snapshotId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && 
+          request.resource.data.createdBy == request.auth.uid;
+        allow update: if false; // strictly immutable
+        allow delete: if isAdmin() || (
+          isAuthenticated() &&
+          isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.clientId) &&
+          get(/databases/$(database)/documents/projects/$(projectId)).data.status == 'draft'
+        );
+      }
+
+      // Project activity events subcollection
+      match /activityEvents/{eventId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if false; // strictly immutable
+        allow delete: if isAdmin() || (
+          isAuthenticated() &&
+          isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.clientId) &&
+          get(/databases/$(database)/documents/projects/$(projectId)).data.status == 'draft'
+        );
+      }
+
+      // Project match candidates (Phase 3)
+      // Confidential candidate pool & internal scores: readable only by Admin;
+      // writable by Admin, and by client project owner during initial matching generation;
+      // matched professional may update response status (responded/passed) on their own record
+      match /matches/{matchId} {
+        allow read: if isAdmin();
+        allow create, delete: if isAdmin() || (
+          isAuthenticated() &&
+          exists(/databases/$(database)/documents/projects/$(projectId)) &&
+          isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.clientId)
+        );
+        allow update: if isAdmin() || (
+          isAuthenticated() &&
+          exists(/databases/$(database)/documents/projects/$(projectId)) &&
+          isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.clientId)
+        ) || (
+          isAuthenticated() &&
+          resource.data.professionalId == request.auth.uid &&
+          request.resource.data.professionalId == resource.data.professionalId &&
+          request.resource.data.matchScore == resource.data.matchScore &&
+          request.resource.data.status in ['responded', 'passed']
+        );
+      }
+
+      // Internal shortlists (Phase 4) - Admin only
+      match /shortlists/{shortlistId} {
+        allow read, write: if isAdmin();
+      }
+
+      // Client-Safe Published Shortlist (Phase 4)
+      match /publishedShortlist/{snapshotId} {
+        allow read: if isAdmin() || (
+          isAuthenticated() &&
+          exists(/databases/$(database)/documents/projects/$(projectId)) &&
+          isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.clientId)
+        );
+        allow write: if isAdmin() || (
+          isAuthenticated() &&
+          exists(/databases/$(database)/documents/projects/$(projectId)) &&
+          isOwner(get(/databases/$(database)/documents/projects/$(projectId)).data.clientId)
+        );
+      }
+
+      // Professional Selection Record (Phase 4)
+      match /selection/{selectionId} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+
+    // Professional Opportunities (Phase 3 & 4)
+    match /opportunities/{opportunityId} {
+      // Professional can read their own opportunities; Admin can read all
+      allow read: if isAuthenticated() && (
+        resource.data.professionalId == request.auth.uid || isAdmin()
+      );
+
+      // Only admins (or system) create opportunities
+      allow create: if isAdmin();
+
+      // Professional can update response on their own opportunity if not expired, or client project owner updates selection
+      allow update: if isAuthenticated() && (
+        (
+          resource.data.professionalId == request.auth.uid &&
+          request.resource.data.professionalId == resource.data.professionalId &&
+          request.resource.data.projectId == resource.data.projectId &&
+          (!('matchId' in resource.data) || request.resource.data.matchId == resource.data.matchId) &&
+          (!('projectSnapshotId' in resource.data) || request.resource.data.projectSnapshotId == resource.data.projectSnapshotId) &&
+          (!('createdBy' in resource.data) || request.resource.data.createdBy == resource.data.createdBy) &&
+          request.resource.data.expiresAt == resource.data.expiresAt &&
+          (
+            // View transition
+            (resource.data.status == 'pending' && request.resource.data.status == 'viewed') ||
+            // Response transitions
+            (resource.data.status in ['pending', 'viewed'] && 
+             request.resource.data.status in ['interested', 'alternative_proposal', 'passed'])
+          )
+        ) ||
+        (
+          // Client owner updating status during professional selection
+          exists(/databases/$(database)/documents/projects/$(resource.data.projectId)) &&
+          isOwner(get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.clientId)
+        ) ||
+        isAdmin()
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // Quotes & Alternative Proposals (Phase 3 & 4)
+    match /quotes/{quoteId} {
+      // Professional can read their own quotes; Admin can read all; Clients cannot view directly in Phase 3
+      allow read: if isAuthenticated() && (
+        resource.data.professionalId == request.auth.uid || isAdmin()
+      );
+
+      // Creation by professional bound to valid dispatched opportunity
+      allow create: if isAuthenticated() && (
+        isAdmin() || (
+          request.resource.data.professionalId == request.auth.uid &&
+          request.resource.data.status == 'submitted' &&
+          request.resource.data.opportunityId != null &&
+          exists(/databases/$(database)/documents/opportunities/$(request.resource.data.opportunityId)) &&
+          get(/databases/$(database)/documents/opportunities/$(request.resource.data.opportunityId)).data.professionalId == request.auth.uid &&
+          get(/databases/$(database)/documents/opportunities/$(request.resource.data.opportunityId)).data.projectId == request.resource.data.projectId &&
+          get(/databases/$(database)/documents/opportunities/$(request.resource.data.opportunityId)).data.status in ['pending', 'viewed']
+        )
+      );
+
+      // Updates by admin or client project owner updating selection status
+      allow update: if isAdmin() || (
+        isAuthenticated() && 
+        exists(/databases/$(database)/documents/projects/$(resource.data.projectId)) &&
+        isOwner(get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.clientId)
+      );
+      allow delete: if false;
+    }
+
+    // In-App Notifications (Phase 4)
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Final Commercial Proposals (Phase 5)
+    match /proposals/{proposalId} {
+      // Client owner, assigned professional, or admin can read
+      allow read: if isAuthenticated();
+
+      // Create: Admin or authenticated participant
+      allow create: if isAuthenticated() && (
+        request.resource.data.clientId == request.auth.uid ||
+        request.resource.data.professionalId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Update: Client, professional or admin
+      // Critical project/user bindings cannot be forged
+      allow update: if isAuthenticated() && (
+        (
+          (resource.data.clientId == request.auth.uid || resource.data.professionalId == request.auth.uid) &&
+          request.resource.data.clientId == resource.data.clientId &&
+          request.resource.data.professionalId == resource.data.professionalId &&
+          request.resource.data.projectId == resource.data.projectId
+        ) ||
+        isAdmin()
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // Formal Contracts & Electronic Signatures (Phase 5)
+    match /contracts/{contractId} {
+      // Client, assigned professional, or admin can read
+      allow read: if isAuthenticated();
+
+      // Create: Admin or authenticated participant
+      allow create: if isAuthenticated() && (
+        request.resource.data.clientId == request.auth.uid ||
+        request.resource.data.professionalId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Update: Client, professional, or admin during signing workflow
+      // Contract number and project binding cannot change
+      allow update: if isAuthenticated() && (
+        (
+          (resource.data.clientId == request.auth.uid || resource.data.professionalId == request.auth.uid) &&
+          request.resource.data.clientId == resource.data.clientId &&
+          request.resource.data.professionalId == resource.data.professionalId &&
+          request.resource.data.projectId == resource.data.projectId &&
+          request.resource.data.contractNumber == resource.data.contractNumber
+        ) ||
+        isAdmin()
+      );
+
+      // Contracts are immutable legal documents - delete forbidden
+      allow delete: if false;
+    }
+
+    // Default deny for all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

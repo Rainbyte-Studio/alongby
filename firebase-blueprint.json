@@ -1,0 +1,293 @@
+{
+  "entities": {
+    "User": {
+      "collection": "users",
+      "fields": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "avatarUrl": { "type": "string", "optional": true },
+        "role": { "type": "string", "enum": ["client", "professional", "admin"] },
+        "accountStatus": { "type": "string", "enum": ["active", "pending", "suspended", "disabled"] },
+        "onboardingStatus": { "type": "string", "enum": ["pending", "completed"] },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" }
+      }
+    },
+    "ClientProfile": {
+      "collection": "clientProfiles",
+      "fields": {
+        "userId": { "type": "string" },
+        "fullName": { "type": "string" },
+        "companyName": { "type": "string", "optional": true },
+        "companyWebsite": { "type": "string", "optional": true },
+        "country": { "type": "string" },
+        "timezone": { "type": "string" },
+        "phone": { "type": "string", "optional": true },
+        "billingEmail": { "type": "string", "optional": true },
+        "profileImageUrl": { "type": "string", "optional": true },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" }
+      }
+    },
+    "ProfessionalProfile": {
+      "collection": "professionalProfiles",
+      "fields": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "professionalTitle": { "type": "string" },
+        "shortBio": { "type": "string" },
+        "country": { "type": "string" },
+        "timezone": { "type": "string" },
+        "languages": { "type": "array" },
+        "primaryServices": { "type": "array" },
+        "skills": { "type": "array" },
+        "yearsOfExperience": { "type": "number" },
+        "minimumBudgetMinor": { "type": "number" },
+        "currency": { "type": "string" },
+        "website": { "type": "string", "optional": true },
+        "verificationStatus": { "type": "string", "enum": ["draft", "submitted", "under_review", "verified", "rejected", "suspended"] },
+        "completedProjectCount": { "type": "number" },
+        "averageRating": { "type": "number", "optional": true },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" }
+      }
+    },
+    "ProfessionalAvailability": {
+      "collection": "availability",
+      "fields": {
+        "userId": { "type": "string" },
+        "availabilityStatus": { "type": "string", "enum": ["available", "limited", "fully_booked", "unavailable"] },
+        "nextAvailableDate": { "type": "string" },
+        "maximumConcurrentProjects": { "type": "number" },
+        "currentActiveProjectCount": { "type": "number" },
+        "updatedAt": { "type": "timestamp" }
+      }
+    },
+    "AuditEvent": {
+      "collection": "auditEvents",
+      "fields": {
+        "id": { "type": "string" },
+        "actorId": { "type": "string" },
+        "actorRole": { "type": "string" },
+        "eventType": { "type": "string" },
+        "targetType": { "type": "string" },
+        "targetId": { "type": "string" },
+        "metadata": { "type": "map" },
+        "timestamp": { "type": "timestamp" }
+      }
+    },
+    "Project": {
+      "collection": "projects",
+      "fields": {
+        "id": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string", "optional": true },
+        "clientCompanyName": { "type": "string", "optional": true },
+        "title": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "projectTypeId": { "type": "string" },
+        "brief": { "type": "map" },
+        "status": { "type": "string" },
+        "currentStep": { "type": "number" },
+        "draftCompletedSteps": { "type": "array" },
+        "version": { "type": "number" },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" },
+        "submittedAt": { "type": "timestamp", "optional": true }
+      }
+    },
+    "ProjectMatch": {
+      "collection": "projects/{projectId}/matches",
+      "fields": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "professionalId": { "type": "string" },
+        "matchScore": { "type": "number" },
+        "scoreBreakdown": { "type": "map" },
+        "matchReasons": { "type": "array" },
+        "warnings": { "type": "array" },
+        "matchingVersion": { "type": "string" },
+        "status": { "type": "string", "enum": ["candidate", "opportunity_pending", "opportunity_sent", "responded", "passed", "expired", "admin_removed"] },
+        "opportunityId": { "type": "string", "optional": true },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" }
+      }
+    },
+    "Opportunity": {
+      "collection": "opportunities",
+      "fields": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "professionalId": { "type": "string" },
+        "matchId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "viewed", "interested", "alternative_proposal", "passed", "expired", "withdrawn"] },
+        "projectSnapshot": { "type": "map" },
+        "matchReasons": { "type": "array" },
+        "expiresAt": { "type": "timestamp" },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" },
+        "viewedAt": { "type": "timestamp", "optional": true },
+        "respondedAt": { "type": "timestamp", "optional": true },
+        "responseType": { "type": "string", "optional": true },
+        "quoteId": { "type": "string", "optional": true },
+        "passReason": { "type": "string", "optional": true },
+        "passNote": { "type": "string", "optional": true },
+        "createdBy": { "type": "string" }
+      }
+    },
+    "Quote": {
+      "collection": "quotes",
+      "fields": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "opportunityId": { "type": "string" },
+        "matchId": { "type": "string" },
+        "professionalId": { "type": "string" },
+        "quoteType": { "type": "string", "enum": ["standard", "alternative"] },
+        "amountMinor": { "type": "number" },
+        "currency": { "type": "string" },
+        "scopeSummary": { "type": "string" },
+        "includedItems": { "type": "array" },
+        "excludedItems": { "type": "array" },
+        "proposedStartDate": { "type": "string" },
+        "estimatedDurationDays": { "type": "number" },
+        "revisionsIncluded": { "type": "number" },
+        "note": { "type": "string", "optional": true },
+        "alternativeExplanation": { "type": "string", "optional": true },
+        "budgetRelation": { "type": "string", "enum": ["within_budget", "slightly_above", "materially_above"] },
+        "status": { "type": "string", "enum": ["submitted", "withdrawn", "expired", "selected", "not_selected"] },
+        "version": { "type": "number" },
+        "createdAt": { "type": "timestamp" },
+        "submittedAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" }
+      }
+    },
+    "InternalShortlist": {
+      "collection": "projects/{projectId}/shortlists",
+      "fields": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "ready", "published", "selection_made", "expired", "superseded"] },
+        "candidateIds": { "type": "array" },
+        "items": { "type": "array" },
+        "adminNotes": { "type": "string", "optional": true },
+        "overrideApplied": { "type": "boolean", "optional": true },
+        "overrideReason": { "type": "string", "optional": true },
+        "version": { "type": "number" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" },
+        "publishedAt": { "type": "timestamp", "optional": true },
+        "selectedProfessionalId": { "type": "string", "optional": true },
+        "selectedAt": { "type": "timestamp", "optional": true }
+      }
+    },
+    "PublishedShortlist": {
+      "collection": "projects/{projectId}/publishedShortlist",
+      "fields": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "shortlistId": { "type": "string" },
+        "version": { "type": "number" },
+        "status": { "type": "string", "enum": ["published", "selection_made", "expired"] },
+        "publishedAt": { "type": "timestamp" },
+        "expiresAt": { "type": "timestamp", "optional": true },
+        "candidates": { "type": "array" },
+        "selectedProfessionalId": { "type": "string", "optional": true },
+        "selectedAt": { "type": "timestamp", "optional": true }
+      }
+    },
+    "ProfessionalSelection": {
+      "collection": "projects/{projectId}/selection",
+      "fields": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "shortlistId": { "type": "string" },
+        "shortlistVersion": { "type": "number" },
+        "professionalId": { "type": "string" },
+        "quoteId": { "type": "string" },
+        "matchId": { "type": "string" },
+        "opportunityId": { "type": "string" },
+        "selectedBy": { "type": "string" },
+        "selectedAt": { "type": "timestamp" },
+        "selectionSnapshot": { "type": "map" }
+      }
+    },
+    "InAppNotification": {
+      "collection": "notifications",
+      "fields": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "link": { "type": "string", "optional": true },
+        "type": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "timestamp" },
+        "metadata": { "type": "map", "optional": true }
+      }
+    },
+    "Proposal": {
+      "collection": "proposals",
+      "fields": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "professionalId": { "type": "string" },
+        "selectedQuoteId": { "type": "string" },
+        "selectedShortlistId": { "type": "string" },
+        "sourceBriefSnapshotId": { "type": "string" },
+        "version": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "pending_review", "changes_requested", "accepted", "superseded", "cancelled"] },
+        "title": { "type": "string" },
+        "scopeSummary": { "type": "string" },
+        "deliverables": { "type": "array" },
+        "exclusions": { "type": "array" },
+        "assumptions": { "type": "array" },
+        "clientResponsibilities": { "type": "array" },
+        "commercialTerms": { "type": "map" },
+        "milestones": { "type": "array" },
+        "specialTerms": { "type": "array" },
+        "clientAcceptance": { "type": "map", "optional": true },
+        "professionalAcceptance": { "type": "map", "optional": true },
+        "changeRequests": { "type": "array", "optional": true },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" },
+        "sentForReviewAt": { "type": "timestamp", "optional": true },
+        "acceptedAt": { "type": "timestamp", "optional": true },
+        "supersededByProposalId": { "type": "string", "optional": true }
+      }
+    },
+    "Contract": {
+      "collection": "contracts",
+      "fields": {
+        "id": { "type": "string" },
+        "contractNumber": { "type": "string" },
+        "projectId": { "type": "string" },
+        "proposalId": { "type": "string" },
+        "proposalVersion": { "type": "number" },
+        "clientId": { "type": "string" },
+        "professionalId": { "type": "string" },
+        "contractVersion": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "generated", "awaiting_signatures", "partially_signed", "fully_signed", "cancelled", "superseded"] },
+        "templateVersion": { "type": "string" },
+        "termsVersion": { "type": "string" },
+        "proposalSnapshot": { "type": "map" },
+        "clientSnapshot": { "type": "map" },
+        "professionalSnapshot": { "type": "map" },
+        "projectTitle": { "type": "string" },
+        "legalSections": { "type": "array" },
+        "eSignature": { "type": "map" },
+        "documentFingerprint": { "type": "string" },
+        "generatedAt": { "type": "timestamp" },
+        "fullySignedAt": { "type": "timestamp", "optional": true },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" }
+      }
+    }
+  }
+}
