@@ -356,17 +356,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                 )}
               </div>
 
-              {/* Compact Dashboard Link on Small/Medium Screens (768–1279px) */}
-              <Link to={dashboardPath} className="hidden md:inline-flex xl:hidden">
-                <Button
-                  variant={location.pathname === dashboardPath ? 'secondary' : 'outline'}
-                  size="sm"
-                >
-                  {isOnboardingPending ? 'Onboarding' : 'Dashboard'}
-                </Button>
-              </Link>
-
-              {/* Notifications (all viewports) */}
+              {/* Notifications (all viewports); navigation lives in the drawer on compact screens. */}
               <NotificationBell />
 
               {/* Desktop User Display */}
