@@ -57,7 +57,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon:
         'bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] active:bg-[var(--color-surface-hover)] border border-transparent',
       destructive:
-        'bg-[var(--color-error)] text-white hover:bg-[var(--color-error-hover)] active:opacity-95 border border-transparent focus-visible:ring-[var(--color-error)]',
+        'bg-[var(--color-error)] text-[var(--color-error-button-text)] hover:bg-[var(--color-error-hover)] active:opacity-95 border border-transparent focus-visible:ring-[var(--color-error)]',
       white:
         'bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] active:bg-[var(--color-surface-hover)] border border-[var(--color-border)]',
     };
