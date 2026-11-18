@@ -2,7 +2,7 @@ import React from 'react';
 import { taxonomyService } from '../../services/taxonomyService';
 import { ProjectBrief } from '../../types';
 import { Input } from '../ui/Input';
-import { Check, Sparkles } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 interface StepFeaturesProps {
   brief: ProjectBrief;
@@ -25,9 +25,8 @@ export const StepFeatures: React.FC<StepFeaturesProps> = ({ brief, onChange }) =
   return (
     <div className="space-y-6">
       <div>
-        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] mb-2">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>{currentService?.name || 'General'}</span>
+        <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-1.5">
+          {currentService?.name || 'General'}
         </div>
         <h2 className="typo-section-heading text-[var(--color-text-primary)]">
           What features & deliverables are needed?
@@ -59,8 +58,8 @@ export const StepFeatures: React.FC<StepFeaturesProps> = ({ brief, onChange }) =
                     {feature.name}
                   </span>
                   {feature.recommended && (
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--color-warning-text)]">
-                      · Standard
+                    <span className="text-xs font-medium text-[var(--color-warning-text)]">
+                      · Recommended
                     </span>
                   )}
                 </div>

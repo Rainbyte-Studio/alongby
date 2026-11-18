@@ -8,8 +8,10 @@ import { Project, Proposal, ChangeRequestCategory } from '../../types';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { ProposalReviewView } from '../../components/proposal/ProposalReviewView';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { Alert } from '../../components/ui/Alert';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { Button } from '../../components/ui/Button';
-import { ArrowLeft, AlertCircle, FileText } from 'lucide-react';
+import { ArrowLeft, FileText } from 'lucide-react';
 
 export const ProjectProposalPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -51,7 +53,10 @@ export const ProjectProposalPage: React.FC = () => {
       let prop = await proposalService.getProposalByProject(projectId);
 
       // Auto-initialize Proposal v1 if professional is selected but proposal doc isn't created yet
-      if (!prop && (proj.status === 'professional_selected' || proj.status === 'proposal_pending')) {
+      if (
+        !prop &&
+        (proj.status === 'professional_selected' || proj.status === 'proposal_pending')
+      ) {
         try {
           prop = await proposalService.initializeProposalFromSelection(projectId, userProfile.id);
         } catch (initErr: any) {
@@ -113,7 +118,7 @@ export const ProjectProposalPage: React.FC = () => {
         projectId: project.id,
         requestedBy: userProfile.id,
         requestedByRole: userProfile.role,
-        requestedByName: userProfile.email || 'Participant',
+        requestedByName: userProfile.displayName || userProfile.email || 'Participant',
         category: params.category,
         message: params.message,
         suggestedChanges: params.suggestedChanges,
@@ -141,71 +146,92 @@ export const ProjectProposalPage: React.FC = () => {
     }
   };
 
+  const role = userProfile?.role || 'client';
+
   const getContractRoute = () => {
-    if (userProfile?.role === 'professional') {
+    if (role === 'professional') {
       return `/professional/projects/${projectId}/contract`;
     }
-    if (userProfile?.role === 'admin') {
+    if (role === 'admin') {
       return `/admin/projects/${projectId}/contract`;
     }
     return `/client/projects/${projectId}/contract`;
   };
 
   const getBackRoute = () => {
-    if (userProfile?.role === 'professional') {
+    if (role === 'professional') {
       return `/professional/opportunities`;
     }
-    if (userProfile?.role === 'admin') {
+    if (role === 'admin') {
       return `/admin/projects/${projectId}/shortlist`;
     }
     return `/client/projects/${projectId}`;
   };
 
-  return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between">
-          <Link
-            to={getBackRoute()}
-            className="inline-flex items-center text-[13px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
-            <span>Back to {userProfile?.role === 'professional' ? 'Opportunities' : 'Project'}</span>
-          </Link>
-        </div>
+  const breadcrumbs =
+    role === 'professional'
+      ? [
+          { label: 'Workspace', to: '/professional' },
+          { label: 'Opportunities', to: '/professional/opportunities' },
+          { label: project?.title || 'Commercial Proposal' },
+        ]
+      : role === 'admin'
+      ? [
+          { label: 'Admin Console', to: '/admin' },
+          { label: project?.title || 'Project', to: `/admin/projects/${projectId}/shortlist` },
+          { label: 'Commercial Proposal' },
+        ]
+      : [
+          { label: 'Workspace', to: '/client' },
+          { label: 'Projects', to: '/client/projects' },
+          { label: project?.title || 'Project', to: `/client/projects/${projectId}` },
+          { label: 'Commercial Proposal' },
+        ];
 
+  return (
+    <DashboardLayout
+      role={role}
+      breadcrumbs={breadcrumbs}
+      action={
+        <Link to={getBackRoute()}>
+          <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="w-3.5 h-3.5" />}>
+            {role === 'professional' ? 'Opportunities' : 'Project Overview'}
+          </Button>
+        </Link>
+      }
+    >
+      <div className="space-y-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <LoadingSpinner size="lg" />
-            <p className="text-sm text-[var(--color-text-secondary)] mt-4">Loading commercial proposal...</p>
+            <LoadingSpinner size="lg" label="Loading commercial proposal…" />
           </div>
         ) : error ? (
-          <div className="p-6 bg-[var(--color-error-bg)] border border-[var(--color-error-border)] rounded-[var(--radius-card)] text-[var(--color-error-text)] text-sm flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">Unable to display proposal</p>
-              <p className="mt-1 text-[13px] opacity-90">{error}</p>
-            </div>
-          </div>
-        ) : !proposal ? (
-          <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] p-12 text-center space-y-4">
-            <FileText className="w-12 h-12 text-[var(--color-text-muted)] mx-auto" />
-            <h3 className="typo-section-heading text-[var(--color-text-primary)]">No Proposal Formulated Yet</h3>
-            <p className="text-sm text-[var(--color-text-secondary)] max-w-md mx-auto leading-relaxed">
-              A commercial proposal has not been generated for this project yet. Proposals are created
-              once a specialist is selected from the verified shortlist.
-            </p>
-            {project?.status === 'professional_selected' && (
-              <Button
-                variant="primary"
-                onClick={loadProposalData}
-                className="mt-2"
-              >
-                Formulate Proposal v1
+          <Alert variant="error" title="Unable to display proposal">
+            <div className="flex flex-wrap items-center justify-between gap-2 mt-1">
+              <span>{error}</span>
+              <Button variant="outline" size="sm" onClick={loadProposalData}>
+                Retry
               </Button>
-            )}
-          </div>
+            </div>
+          </Alert>
+        ) : !proposal ? (
+          <EmptyState
+            icon={FileText}
+            title="No Proposal Formulated Yet"
+            description="A commercial proposal is created once a specialist is selected from the curated shortlist."
+            action={
+              project?.status === 'professional_selected'
+                ? {
+                    label: 'Formulate Proposal v1',
+                    onClick: loadProposalData,
+                    variant: 'primary',
+                  }
+                : {
+                    label: 'Return to Project',
+                    onClick: () => navigate(getBackRoute()),
+                  }
+            }
+          />
         ) : (
           <ProposalReviewView
             proposal={proposal}

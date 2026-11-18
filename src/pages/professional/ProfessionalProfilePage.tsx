@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { profileService } from '../../services/profileService';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
@@ -9,14 +9,13 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
 import { Badge } from '../../components/ui/Badge';
+import { Alert } from '../../components/ui/Alert';
 import { DiscardChangesModal } from '../../components/common/DiscardChangesModal';
 import { PortfolioItem } from '../../types';
 import {
   User,
   Briefcase,
   Globe,
-  MapPin,
-  Clock,
   Euro,
   ShieldCheck,
   Check,
@@ -27,7 +26,6 @@ import {
   Calendar,
   Lock,
   Layers,
-  Sparkles,
 } from 'lucide-react';
 
 const SERVICE_OPTIONS = [
@@ -70,7 +68,6 @@ export const ProfessionalProfilePage: React.FC = () => {
   const { currentUser, userProfile, professionalProfile, refreshData } = useAuth();
   const navigate = useNavigate();
 
-  // Form states
   const [displayName, setDisplayName] = useState(
     professionalProfile?.displayName || userProfile?.displayName || ''
   );
@@ -94,7 +91,6 @@ export const ProfessionalProfilePage: React.FC = () => {
     professionalProfile ? Math.round(professionalProfile.minimumBudgetMinor / 100) : 2500
   );
 
-  // Portfolio items
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(
     professionalProfile?.portfolioItems || []
   );
@@ -110,7 +106,6 @@ export const ProfessionalProfilePage: React.FC = () => {
   const [isDirty, setIsDirty] = useState(false);
   const [showDiscardModal, setShowDiscardModal] = useState(false);
 
-  // Authoritative reset to persisted profile values
   const resetToPersisted = () => {
     if (professionalProfile) {
       setDisplayName(professionalProfile.displayName || userProfile?.displayName || '');
@@ -147,7 +142,6 @@ export const ProfessionalProfilePage: React.FC = () => {
     setSuccessMessage(null);
   };
 
-  // Synchronize when professionalProfile loads if not dirty
   useEffect(() => {
     if (professionalProfile && !isDirty) {
       resetToPersisted();
@@ -210,16 +204,12 @@ export const ProfessionalProfilePage: React.FC = () => {
       setShowDiscardModal(true);
       return;
     }
-    // No unsaved changes: navigate immediately
     navigate('/professional');
   };
 
   const handleConfirmDiscard = () => {
-    // 1. Discard all unsaved local form changes and restore last persisted profile values
     resetToPersisted();
-    // 2. Clear modal state
     setShowDiscardModal(false);
-    // 3. Navigate back to professional workspace
     navigate('/professional');
   };
 
@@ -294,7 +284,6 @@ export const ProfessionalProfilePage: React.FC = () => {
         portfolioItems: portfolioItems.length > 0 ? portfolioItems : undefined,
       });
 
-      // Synchronize in-memory auth state so ProfessionalDashboard updates immediately
       await refreshData();
 
       setIsDirty(false);
@@ -320,48 +309,36 @@ export const ProfessionalProfilePage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Professional Profile"
-      subtitle="Manage your public practitioner profile, capabilities, and matching preferences."
-      showBack={true}
-      onBack={handleCancel}
+      breadcrumbs={[
+        { label: 'Professional Workspace', to: '/professional' },
+        { label: 'Practitioner Profile' },
+      ]}
+      title="Practitioner Profile"
+      subtitle="Manage your curated presentation, core disciplines, portfolio highlights, and matching floor budget."
+      action={
+        <Button variant="outline" size="sm" onClick={handleCancel}>
+          Back to Workspace
+        </Button>
+      }
     >
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Success Alert */}
+      <div className="max-w-4xl space-y-8">
         {successMessage && (
-          <div
-            id="professional-profile-success"
-            className="p-4 rounded-[var(--radius-card)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] flex flex-col sm:flex-row sm:items-center gap-3 text-[var(--color-success-text)]"
-          >
-            <div className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center shrink-0">
-              <Check className="w-4 h-4" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold">{successMessage}</h3>
-              <p className="text-xs mt-0.5 opacity-90">
-                Your updated capabilities, services, and floor budget are active for future project matching.
-              </p>
-            </div>
-            <Button
-              variant="white"
-              size="sm"
-              onClick={() => navigate('/professional')}
+          <div id="professional-profile-success">
+            <Alert
+              variant="success"
+              title={successMessage}
+              onDismiss={() => setSuccessMessage(null)}
             >
-              Go to Workspace
-            </Button>
+              Your updated capabilities, services, and floor budget are active for future project matching.
+            </Alert>
           </div>
         )}
 
-        {/* Error Alert */}
         {error && (
-          <div
-            id="professional-profile-error"
-            className="p-4 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-3 text-[var(--color-error-text)]"
-          >
-            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold">Unable to save profile</h3>
-              <p className="text-xs mt-0.5 opacity-90">{error}</p>
-            </div>
+          <div id="professional-profile-error">
+            <Alert variant="error" title="Unable to save profile" onDismiss={() => setError(null)}>
+              {error}
+            </Alert>
           </div>
         )}
 
@@ -370,11 +347,11 @@ export const ProfessionalProfilePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-[var(--radius-button)] bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-primary)] shrink-0">
-                <ShieldCheck className="w-5 h-5" />
+                <ShieldCheck className="w-5 h-5" aria-hidden="true" />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
                     Governance Status
                   </span>
                   <Badge variant={verificationBadgeProps.variant} size="sm">
@@ -382,10 +359,16 @@ export const ProfessionalProfilePage: React.FC = () => {
                   </Badge>
                 </div>
                 <p className="text-xs text-[var(--color-text-secondary)] tabular-nums mt-0.5">
-                  Completed Projects: <strong className="font-semibold text-[var(--color-text-primary)]">{professionalProfile?.completedProjectCount ?? 0}</strong>
+                  Completed Projects:{' '}
+                  <strong className="font-semibold text-[var(--color-text-primary)]">
+                    {professionalProfile?.completedProjectCount ?? 0}
+                  </strong>
                   {typeof professionalProfile?.averageRating === 'number' && (
                     <span className="ml-3">
-                      Client Rating: <strong className="font-semibold text-[var(--color-text-primary)]">★ {professionalProfile.averageRating.toFixed(1)}</strong>
+                      Client Rating:{' '}
+                      <strong className="font-semibold text-[var(--color-text-primary)]">
+                        ★ {professionalProfile.averageRating.toFixed(1)}
+                      </strong>
                     </span>
                   )}
                 </p>
@@ -393,44 +376,46 @@ export const ProfessionalProfilePage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
-              <Lock className="w-3.5 h-3.5 text-[var(--color-text-muted)] shrink-0" />
-              <span>Curation metrics are managed directly by Alongby and cannot be manually modified.</span>
+              <Lock className="w-3.5 h-3.5 text-[var(--color-text-muted)] shrink-0" aria-hidden="true" />
+              <span>Verification and completion metrics are governed by Alongby curation.</span>
             </div>
           </div>
         </Card>
 
-        {/* Fast-Moving Operational State Notice: Link to Live Availability */}
-        <div className="p-5 sm:p-6 rounded-[var(--radius-card)] bg-[var(--color-primary)] text-[var(--color-primary-text)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Link to Live Availability */}
+        <Card className="p-5 sm:p-6 bg-[var(--color-surface)] border-[var(--color-border-strong)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[var(--radius-button)] bg-white/10 flex items-center justify-center text-[#A7F3D0] shrink-0">
-              <Calendar className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-primary)] shrink-0">
+              <Calendar className="w-4 h-4" aria-hidden="true" />
             </div>
             <div>
-              <h4 className="typo-card-title text-white">Live Availability & Capacity</h4>
-              <p className="text-[13px] text-[#D6D3CD] mt-0.5">
-                Fast-moving operational capacity and next start dates are managed separately from your practitioner profile.
+              <h2 className="typo-card-title text-[var(--color-text-primary)]">
+                Live Availability &amp; Capacity
+              </h2>
+              <p className="text-[13px] text-[var(--color-text-secondary)] mt-0.5">
+                Earliest start dates and concurrent project limits are managed in your workspace availability controls.
               </p>
             </div>
           </div>
           <Button
-            variant="white"
+            variant="outline"
             size="sm"
             onClick={() => navigate('/professional?tab=availability')}
           >
             Manage Availability
           </Button>
-        </div>
+        </Card>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Identity & Headline Card */}
           <Card className="p-6 sm:p-8">
             <div className="border-b border-[var(--color-border)] pb-4 mb-6">
               <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
-                <User className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
-                <span>Practitioner Identity & Headline</span>
+                <User className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" aria-hidden="true" />
+                <span>Practitioner Identity &amp; Headline</span>
               </h2>
               <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                Your public identity presented to matched clients and curation review panels.
+                Your identity presented on curated shortlists, commercial proposals, and agreements.
               </p>
             </div>
 
@@ -446,7 +431,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                   }}
                   placeholder="e.g. Elena Rostova"
                   required
-                  helperText="Your full practitioner name shown on proposals and contracts."
+                  helperText="Full practitioner name shown on proposals and agreements."
                 />
               </div>
 
@@ -461,7 +446,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                   }}
                   placeholder="e.g. Senior Full-Stack Architect & UI Designer"
                   required
-                  helperText="A concise summary of your primary craft."
+                  helperText="Concise summary of your primary craft."
                 />
               </div>
 
@@ -475,9 +460,9 @@ export const ProfessionalProfilePage: React.FC = () => {
                     markDirty();
                   }}
                   rows={4}
-                  placeholder="Describe your design and engineering philosophy, domain focus, and key accomplishments..."
+                  placeholder="Describe your design and engineering approach, domain focus, and delivery methodology..."
                   required
-                  helperText="Helps clients understand how you approach collaboration and technical delivery."
+                  helperText="Helps clients understand how you structure collaboration and execution."
                 />
               </div>
 
@@ -491,7 +476,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                     markDirty();
                   }}
                   placeholder="e.g. https://elenadesign.io"
-                  helperText="Personal portfolio, studio website, or GitHub profile."
+                  helperText="Personal portfolio, studio site, or GitHub profile."
                   leftIcon={<Globe className="w-4 h-4 text-[var(--color-text-muted)]" />}
                 />
               </div>
@@ -509,7 +494,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                     markDirty();
                   }}
                   className="tabular-nums"
-                  helperText="Verified experience considered in matching algorithm scoring."
+                  helperText="Experience considered in curated matching evaluation."
                 />
               </div>
 
@@ -537,7 +522,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                     markDirty();
                   }}
                   options={COMMON_TIMEZONES}
-                  helperText="Facilitates scheduling and client overlap calculations."
+                  helperText="Supports client working-hour overlap alignment."
                 />
               </div>
             </div>
@@ -547,19 +532,18 @@ export const ProfessionalProfilePage: React.FC = () => {
           <Card className="p-6 sm:p-8">
             <div className="border-b border-[var(--color-border)] pb-4 mb-6">
               <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
-                <Briefcase className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
-                <span>Services, Skills & Floor Budget</span>
+                <Briefcase className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" aria-hidden="true" />
+                <span>Services, Skills &amp; Engagement Floor</span>
               </h2>
               <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                Authoritative parameters used directly by the Alongby matching engine to evaluate project suitability.
+                Parameters used by Alongby matching to evaluate project fit.
               </p>
             </div>
 
             <div className="space-y-6">
-              {/* Primary Services Checkboxes */}
               <div>
                 <label className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-2">
-                  Primary Services & Disciplines (select all that apply)
+                  Primary Services &amp; Disciplines
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {SERVICE_OPTIONS.map((srv) => {
@@ -577,17 +561,18 @@ export const ProfessionalProfilePage: React.FC = () => {
                         }`}
                       >
                         <span>{srv}</span>
-                        {isSelected && <Check className="w-4 h-4 text-white shrink-0 ml-2" />}
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-[var(--color-primary-text)] shrink-0 ml-2" aria-hidden="true" />
+                        )}
                       </button>
                     );
                   })}
                 </div>
                 <p className="text-xs text-[var(--color-text-secondary)] mt-1.5">
-                  Updating primary services directly calibrates project category eligibility in the matching engine.
+                  Select at least one discipline you actively deliver.
                 </p>
               </div>
 
-              {/* Skills Input with tags */}
               <div>
                 <Input
                   id="prof-skills"
@@ -600,23 +585,20 @@ export const ProfessionalProfilePage: React.FC = () => {
                   placeholder="e.g. React, TypeScript, Figma, Tailwind CSS, GraphQL, PostgreSQL"
                   helperText="Comma-separated list of core technologies and competencies."
                 />
-                <div className="flex flex-wrap gap-1.5 mt-2.5">
-                  {skillsInput
-                    .split(',')
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                    .map((skill) => (
-                      <span
-                        key={skill}
-                        className="px-2.5 py-0.5 rounded-md bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs font-medium border border-[var(--color-border)]"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                </div>
+                {skillsInput
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean).length > 0 && (
+                  <p className="text-xs text-[var(--color-text-secondary)] mt-2 leading-relaxed">
+                    {skillsInput
+                      .split(',')
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                )}
               </div>
 
-              {/* Minimum Floor Budget */}
               <div className="pt-4 border-t border-[var(--color-border)]">
                 <div className="max-w-md">
                   <Input
@@ -631,11 +613,11 @@ export const ProfessionalProfilePage: React.FC = () => {
                       markDirty();
                     }}
                     className="tabular-nums"
-                    helperText="Opportunities below this threshold will be flagged as budget stretch before routing."
+                    helperText="Opportunities below this baseline are flagged during curation review."
                     leftIcon={<Euro className="w-4 h-4 text-[var(--color-text-muted)]" />}
                   />
                   <div className="mt-2 text-xs text-[var(--color-text-secondary)] flex items-center gap-1.5">
-                    <span>Floor Level:</span>
+                    <span>Active Floor:</span>
                     <strong className="text-[var(--color-text-primary)] font-semibold tabular-nums">
                       €{Number(floorBudgetEur || 0).toLocaleString()} EUR
                     </strong>
@@ -650,11 +632,11 @@ export const ProfessionalProfilePage: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between border-b border-[var(--color-border)] pb-4 mb-6 gap-4">
               <div>
                 <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
-                  <Layers className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
-                  <span>Portfolio & Project Highlights</span>
+                  <Layers className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" aria-hidden="true" />
+                  <span>Portfolio &amp; Project Highlights</span>
                 </h2>
                 <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                  Curated case studies displayed to clients reviewing proposal shortlists.
+                  Selected case studies shown to clients comparing curated shortlists.
                 </p>
               </div>
 
@@ -672,11 +654,10 @@ export const ProfessionalProfilePage: React.FC = () => {
               )}
             </div>
 
-            {/* Existing Portfolio Items */}
             {portfolioItems.length === 0 && !showAddPortfolio && (
               <div className="text-center py-8 px-4 border border-dashed border-[var(--color-border-strong)] rounded-[var(--radius-card)] bg-[var(--color-surface-secondary)]">
                 <p className="text-xs text-[var(--color-text-secondary)] mb-3">
-                  No portfolio highlights added yet. Adding 1–3 past project highlights increases client selection confidence.
+                  No portfolio highlights added yet. Adding 1–3 relevant case studies helps clients evaluate your work.
                 </p>
                 <Button
                   type="button"
@@ -695,13 +676,13 @@ export const ProfessionalProfilePage: React.FC = () => {
                 {portfolioItems.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] flex items-start justify-between gap-4"
+                    className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-start justify-between gap-4"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-semibold text-[var(--color-text-primary)] break-words">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] break-words">
                           {item.title}
-                        </h4>
+                        </h3>
                         {item.year && (
                           <span className="text-xs text-[var(--color-text-secondary)] font-medium tabular-nums">
                             ({item.year})
@@ -718,7 +699,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs text-[var(--color-text-primary)] font-medium mt-2 underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
                         >
-                          <ExternalLink className="w-3 h-3" />
+                          <ExternalLink className="w-3 h-3" aria-hidden="true" />
                           <span>View Live Case Study</span>
                         </a>
                       )}
@@ -728,21 +709,20 @@ export const ProfessionalProfilePage: React.FC = () => {
                       type="button"
                       onClick={() => handleRemovePortfolioItem(item.id)}
                       aria-label={`Remove portfolio highlight ${item.title}`}
-                      className="text-[var(--color-text-muted)] hover:text-[var(--color-error-text)] p-1.5 rounded-[var(--radius-button)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+                      className="text-[var(--color-text-muted)] hover:text-[var(--color-error-text)] p-2 rounded-[var(--radius-button)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                       title="Remove highlight"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Add Portfolio Highlight Form */}
             {showAddPortfolio && (
               <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface-secondary)] space-y-4">
                 <div className="flex items-center justify-between pb-2 border-b border-[var(--color-border)]">
-                  <span className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-[var(--color-text-primary)]">
                     New Project Highlight
                   </span>
                   <button
@@ -767,7 +747,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                     label="Year / Period (Optional)"
                     value={newPortfolioYear}
                     onChange={(e) => setNewPortfolioYear(e.target.value)}
-                    placeholder="e.g. 2024"
+                    placeholder="e.g. 2025"
                     className="tabular-nums"
                   />
 
@@ -776,7 +756,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                       label="Live Project or Case Study URL (Optional)"
                       value={newPortfolioUrl}
                       onChange={(e) => setNewPortfolioUrl(e.target.value)}
-                      placeholder="e.g. https://behance.net/gallery/..."
+                      placeholder="e.g. https://studio.example.com/case-study"
                       leftIcon={<Globe className="w-4 h-4 text-[var(--color-text-muted)]" />}
                     />
                   </div>
@@ -787,7 +767,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                       value={newPortfolioDesc}
                       onChange={(e) => setNewPortfolioDesc(e.target.value)}
                       rows={2}
-                      placeholder="Summarize the core problem solved, architecture delivered, and business impact achieved..."
+                      placeholder="Summarize the scope delivered and measurable outcome..."
                       required
                     />
                   </div>
@@ -815,18 +795,16 @@ export const ProfessionalProfilePage: React.FC = () => {
             )}
           </Card>
 
-          {/* Historical Consistency & Governance Notice */}
+          {/* Historical Consistency Notice */}
           <div className="p-5 rounded-[var(--radius-card)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-start gap-3.5 text-[var(--color-text-secondary)]">
             <div className="w-8 h-8 rounded-[var(--radius-button)] bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center shrink-0 text-[var(--color-text-primary)]">
-              <Sparkles className="w-4 h-4" />
+              <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             </div>
             <div className="text-[13px] leading-relaxed">
               <span className="font-semibold text-[var(--color-text-primary)] block mb-0.5">
-                Future Matching & Commercial Consistency
+                Future Matching &amp; Snapshot Integrity
               </span>
-              Updates to your primary services, skills, location, and minimum budget will calibrate future project
-              matching opportunities. Historical snapshots in already-submitted quotes, accepted proposals, and executed
-              contracts remain preserved and uncompromised.
+              Updates to your primary services, skills, location, and minimum budget calibrate future matching invitations. Historical snapshots in already-published shortlists, proposals, and signed agreements remain preserved.
             </div>
           </div>
 
@@ -835,12 +813,12 @@ export const ProfessionalProfilePage: React.FC = () => {
             <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
               {isDirty ? (
                 <span className="inline-flex items-center gap-1.5 text-[var(--color-warning-text)] font-medium">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   Unsaved changes
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-[var(--color-text-secondary)]">
-                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   All changes saved
                 </span>
               )}
@@ -861,7 +839,7 @@ export const ProfessionalProfilePage: React.FC = () => {
                 id="prof-profile-save"
                 type="submit"
                 variant="primary"
-                loading={isSubmitting}
+                isLoading={isSubmitting}
                 disabled={isSubmitting || !isDirty}
                 className="w-full sm:w-auto min-w-[140px]"
               >

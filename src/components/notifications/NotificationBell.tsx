@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { notificationService } from '../../services/notificationService';
 import { InAppNotification } from '../../types';
+import { LoadingSpinner } from '../ui/LoadingSpinner';
 import {
   Bell,
   Check,
   CheckCircle2,
-  Sparkles,
   Award,
-  AlertCircle,
-  ExternalLink,
-  ChevronRight,
 } from 'lucide-react';
 
 export const NotificationBell: React.FC = () => {
@@ -19,36 +16,51 @@ export const NotificationBell: React.FC = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<InAppNotification[]>([]);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const loadNotifications = async () => {
+  const loadNotifications = async (isInitial = false) => {
     if (!currentUser) return;
+    if (isInitial) setLoading(true);
     try {
       const list = await notificationService.getUserNotifications(currentUser.uid);
       setNotifications(list);
     } catch (err) {
       console.warn('Could not load notifications:', err);
+    } finally {
+      if (isInitial) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadNotifications();
-    const interval = setInterval(loadNotifications, 15000);
+    loadNotifications(true);
+    const interval = setInterval(() => loadNotifications(false), 15000);
     return () => clearInterval(interval);
   }, [currentUser]);
 
-  // Click outside to close
+  // Click outside or Escape key to close
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
     if (open) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [open]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -77,22 +89,36 @@ export const NotificationBell: React.FC = () => {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen(!open)}
-        className="relative p-2 min-h-[36px] min-w-[36px] flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-[var(--radius-button)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-        aria-label="Notifications"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-label={
+          unreadCount > 0 ? `Notifications (${unreadCount} unread)` : 'Notifications'
+        }
+        className="relative p-2 min-h-[40px] min-w-[40px] flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-[var(--radius-button)] hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
       >
-        <Bell className="w-4 h-4" />
+        <Bell className="w-4 h-4" aria-hidden="true" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--color-error)] rounded-full ring-2 ring-[var(--color-surface)]" />
+          <span
+            aria-hidden="true"
+            className="absolute top-2 right-2 w-2 h-2 bg-[var(--color-error)] rounded-full ring-2 ring-[var(--color-surface)]"
+          />
         )}
       </button>
 
       {open && (
-        <div className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-[68px] sm:top-auto sm:mt-2 sm:w-96 bg-[var(--color-surface)] rounded-[var(--radius-modal)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] py-2 z-50 overflow-hidden font-sans">
-          <div className="px-4 py-2.5 border-b border-[var(--color-border)] flex items-center justify-between">
+        <div
+          role="dialog"
+          aria-label="Notifications"
+          className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-[68px] sm:top-auto sm:mt-2 sm:w-96 bg-[var(--color-surface)] rounded-[var(--radius-modal)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] py-2 z-50 overflow-hidden font-sans"
+        >
+          <div className="px-4 py-2.5 border-b border-[var(--color-border)] flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="font-sans font-semibold text-sm text-[var(--color-text-primary)]">Notifications</span>
+              <span className="font-sans font-semibold text-sm text-[var(--color-text-primary)]">
+                Notifications
+              </span>
               {unreadCount > 0 && (
                 <span className="px-1.5 py-0.5 bg-[var(--color-primary)] text-[var(--color-primary-text)] rounded-md text-xs font-medium tabular-nums leading-none">
                   {unreadCount}
@@ -103,63 +129,74 @@ export const NotificationBell: React.FC = () => {
               <button
                 type="button"
                 onClick={handleMarkAllRead}
-                className="text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
+                className="text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm py-0.5 px-1"
               >
-                <Check className="w-3 h-3" />
+                <Check className="w-3 h-3" aria-hidden="true" />
                 Mark all read
               </button>
             )}
           </div>
 
           <div className="max-h-80 overflow-y-auto divide-y divide-[var(--color-border)]">
-            {notifications.length === 0 ? (
+            {loading && notifications.length === 0 ? (
+              <div className="p-6 flex justify-center">
+                <LoadingSpinner size="sm" inline label="Loading notifications…" />
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="p-6 text-center text-[13px] text-[var(--color-text-secondary)]">
                 No notifications right now.
               </div>
             ) : (
-              notifications.map((notif) => {
-                return (
-                  <button
-                    key={notif.id}
-                    type="button"
-                    onClick={() => handleNotificationClick(notif)}
-                    className={`w-full p-3.5 hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer text-left flex items-start gap-3 ${
-                      !notif.read ? 'bg-[var(--color-bg-app)]' : ''
-                    }`}
-                  >
-                    <div className="w-7 h-7 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-center justify-center flex-shrink-0 mt-0.5 text-[var(--color-text-secondary)]">
-                      {notif.type === 'shortlist_ready' ? (
-                        <Sparkles className="w-3.5 h-3.5 text-[var(--color-warning)]" />
-                      ) : notif.type === 'professional_selected' ? (
-                        <Award className="w-3.5 h-3.5 text-[var(--color-success)]" />
-                      ) : (
-                        <Bell className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />
+              notifications.map((notif) => (
+                <button
+                  key={notif.id}
+                  type="button"
+                  onClick={() => handleNotificationClick(notif)}
+                  className={`w-full p-3.5 hover:bg-[var(--color-surface-secondary)] focus-visible:bg-[var(--color-surface-secondary)] focus-visible:outline-none transition-colors cursor-pointer text-left flex items-start gap-3 ${
+                    !notif.read ? 'bg-[var(--color-bg-app)]' : ''
+                  }`}
+                >
+                  <div className="w-7 h-7 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-center justify-center flex-shrink-0 mt-0.5 text-[var(--color-text-secondary)]">
+                    {notif.type === 'shortlist_ready' ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[var(--color-success)]" aria-hidden="true" />
+                    ) : notif.type === 'professional_selected' ? (
+                      <Award className="w-3.5 h-3.5 text-[var(--color-success)]" aria-hidden="true" />
+                    ) : (
+                      <Bell className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" aria-hidden="true" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <span
+                        className={`text-[13px] truncate ${
+                          !notif.read
+                            ? 'font-semibold text-[var(--color-text-primary)]'
+                            : 'font-medium text-[var(--color-text-secondary)]'
+                        }`}
+                      >
+                        {notif.title}
+                      </span>
+                      {!notif.read && (
+                        <span
+                          aria-label="Unread"
+                          className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] flex-shrink-0"
+                        />
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2 mb-0.5">
-                        <span className={`text-[13px] truncate ${!notif.read ? 'font-semibold text-[var(--color-text-primary)]' : 'font-medium text-[var(--color-text-secondary)]'}`}>
-                          {notif.title}
-                        </span>
-                        {!notif.read && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] flex-shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">
-                        {notif.message}
-                      </p>
-                      <span className="text-xs text-[var(--color-text-muted)] tabular-nums mt-1 block">
-                        {new Date(notif.createdAt).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })
+                    <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">
+                      {notif.message}
+                    </p>
+                    <span className="text-xs text-[var(--color-text-muted)] tabular-nums mt-1 block">
+                      {new Date(notif.createdAt).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                </button>
+              ))
             )}
           </div>
         </div>

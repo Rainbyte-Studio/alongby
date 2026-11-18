@@ -1,7 +1,7 @@
 import React from 'react';
 import { taxonomyService } from '../../services/taxonomyService';
 import { ProjectBrief } from '../../types';
-import { Check, Sparkles } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 interface StepProjectTypeProps {
   brief: ProjectBrief;
@@ -37,9 +37,8 @@ export const StepProjectType: React.FC<StepProjectTypeProps> = ({
   return (
     <div className="space-y-6">
       <div>
-        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] mb-2">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>{currentService.name}</span>
+        <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-1.5">
+          {currentService.name}
         </div>
         <h2 className="typo-section-heading text-[var(--color-text-primary)]">
           What is the scope of this {currentService.name.toLowerCase()} project?

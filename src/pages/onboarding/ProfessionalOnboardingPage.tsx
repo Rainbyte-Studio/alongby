@@ -9,7 +9,8 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
 import { Card } from '../../components/ui/Card';
-import { ArrowRight, AlertCircle, Check } from 'lucide-react';
+import { Alert } from '../../components/ui/Alert';
+import { ArrowRight, Check } from 'lucide-react';
 import { AvailabilityStatus } from '../../types';
 
 const SERVICE_OPTIONS = [
@@ -64,11 +65,16 @@ export const ProfessionalOnboardingPage: React.FC = () => {
   const [shortBio, setShortBio] = useState('');
   const [country, setCountry] = useState('United Kingdom');
   const [timezone, setTimezone] = useState('UTC');
-  const [selectedServices, setSelectedServices] = useState<string[]>(['Web Applications', 'UI/UX Design']);
-  const [skillsInput, setSkillsInput] = useState('React, TypeScript, Figma, Tailwind CSS, Node.js');
+  const [selectedServices, setSelectedServices] = useState<string[]>([
+    'Web Applications',
+    'UI/UX Design',
+  ]);
+  const [skillsInput, setSkillsInput] = useState(
+    'React, TypeScript, Figma, Tailwind CSS, Node.js'
+  );
   const [yearsOfExperience, setYearsOfExperience] = useState<number>(6);
   const [minBudgetEur, setMinBudgetEur] = useState<number>(3000);
-  
+
   // Availability fields
   const [availabilityStatus, setAvailabilityStatus] = useState<AvailabilityStatus>('available');
   const [nextAvailableDate, setNextAvailableDate] = useState(
@@ -162,173 +168,199 @@ export const ProfessionalOnboardingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[85vh] bg-[var(--color-bg-app)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full">
-        <div className="text-center mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)] mb-2.5">
-            Professional Profile &amp; Availability
+    <div className="min-h-[85vh] bg-[var(--color-bg-app)] flex items-center justify-center py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl w-full space-y-8">
+        <div className="text-center space-y-2.5">
+          <p className="text-xs font-medium text-[var(--color-text-secondary)] tabular-nums">
+            Step 1 of 1 · Practitioner Profile &amp; Availability
           </p>
           <h1 className="typo-page-title text-[var(--color-text-primary)]">
             Complete your Professional Profile
           </h1>
-          <p className="mt-2 text-sm sm:text-[15px] text-[var(--color-text-secondary)] max-w-lg mx-auto leading-relaxed">
-            Alongby curates matches using verified skills, experience, and structured availability. You will not be displayed in a public directory.
+          <p className="text-sm sm:text-[15px] text-[var(--color-text-secondary)] max-w-lg mx-auto leading-relaxed">
+            Alongby curates private invitations using verified disciplines, engagement minimums, and structured availability. Your profile is never listed in a public directory.
           </p>
         </div>
 
         <Card className="p-6 sm:p-8">
           {error && (
-            <div className="mb-6 p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[var(--color-error)]" />
-              <span>{error}</span>
-            </div>
+            <Alert variant="error" className="mb-6" onDismiss={() => setError(null)}>
+              {error}
+            </Alert>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Display Name"
-                required
-                placeholder="e.g. Julian Hayes"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-              />
-              <Input
-                label="Professional Title"
-                required
-                placeholder="e.g. Lead Brand & Web Designer"
-                value={professionalTitle}
-                onChange={(e) => setProfessionalTitle(e.target.value)}
-              />
-            </div>
-
-            <Textarea
-              label="Professional Bio"
-              required
-              rows={3}
-              placeholder="Describe your craft, technical stack, and the types of client briefs you specialize in delivering..."
-              value={shortBio}
-              onChange={(e) => setShortBio(e.target.value)}
-            />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Select
-                label="Country"
-                required
-                options={COMMON_COUNTRIES}
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              />
-              <Select
-                label="Timezone"
-                required
-                options={COMMON_TIMEZONES}
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-              />
-            </div>
-
-            {/* Primary Services Multi-select */}
-            <div>
-              <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-2">
-                Primary Services Offered <span className="text-[var(--color-error)]">*</span>
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {SERVICE_OPTIONS.map((srv) => {
-                  const isSelected = selectedServices.includes(srv);
-                  return (
-                    <button
-                      key={srv}
-                      type="button"
-                      onClick={() => toggleService(srv)}
-                      className={`px-3.5 py-2.5 min-h-[42px] text-[13px] font-medium rounded-[var(--radius-button)] border text-left flex items-center justify-between transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
-                        isSelected
-                          ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-text)]'
-                          : 'border-[var(--color-border-strong)] hover:border-[var(--color-text-muted)] bg-[var(--color-surface)] text-[var(--color-text-primary)]'
-                      }`}
-                    >
-                      <span>{srv}</span>
-                      {isSelected && <Check className="w-3.5 h-3.5 shrink-0 ml-2" />}
-                    </button>
-                  );
-                })}
+            <div className="space-y-4">
+              <div className="pb-2 border-b border-[var(--color-border)]">
+                <h2 className="typo-card-title text-[var(--color-text-primary)]">
+                  01. Identity &amp; Core Discipline
+                </h2>
+                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                  Presented confidentially to clients only when your quote is selected for a curated shortlist.
+                </p>
               </div>
-            </div>
 
-            <Input
-              label="Core Skills & Technologies (comma separated)"
-              placeholder="e.g. Next.js, TypeScript, PostgreSQL, Figma, UI Systems"
-              value={skillsInput}
-              onChange={(e) => setSkillsInput(e.target.value)}
-            />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  id="pro-onboard-name"
+                  label="Display Name"
+                  required
+                  placeholder="e.g. Julian Hayes"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                />
+                <Input
+                  id="pro-onboard-title"
+                  label="Professional Title"
+                  required
+                  placeholder="e.g. Lead Brand & Web Designer"
+                  value={professionalTitle}
+                  onChange={(e) => setProfessionalTitle(e.target.value)}
+                />
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Years of Professional Experience"
-                type="number"
-                min="1"
-                max="50"
-                className="tabular-nums"
-                value={yearsOfExperience}
-                onChange={(e) => setYearsOfExperience(parseInt(e.target.value, 10) || 1)}
+              <Textarea
+                id="pro-onboard-bio"
+                label="Professional Bio"
+                required
+                rows={3}
+                placeholder="Describe your craft, technical stack, and the types of client briefs you specialize in delivering..."
+                value={shortBio}
+                onChange={(e) => setShortBio(e.target.value)}
               />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Select
+                  id="pro-onboard-country"
+                  label="Country"
+                  required
+                  options={COMMON_COUNTRIES}
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                />
+                <Select
+                  id="pro-onboard-timezone"
+                  label="Timezone"
+                  required
+                  options={COMMON_TIMEZONES}
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                />
+              </div>
+
+              {/* Primary Services Multi-select */}
+              <div>
+                <span className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-2">
+                  Primary Services Offered <span className="text-[var(--color-error)]">*</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {SERVICE_OPTIONS.map((srv) => {
+                    const isSelected = selectedServices.includes(srv);
+                    return (
+                      <button
+                        key={srv}
+                        type="button"
+                        aria-pressed={isSelected}
+                        onClick={() => toggleService(srv)}
+                        className={`px-3.5 py-2.5 min-h-[42px] text-[13px] font-medium rounded-[var(--radius-button)] border text-left flex items-center justify-between transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+                          isSelected
+                            ? 'border-[var(--color-primary)] bg-[var(--color-surface-secondary)] ring-1 ring-[var(--color-primary)] text-[var(--color-text-primary)] font-semibold'
+                            : 'border-[var(--color-border-strong)] hover:border-[var(--color-text-muted)] bg-[var(--color-surface)] text-[var(--color-text-primary)]'
+                        }`}
+                      >
+                        <span>{srv}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 shrink-0 ml-2 text-[var(--color-text-primary)]" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <Input
-                label="Minimum Project Budget (€ EUR)"
-                type="number"
-                step="250"
-                min="500"
-                className="tabular-nums"
-                value={minBudgetEur}
-                onChange={(e) => setMinBudgetEur(parseInt(e.target.value, 10) || 1000)}
-                helperText="Indicative floor for matched project scopes"
+                id="pro-onboard-skills"
+                label="Core Skills & Technologies (comma separated)"
+                placeholder="e.g. Next.js, TypeScript, PostgreSQL, Figma, UI Systems"
+                value={skillsInput}
+                onChange={(e) => setSkillsInput(e.target.value)}
               />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  id="pro-onboard-exp"
+                  label="Years of Professional Experience"
+                  type="number"
+                  min="1"
+                  max="50"
+                  className="tabular-nums"
+                  value={yearsOfExperience}
+                  onChange={(e) => setYearsOfExperience(parseInt(e.target.value, 10) || 1)}
+                />
+                <Input
+                  id="pro-onboard-min-budget"
+                  label="Minimum Project Budget (€ EUR)"
+                  type="number"
+                  step="250"
+                  min="500"
+                  className="tabular-nums"
+                  value={minBudgetEur}
+                  onChange={(e) => setMinBudgetEur(parseInt(e.target.value, 10) || 1000)}
+                  helperText="Indicative floor for matched project scopes."
+                />
+              </div>
             </div>
 
             {/* Availability Setup */}
-            <div className="pt-6 border-t border-[var(--color-border)]">
-              <h3 className="typo-card-title text-[var(--color-text-primary)] mb-1">
-                Initial Availability Settings
-              </h3>
-              <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
-                Alongby uses structured availability to ensure you are only matched with projects when you have real delivery capacity.
-              </p>
+            <div className="pt-6 border-t border-[var(--color-border)] space-y-4">
+              <div>
+                <h2 className="typo-card-title text-[var(--color-text-primary)]">
+                  02. Initial Availability &amp; Capacity
+                </h2>
+                <p className="text-[13px] text-[var(--color-text-secondary)] mt-0.5 leading-relaxed">
+                  Alongby checks your real delivery capacity before dispatching private project opportunities.
+                </p>
+              </div>
 
-              <div className="space-y-4">
-                <Select
-                  label="Current Availability Status"
-                  options={AVAILABILITY_STATUS_OPTIONS}
-                  value={availabilityStatus}
-                  onChange={(e) => setAvailabilityStatus(e.target.value as AvailabilityStatus)}
+              <Select
+                id="pro-onboard-availability"
+                label="Current Availability Status"
+                options={AVAILABILITY_STATUS_OPTIONS}
+                value={availabilityStatus}
+                onChange={(e) => setAvailabilityStatus(e.target.value as AvailabilityStatus)}
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  id="pro-onboard-next-date"
+                  label="Next Available Start Date"
+                  type="date"
+                  required
+                  className="tabular-nums"
+                  value={nextAvailableDate}
+                  onChange={(e) => setNextAvailableDate(e.target.value)}
                 />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    label="Next Available Start Date"
-                    type="date"
-                    required
-                    className="tabular-nums"
-                    value={nextAvailableDate}
-                    onChange={(e) => setNextAvailableDate(e.target.value)}
-                  />
-                  <Input
-                    label="Maximum Concurrent Projects"
-                    type="number"
-                    min="1"
-                    max="10"
-                    className="tabular-nums"
-                    value={maxProjects}
-                    onChange={(e) => setMaxProjects(parseInt(e.target.value, 10) || 1)}
-                  />
-                </div>
+                <Input
+                  id="pro-onboard-max-projects"
+                  label="Maximum Concurrent Projects"
+                  type="number"
+                  min="1"
+                  max="10"
+                  className="tabular-nums"
+                  value={maxProjects}
+                  onChange={(e) => setMaxProjects(parseInt(e.target.value, 10) || 1)}
+                />
               </div>
             </div>
 
-            <div className="pt-4 border-t border-[var(--color-border)] flex items-center justify-end">
+            <div className="pt-5 border-t border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <span className="text-xs text-[var(--color-text-secondary)]">
+                Portfolio items and credentials can be added from your Profile workspace.
+              </span>
               <Button
                 type="submit"
                 variant="primary"
                 isLoading={isSubmitting}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="w-full sm:w-auto"
               >
                 Submit Profile &amp; Enter Workspace
               </Button>

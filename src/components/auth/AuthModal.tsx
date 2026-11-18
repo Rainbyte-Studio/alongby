@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { Alert } from '../ui/Alert';
 import { authService } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, UserCheck, Sparkles, AlertCircle } from 'lucide-react';
+import { Briefcase, UserCheck, Check, ChevronDown } from 'lucide-react';
 import { AlongbyWordmark } from '../brand/AlongbyWordmark';
 
 interface AuthModalProps {
@@ -22,12 +23,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   initialRole = 'client',
 }) => {
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
-  const [selectedRole, setSelectedRole] = useState<'client' | 'professional'>(initialRole);
+  const [selectedRole, setSelectedRole] = useState<'client' | 'professional'>(
+    initialRole
+  );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showEvalAccounts, setShowEvalAccounts] = useState(false);
 
   const { refreshData } = useAuth();
   const navigate = useNavigate();
@@ -40,7 +44,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   }, [isOpen, initialMode, initialRole]);
 
-  // Reset state on mode change
+  // Reset error state on mode change
   const switchMode = (newMode: 'signin' | 'signup') => {
     setMode(newMode);
     setError(null);
@@ -84,7 +88,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
 
         if (profile?.onboardingStatus === 'pending') {
-          navigate(profile.role === 'client' ? '/onboarding/client' : '/onboarding/professional');
+          navigate(
+            profile.role === 'client'
+              ? '/onboarding/client'
+              : '/onboarding/professional'
+          );
         } else if (profile?.role === 'client') {
           navigate('/client');
         } else if (profile?.role === 'professional') {
@@ -100,7 +108,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       let message = err.message || 'An error occurred during authentication.';
       if (err.code === 'auth/email-already-in-use') {
         message = 'This email is already registered. Please sign in instead.';
-      } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+      } else if (
+        err.code === 'auth/invalid-credential' ||
+        err.code === 'auth/wrong-password' ||
+        err.code === 'auth/user-not-found'
+      ) {
         message = 'Invalid email or password.';
       } else if (err.code === 'auth/weak-password') {
         message = 'Password should be at least 6 characters.';
@@ -116,7 +128,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setMode('signin');
     setEmail(`demo.${roleToFill}@alongby.example`);
     setPassword('alongby123');
-    setDisplayName(`Demo ${roleToFill.charAt(0).toUpperCase() + roleToFill.slice(1)}`);
+    setDisplayName(
+      `Demo ${roleToFill.charAt(0).toUpperCase() + roleToFill.slice(1)}`
+    );
     setSelectedRole(roleToFill === 'admin' ? 'client' : roleToFill);
     setError(null);
   };
@@ -125,39 +139,50 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={mode === 'signin' ? 'Sign in to alongby' : 'Create your alongby account'}
+      title={mode === 'signin' ? 'Sign in' : 'Create your account'}
       description={
         mode === 'signin'
-          ? 'Enter your email and password to access your projects or workspace.'
-          : 'Join the curated network for high-calibre digital and creative projects.'
+          ? 'Access your project briefs, curated shortlists, or specialist workspace.'
+          : 'Register as a commissioning client or apply to join as an independent specialist.'
       }
       maxWidth="md"
     >
-      {/* Brand Wordmark Header */}
-      <div className="flex justify-center pb-3 mb-6 border-b border-[var(--color-border)]">
-        <AlongbyWordmark size="lg" className="text-[var(--color-text-primary)]" />
+      {/* Subtle Brand Eyebrow */}
+      <div className="flex items-center justify-between pb-4 mb-5 border-b border-[var(--color-border)]">
+        <AlongbyWordmark size="sm" className="text-[var(--color-text-primary)]" />
+        <span className="text-xs text-[var(--color-text-muted)]">
+          Curated Digital Practice
+        </span>
       </div>
 
-      {/* Mode toggle */}
-      <div className="flex rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] p-1 mb-6">
+      {/* Mode Switcher */}
+      <div
+        role="tablist"
+        aria-label="Authentication mode"
+        className="flex rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] p-1 mb-5"
+      >
         <button
           type="button"
+          role="tab"
+          aria-selected={mode === 'signin'}
           onClick={() => switchMode('signin')}
-          className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+          className={`flex-1 py-2 text-[13px] rounded-[6px] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
             mode === 'signin'
               ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] font-semibold shadow-[var(--shadow-card)]'
-              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+              : 'text-[var(--color-text-secondary)] font-medium hover:text-[var(--color-text-primary)]'
           }`}
         >
           Sign In
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={mode === 'signup'}
           onClick={() => switchMode('signup')}
-          className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+          className={`flex-1 py-2 text-[13px] rounded-[6px] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
             mode === 'signup'
               ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] font-semibold shadow-[var(--shadow-card)]'
-              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+              : 'text-[var(--color-text-secondary)] font-medium hover:text-[var(--color-text-primary)]'
           }`}
         >
           Create Account
@@ -165,58 +190,84 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       </div>
 
       {error && (
-        <div className="mb-4 p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[var(--color-error)]" />
-          <span>{error}</span>
-        </div>
+        <Alert variant="error" className="mb-4">
+          {error}
+        </Alert>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {mode === 'signup' && (
           <>
-            {/* Role Selection */}
-            <div>
-              <label className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-2">
-                I am joining as a
-              </label>
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-3">
+            {/* Editorial Role Selection */}
+            <fieldset>
+              <legend className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-2">
+                Select account type
+              </legend>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
+                  aria-pressed={selectedRole === 'client'}
                   onClick={() => setSelectedRole('client')}
-                  className={`p-3.5 rounded-[var(--radius-button)] border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+                  className={`p-3.5 rounded-[var(--radius-card)] border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                     selectedRole === 'client'
-                      ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-text)]'
-                      : 'border-[var(--color-border-strong)] hover:border-[var(--color-text-muted)] bg-[var(--color-surface)] text-[var(--color-text-primary)]'
+                      ? 'border-[var(--color-primary)] bg-[var(--color-surface-secondary)] ring-1 ring-[var(--color-primary)]'
+                      : 'border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)]'
                   }`}
                 >
-                  <Briefcase className={`w-4 h-4 mb-2 ${selectedRole === 'client' ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
-                  <div className="text-[13px] font-semibold">Client</div>
-                  <div className={`text-xs mt-0.5 leading-snug ${selectedRole === 'client' ? 'text-neutral-300' : 'text-[var(--color-text-secondary)]'}`}>
-                    I want to hire curated talent
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <Briefcase
+                      className="w-4 h-4 text-[var(--color-text-primary)]"
+                      aria-hidden="true"
+                    />
+                    {selectedRole === 'client' && (
+                      <span className="w-4 h-4 rounded-full bg-[var(--color-primary)] text-[var(--color-primary-text)] inline-flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5" aria-hidden="true" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">
+                    Client
+                  </div>
+                  <div className="text-xs text-[var(--color-text-secondary)] mt-0.5 leading-snug">
+                    Submit project briefs and compare curated shortlists
                   </div>
                 </button>
 
                 <button
                   type="button"
+                  aria-pressed={selectedRole === 'professional'}
                   onClick={() => setSelectedRole('professional')}
-                  className={`p-3.5 rounded-[var(--radius-button)] border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+                  className={`p-3.5 rounded-[var(--radius-card)] border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                     selectedRole === 'professional'
-                      ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-text)]'
-                      : 'border-[var(--color-border-strong)] hover:border-[var(--color-text-muted)] bg-[var(--color-surface)] text-[var(--color-text-primary)]'
+                      ? 'border-[var(--color-primary)] bg-[var(--color-surface-secondary)] ring-1 ring-[var(--color-primary)]'
+                      : 'border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)]'
                   }`}
                 >
-                  <UserCheck className={`w-4 h-4 mb-2 ${selectedRole === 'professional' ? 'text-white' : 'text-[var(--color-text-secondary)]'}`} />
-                  <div className="text-[13px] font-semibold">Professional</div>
-                  <div className={`text-xs mt-0.5 leading-snug ${selectedRole === 'professional' ? 'text-neutral-300' : 'text-[var(--color-text-secondary)]'}`}>
-                    I offer design / dev services
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <UserCheck
+                      className="w-4 h-4 text-[var(--color-text-primary)]"
+                      aria-hidden="true"
+                    />
+                    {selectedRole === 'professional' && (
+                      <span className="w-4 h-4 rounded-full bg-[var(--color-primary)] text-[var(--color-primary-text)] inline-flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5" aria-hidden="true" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">
+                    Professional
+                  </div>
+                  <div className="text-xs text-[var(--color-text-secondary)] mt-0.5 leading-snug">
+                    Receive matched briefs and submit commercial quotes
                   </div>
                 </button>
               </div>
-            </div>
+            </fieldset>
 
             <Input
               label="Full Name"
               type="text"
+              autoComplete="name"
               required
               placeholder="e.g. Eleanor Vance"
               value={displayName}
@@ -228,8 +279,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <Input
           label="Email Address"
           type="email"
+          autoComplete="email"
           required
-          placeholder="name@company.com"
+          placeholder="name@organisation.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -237,9 +289,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <Input
           label="Password"
           type="password"
+          autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
           required
           placeholder="••••••••"
-          helperText={mode === 'signup' ? 'Must be at least 6 characters' : undefined}
+          helperText={
+            mode === 'signup' ? 'Minimum 6 characters required.' : undefined
+          }
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -247,45 +302,64 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <Button
           type="submit"
           variant="primary"
+          size="lg"
           className="w-full mt-2"
           isLoading={isLoading}
         >
-          {mode === 'signin' ? 'Sign In' : `Create ${selectedRole === 'client' ? 'Client' : 'Professional'} Account`}
+          {mode === 'signin'
+            ? 'Sign In'
+            : `Continue as ${selectedRole === 'client' ? 'Client' : 'Professional'}`}
         </Button>
       </form>
 
-      {/* Quick Testing Helper */}
-      <div className="mt-6 pt-4 border-t border-[var(--color-border)]">
-        <div className="flex items-center justify-between text-xs font-medium text-[var(--color-text-secondary)] mb-2">
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-[var(--color-warning)]" />
-            <span className="font-semibold text-[var(--color-text-primary)]">Quick Evaluation Helpers:</span>
+      {/* Discreet Evaluation Account Switcher (preserves existing rapid evaluation helpers) */}
+      <div className="mt-5 pt-4 border-t border-[var(--color-border)]">
+        <button
+          type="button"
+          aria-expanded={showEvalAccounts}
+          onClick={() => setShowEvalAccounts((prev) => !prev)}
+          className="w-full flex items-center justify-between text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors cursor-pointer py-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+        >
+          <span className="font-medium">Evaluation &amp; Demo Credentials</span>
+          <ChevronDown
+            className={`w-3.5 h-3.5 transition-transform duration-150 ${
+              showEvalAccounts ? 'rotate-180' : ''
+            }`}
+            aria-hidden="true"
+          />
+        </button>
+
+        {showEvalAccounts && (
+          <div className="mt-2.5 p-3 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] space-y-2.5">
+            <div className="flex items-center justify-between text-xs text-[var(--color-text-secondary)] tabular-nums">
+              <span>Select role to prefill sign-in:</span>
+              <span className="text-[var(--color-text-muted)]">pass: alongby123</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => fillDemoAccount('client')}
+                className="text-xs px-2.5 py-1.5 rounded-[6px] bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+              >
+                Prefill Client
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemoAccount('professional')}
+                className="text-xs px-2.5 py-1.5 rounded-[6px] bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+              >
+                Prefill Professional
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemoAccount('admin')}
+                className="text-xs px-2.5 py-1.5 rounded-[6px] bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+              >
+                Prefill Admin
+              </button>
+            </div>
           </div>
-          <span className="text-xs text-[var(--color-text-muted)] tabular-nums">dev pass: alongby123</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            onClick={() => fillDemoAccount('client')}
-            className="text-xs px-2.5 py-1.5 rounded-md bg-[var(--color-surface-secondary)] hover:bg-[#E7E3DD] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer"
-          >
-            Prefill Client
-          </button>
-          <button
-            type="button"
-            onClick={() => fillDemoAccount('professional')}
-            className="text-xs px-2.5 py-1.5 rounded-md bg-[var(--color-surface-secondary)] hover:bg-[#E7E3DD] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer"
-          >
-            Prefill Professional
-          </button>
-          <button
-            type="button"
-            onClick={() => fillDemoAccount('admin')}
-            className="text-xs px-2.5 py-1.5 rounded-md bg-[var(--color-surface-secondary)] hover:bg-[#E7E3DD] border border-[var(--color-border)] text-[var(--color-text-primary)] transition-colors font-medium cursor-pointer"
-          >
-            Prefill Admin
-          </button>
-        </div>
+        )}
       </div>
     </Modal>
   );

@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import {
   Proposal,
-  ProposalChangeRequest,
   ChangeRequestCategory,
   UserRole,
 } from '../../types';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Select } from '../ui/Select';
+import { Textarea } from '../ui/Textarea';
+import { Checkbox } from '../ui/Checkbox';
+import { Alert } from '../ui/Alert';
 import { Modal } from '../ui/Modal';
 import {
   FileText,
   CheckCircle2,
   Clock,
-  AlertCircle,
   ShieldCheck,
   Calendar,
   Layers,
   ChevronRight,
   MessageSquarePlus,
   RefreshCw,
-  ExternalLink,
   Check,
   User,
   Building,
@@ -45,7 +47,6 @@ interface ProposalReviewViewProps {
 export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
   proposal,
   userRole,
-  userId,
   onAcceptProposal,
   onSubmitChangeRequest,
   onPublishRevisedProposal,
@@ -59,14 +60,20 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
   const [changeCategory, setChangeCategory] = useState<ChangeRequestCategory>('scope');
   const [changeMessage, setChangeMessage] = useState('');
   const [suggestedValue, setSuggestedValue] = useState('');
+  const [changeError, setChangeError] = useState('');
+
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [typedName, setTypedName] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [acceptError, setAcceptError] = useState('');
 
   // Revision modal states
   const [revScope, setRevScope] = useState(proposal.scopeSummary);
-  const [revAmount, setRevAmount] = useState((proposal.commercialTerms.totalAmountMinor / 100).toString());
-  const [revDuration, setRevDuration] = useState(proposal.commercialTerms.estimatedDurationDays.toString());
+  const [revAmount, setRevAmount] = useState(
+    (proposal.commercialTerms.totalAmountMinor / 100).toString()
+  );
+  const [revDuration, setRevDuration] = useState(
+    proposal.commercialTerms.estimatedDurationDays.toString()
+  );
   const [revNotes, setRevNotes] = useState('');
   const [revisionError, setRevisionError] = useState('');
 
@@ -78,54 +85,57 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
   const professionalAccepted = Boolean(proposal.professionalAcceptance?.accepted);
   const bothAccepted = proposal.status === 'accepted' || (clientAccepted && professionalAccepted);
 
-  const hasCurrentPartyAccepted = isClient
-    ? clientAccepted
-    : isProfessional
-    ? professionalAccepted
-    : false;
-
   const canAccept =
     (isClient && !clientAccepted) ||
     (isProfessional && !professionalAccepted) ||
     isAdmin;
 
-  const totalFormatted = `${(proposal.commercialTerms.totalAmountMinor / 100).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })} ${proposal.commercialTerms.currency}`;
+  const totalFormatted = `${(proposal.commercialTerms.totalAmountMinor / 100).toLocaleString(
+    'en-US',
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  )} ${proposal.commercialTerms.currency}`;
 
-  const phase1Formatted = `${(proposal.commercialTerms.phase1AmountMinor / 100).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })} ${proposal.commercialTerms.currency}`;
+  const phase1Formatted = `${(proposal.commercialTerms.phase1AmountMinor / 100).toLocaleString(
+    'en-US',
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  )} ${proposal.commercialTerms.currency}`;
 
-  const phase2Formatted = `${(proposal.commercialTerms.phase2AmountMinor / 100).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })} ${proposal.commercialTerms.currency}`;
+  const phase2Formatted = `${(proposal.commercialTerms.phase2AmountMinor / 100).toLocaleString(
+    'en-US',
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  )} ${proposal.commercialTerms.currency}`;
 
   const handleAccept = async () => {
-    setErrorMsg('');
+    setAcceptError('');
     if (!agreeTerms) {
-      setErrorMsg('Please confirm agreement to the scope and commercial terms.');
+      setAcceptError('Please confirm agreement to the scope and commercial terms.');
       return;
     }
     if (!typedName.trim()) {
-      setErrorMsg('Please enter your full legal name to sign acceptance.');
+      setAcceptError('Please enter your full legal name to confirm acceptance.');
       return;
     }
     try {
       await onAcceptProposal(typedName.trim());
     } catch (err: any) {
-      setErrorMsg(err.message || 'Failed to record proposal acceptance.');
+      setAcceptError(err.message || 'Failed to record proposal acceptance.');
     }
   };
 
   const handleChangeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg('');
+    setChangeError('');
     if (!changeMessage.trim()) {
-      setErrorMsg('Please describe the adjustments you are requesting.');
+      setChangeError('Please describe the adjustments you are requesting.');
       return;
     }
 
@@ -141,7 +151,7 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
       setChangeMessage('');
       setSuggestedValue('');
     } catch (err: any) {
-      setErrorMsg(err.message || 'Failed to submit change request.');
+      setChangeError(err.message || 'Failed to submit change request.');
     }
   };
 
@@ -191,28 +201,30 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--color-border)] pb-6">
           <div className="space-y-1.5 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="info" size="md">
+              <Badge variant="info" size="md" className="tabular-nums">
                 Proposal v{proposal.version}
               </Badge>
               {bothAccepted ? (
                 <Badge variant="success" size="md">
-                  <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Mutually Accepted
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1" aria-hidden="true" /> Mutually Accepted
                 </Badge>
               ) : proposal.status === 'changes_requested' ? (
                 <Badge variant="warning" size="md">
-                  <RefreshCw className="w-3.5 h-3.5 mr-1" /> Revisions Requested
+                  <RefreshCw className="w-3.5 h-3.5 mr-1" aria-hidden="true" /> Revisions Requested
                 </Badge>
               ) : (
                 <Badge variant="neutral" size="md">
-                  <Clock className="w-3.5 h-3.5 mr-1" /> Pending Mutual Acceptance
+                  <Clock className="w-3.5 h-3.5 mr-1" aria-hidden="true" /> Pending Mutual Acceptance
                 </Badge>
               )}
             </div>
-            <h1 className="typo-page-title text-[var(--color-text-primary)] pt-1">
+            <h1 className="typo-page-title text-[var(--color-text-primary)] pt-1 break-words">
               {proposal.title}
             </h1>
             <p className="text-[13px] text-[var(--color-text-secondary)] tabular-nums">
-              Ref: <span className="font-medium text-[var(--color-text-primary)]">{proposal.id}</span> · Formulated on{' '}
+              Ref:{' '}
+              <span className="font-medium text-[var(--color-text-primary)]">{proposal.id}</span> ·
+              Formulated{' '}
               {new Date(proposal.createdAt).toLocaleDateString(undefined, {
                 year: 'numeric',
                 month: 'long',
@@ -228,15 +240,20 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
                 onClick={onNavigateToContract}
                 rightIcon={<ChevronRight className="w-4 h-4" />}
               >
-                View Master Contract
+                Open Service Agreement
               </Button>
             )}
 
             {!bothAccepted && (
               <Button
                 variant="outline"
-                onClick={() => setShowChangeModal(true)}
-                leftIcon={<MessageSquarePlus className="w-4 h-4 text-[var(--color-text-secondary)]" />}
+                onClick={() => {
+                  setChangeError('');
+                  setShowChangeModal(true);
+                }}
+                leftIcon={
+                  <MessageSquarePlus className="w-4 h-4 text-[var(--color-text-secondary)]" />
+                }
               >
                 Request Adjustments
               </Button>
@@ -248,47 +265,49 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
           <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] min-w-0">
             <span className="text-xs font-medium text-[var(--color-text-secondary)] block">
-              Total Contract Consideration
+              Total Fee
             </span>
             <span className="text-xl sm:text-2xl font-bold font-sans tabular-nums text-[var(--color-text-primary)] mt-1 block break-words">
               {totalFormatted}
             </span>
-            <span className="text-xs text-[var(--color-text-secondary)] mt-0.5 block">Fixed price inclusive of scope</span>
+            <span className="text-xs text-[var(--color-text-secondary)] mt-0.5 block">
+              Fixed price for agreed scope
+            </span>
           </div>
 
           <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] min-w-0">
             <span className="text-xs font-medium text-[var(--color-text-secondary)] block">
-              Phase 1 Staged Deposit
+              Phase 1 Kickoff Deposit
             </span>
             <span className="text-xl sm:text-2xl font-bold font-sans tabular-nums text-[var(--color-text-primary)] mt-1 block break-words">
               {phase1Formatted}
             </span>
             <span className="text-xs text-[var(--color-text-secondary)] mt-0.5 block tabular-nums">
-              {proposal.commercialTerms.phase1Percentage ?? 50}% upfront payment protection hold before kickoff
+              {proposal.commercialTerms.phase1Percentage ?? 50}% due after contract signing to activate delivery
             </span>
           </div>
 
           <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] min-w-0">
             <span className="text-xs font-medium text-[var(--color-text-secondary)] block">
-              Phase 2 Final Balance
+              Phase 2 Completion Payment
             </span>
             <span className="text-xl sm:text-2xl font-bold font-sans tabular-nums text-[var(--color-text-primary)] mt-1 block break-words">
               {phase2Formatted}
             </span>
             <span className="text-xs text-[var(--color-text-secondary)] mt-0.5 block tabular-nums">
-              {proposal.commercialTerms.phase2Percentage ?? 50}% released upon launch inspection
+              {proposal.commercialTerms.phase2Percentage ?? 50}% due upon final deliverable review
             </span>
           </div>
 
           <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] min-w-0">
             <span className="text-xs font-medium text-[var(--color-text-secondary)] block">
-              Target Completion
+              Estimated Timeline
             </span>
             <span className="text-xl sm:text-2xl font-bold font-sans tabular-nums text-[var(--color-text-primary)] mt-1 block">
               {proposal.commercialTerms.estimatedDurationDays} Days
             </span>
             <span className="text-xs text-[var(--color-text-secondary)] mt-0.5 block tabular-nums">
-              Start: {proposal.commercialTerms.proposedStartDate}
+              Target start: {proposal.commercialTerms.proposedStartDate}
             </span>
           </div>
         </div>
@@ -297,7 +316,7 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
       {/* Acceptance Status Tracker Bar */}
       <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6">
         <h2 className="typo-card-title text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-[var(--color-text-secondary)]" />
+          <ShieldCheck className="w-5 h-5 text-[var(--color-text-secondary)]" aria-hidden="true" />
           <span>Mutual Acceptance Status</span>
         </h2>
 
@@ -313,9 +332,9 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0" />
+                  <User className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0" aria-hidden="true" />
                   <span className="text-sm font-semibold text-[var(--color-text-primary)]">
-                    Client Formal Acceptance
+                    Client Acceptance
                   </span>
                 </div>
                 <p className="text-xs text-[var(--color-text-secondary)] mt-1 tabular-nums">
@@ -332,13 +351,13 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
                       })}
                     </>
                   ) : (
-                    'Awaiting Client signoff and agreement'
+                    'Awaiting Client review and sign-off'
                   )}
                 </p>
               </div>
               {clientAccepted ? (
                 <Badge variant="success" size="sm">
-                  <Check className="w-3 h-3 mr-1" /> Agreed
+                  <Check className="w-3 h-3 mr-1" aria-hidden="true" /> Agreed
                 </Badge>
               ) : (
                 <Badge variant="neutral" size="sm">
@@ -359,9 +378,9 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <Building className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0" />
+                  <Building className="w-4 h-4 text-[var(--color-text-secondary)] shrink-0" aria-hidden="true" />
                   <span className="text-sm font-semibold text-[var(--color-text-primary)]">
-                    Specialist Formal Acceptance
+                    Specialist Acceptance
                   </span>
                 </div>
                 <p className="text-xs text-[var(--color-text-secondary)] mt-1 tabular-nums">
@@ -381,13 +400,13 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
                       )}
                     </>
                   ) : (
-                    'Awaiting Specialist signoff and confirmation'
+                    'Awaiting Specialist review and confirmation'
                   )}
                 </p>
               </div>
               {professionalAccepted ? (
                 <Badge variant="success" size="sm">
-                  <Check className="w-3 h-3 mr-1" /> Agreed
+                  <Check className="w-3 h-3 mr-1" aria-hidden="true" /> Agreed
                 </Badge>
               ) : (
                 <Badge variant="neutral" size="sm">
@@ -401,10 +420,9 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
         {bothAccepted && (
           <div className="mt-4 p-4 rounded-[var(--radius-button)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-5 h-5 text-[var(--color-success-text)] flex-shrink-0" />
+              <CheckCircle2 className="w-5 h-5 text-[var(--color-success-text)] shrink-0" aria-hidden="true" />
               <p className="text-sm text-[var(--color-success-text)]">
-                <span className="font-semibold">Proposal mutually accepted.</span> The formal Master
-                Services Contract is ready for electronic signature.
+                <span className="font-semibold">Proposal mutually accepted.</span> This version is now immutable and incorporated into the formal Service Agreement.
               </p>
             </div>
             {onNavigateToContract && (
@@ -414,7 +432,7 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
                 onClick={onNavigateToContract}
                 rightIcon={<ChevronRight className="w-3.5 h-3.5" />}
               >
-                Proceed to Contract
+                Proceed to Agreement
               </Button>
             )}
           </div>
@@ -425,10 +443,10 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
       <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 sm:p-8 space-y-6">
         <div>
           <h2 className="typo-section-heading text-[var(--color-text-primary)] flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
+            <FileText className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" aria-hidden="true" />
             <span>Scope Summary</span>
           </h2>
-          <p className="text-sm text-[var(--color-text-primary)] leading-relaxed mt-3 bg-[var(--color-surface-secondary)] p-4 rounded-[var(--radius-button)]">
+          <p className="text-sm text-[var(--color-text-primary)] leading-relaxed mt-3 bg-[var(--color-surface-secondary)] p-4 rounded-[var(--radius-button)] whitespace-pre-wrap break-words">
             {proposal.scopeSummary}
           </p>
         </div>
@@ -436,7 +454,7 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
         {/* Deliverables Breakdown */}
         <div className="space-y-4 pt-2">
           <h3 className="typo-card-title text-[var(--color-text-primary)] flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[var(--color-text-secondary)]" />
+            <Layers className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
             <span>Schedule of Deliverables</span>
           </h3>
 
@@ -451,24 +469,34 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
                     <span className="w-6 h-6 rounded-full bg-[var(--color-primary)] text-[var(--color-primary-text)] text-xs font-semibold tabular-nums flex items-center justify-center shrink-0">
                       {del.phase}
                     </span>
-                    <h4 className="text-sm font-semibold text-[var(--color-text-primary)]">{del.title}</h4>
+                    <h4 className="text-sm font-semibold text-[var(--color-text-primary)]">
+                      {del.title}
+                    </h4>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)] tabular-nums">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>Est. Due: Within {del.estimatedDueDays} days of start</span>
+                    <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>Target delivery: Day {del.estimatedDueDays}</span>
                   </div>
                 </div>
 
-                <p className="text-sm text-[var(--color-text-secondary)] mb-4 leading-relaxed">{del.description}</p>
+                <p className="text-sm text-[var(--color-text-secondary)] mb-4 leading-relaxed">
+                  {del.description}
+                </p>
 
                 <div>
-                  <span className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider block mb-2">
+                  <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-2">
                     Acceptance Criteria
                   </span>
                   <ul className="space-y-1.5">
                     {del.acceptanceCriteria.map((crit, cIdx) => (
-                      <li key={cIdx} className="text-xs text-[var(--color-text-secondary)] flex items-start gap-2">
-                        <Check className="w-3.5 h-3.5 text-[var(--color-success)] mt-0.5 flex-shrink-0" />
+                      <li
+                        key={cIdx}
+                        className="text-xs text-[var(--color-text-secondary)] flex items-start gap-2"
+                      >
+                        <Check
+                          className="w-3.5 h-3.5 text-[var(--color-success)] mt-0.5 shrink-0"
+                          aria-hidden="true"
+                        />
                         <span>{crit}</span>
                       </li>
                     ))}
@@ -482,7 +510,7 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
         {/* Milestones & Staged Payment Commercial Terms */}
         <div className="space-y-4 pt-4 border-t border-[var(--color-border)]">
           <h3 className="typo-card-title text-[var(--color-text-primary)]">
-            Two-Stage Payment Protection Schedule
+            Two-Stage Milestone Payment Schedule
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -497,18 +525,24 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
                   className="rounded-[var(--radius-button)] p-4 bg-[var(--color-surface-secondary)] space-y-2"
                 >
                   <div className="flex items-center justify-between gap-2 tabular-nums">
-                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
                       Phase {ms.phase} ({ms.percentage}%)
                     </span>
                     <span className="text-sm font-bold text-[var(--color-text-primary)]">
                       {msAmountFormatted}
                     </span>
                   </div>
-                  <h4 className="text-sm font-semibold text-[var(--color-text-primary)]">{ms.title}</h4>
-                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{ms.description}</p>
+                  <h4 className="text-sm font-semibold text-[var(--color-text-primary)]">
+                    {ms.title}
+                  </h4>
+                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                    {ms.description}
+                  </p>
                   <div className="pt-2 text-xs text-[var(--color-text-secondary)] border-t border-[var(--color-border)] flex flex-wrap justify-between gap-2 tabular-nums">
                     <span>Revisions included: {ms.revisionsAllowed}</span>
-                    <span>Hold type: Staged Payment Protection</span>
+                    <span>
+                      {ms.phase === 1 ? 'Due prior to activation' : 'Due upon final sign-off'}
+                    </span>
                   </div>
                 </div>
               );
@@ -519,13 +553,18 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
         {/* Exclusions, Assumptions & Client Responsibilities */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-[var(--color-border)]">
           <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">
+            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">
               Exclusions (Out of Scope)
-            </h4>
+            </h3>
             <ul className="space-y-1.5">
               {proposal.exclusions.map((item, idx) => (
-                <li key={idx} className="text-xs text-[var(--color-text-secondary)] flex items-start gap-1.5 leading-relaxed">
-                  <span className="text-[var(--color-error)] font-bold">·</span>
+                <li
+                  key={idx}
+                  className="text-xs text-[var(--color-text-secondary)] flex items-start gap-1.5 leading-relaxed"
+                >
+                  <span className="text-[var(--color-error)] font-bold" aria-hidden="true">
+                    ·
+                  </span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -533,13 +572,18 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
           </div>
 
           <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">
+            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">
               Working Assumptions
-            </h4>
+            </h3>
             <ul className="space-y-1.5">
               {proposal.assumptions.map((item, idx) => (
-                <li key={idx} className="text-xs text-[var(--color-text-secondary)] flex items-start gap-1.5 leading-relaxed">
-                  <span className="text-[var(--color-text-muted)] font-bold">·</span>
+                <li
+                  key={idx}
+                  className="text-xs text-[var(--color-text-secondary)] flex items-start gap-1.5 leading-relaxed"
+                >
+                  <span className="text-[var(--color-text-muted)] font-bold" aria-hidden="true">
+                    ·
+                  </span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -547,13 +591,18 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
           </div>
 
           <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">
+            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">
               Client Responsibilities
-            </h4>
+            </h3>
             <ul className="space-y-1.5">
               {proposal.clientResponsibilities.map((item, idx) => (
-                <li key={idx} className="text-xs text-[var(--color-text-secondary)] flex items-start gap-1.5 leading-relaxed">
-                  <span className="text-[var(--color-text-muted)] font-bold">·</span>
+                <li
+                  key={idx}
+                  className="text-xs text-[var(--color-text-secondary)] flex items-start gap-1.5 leading-relaxed"
+                >
+                  <span className="text-[var(--color-text-muted)] font-bold" aria-hidden="true">
+                    ·
+                  </span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -562,23 +611,21 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
         </div>
 
         {/* Revision Policy & Inspection */}
-        <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-info-bg)] border border-[var(--color-info-border)] text-xs text-[var(--color-info-text)] space-y-1">
-          <span className="font-semibold block">Inspection & Revision Standard</span>
+        <Alert variant="info" title="Inspection & Revision Standard">
           <p className="leading-relaxed">{proposal.commercialTerms.revisionPolicy}</p>
-          <p className="opacity-90 leading-relaxed">
-            Inspection Window: Client receives five (5) business days following deliverable
-            submission to review against the acceptance criteria.
+          <p className="mt-1 opacity-90 leading-relaxed">
+            Inspection Window: Client receives five (5) business days following deliverable submission to review against the agreed acceptance criteria.
           </p>
-        </div>
+        </Alert>
       </div>
 
       {/* Change Requests Section (if any exist) */}
       {proposal.changeRequests && proposal.changeRequests.length > 0 && (
         <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-4">
-          <h3 className="typo-card-title text-[var(--color-text-primary)] flex items-center gap-2">
-            <RefreshCw className="w-4 h-4 text-[var(--color-warning)]" />
+          <h2 className="typo-card-title text-[var(--color-text-primary)] flex items-center gap-2 tabular-nums">
+            <RefreshCw className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />
             <span>Adjustment Requests History ({proposal.changeRequests.length})</span>
-          </h3>
+          </h2>
 
           <div className="space-y-3">
             {proposal.changeRequests.map((cr) => (
@@ -588,51 +635,60 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-semibold text-[var(--color-text-primary)]">{cr.requestedByName}</span>
-                    <Badge variant="neutral" size="sm">
-                      {cr.requestedByRole.toUpperCase()}
+                    <span className="font-semibold text-[var(--color-text-primary)]">
+                      {cr.requestedByName}
+                    </span>
+                    <Badge variant="neutral" size="sm" className="capitalize">
+                      {cr.requestedByRole}
                     </Badge>
-                    <Badge variant="warning" size="sm">
-                      {cr.category.toUpperCase()}
+                    <Badge variant="warning" size="sm" className="capitalize">
+                      {cr.category}
                     </Badge>
                   </div>
                   <span className="text-[var(--color-text-secondary)] tabular-nums">
                     {new Date(cr.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-[var(--color-text-secondary)] leading-relaxed">{cr.message}</p>
+                <p className="text-[var(--color-text-secondary)] leading-relaxed break-words">
+                  {cr.message}
+                </p>
               </div>
             ))}
           </div>
 
-          {proposal.status === 'changes_requested' && (isProfessional || isAdmin) && onPublishRevisedProposal && (
-            <div className="mt-4 p-4 rounded-[var(--radius-button)] bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <h4 className="text-xs font-semibold text-[var(--color-warning-text)]">Revisions Requested on Proposal v{proposal.version}</h4>
-                <p className="text-xs text-[var(--color-warning-text)] opacity-90 mt-0.5">
-                  Review the feedback above and create Proposal v{proposal.version + 1} with updated scope, timeline, or commercial terms.
-                </p>
+          {proposal.status === 'changes_requested' &&
+            (isProfessional || isAdmin) &&
+            onPublishRevisedProposal && (
+              <div className="mt-4 p-4 rounded-[var(--radius-button)] bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-xs font-semibold text-[var(--color-warning-text)] tabular-nums">
+                    Revisions Requested on Proposal v{proposal.version}
+                  </h3>
+                  <p className="text-xs text-[var(--color-warning-text)] opacity-90 mt-0.5 tabular-nums">
+                    Review the feedback above and publish Proposal v{proposal.version + 1} with updated scope, timeline, or commercial terms.
+                  </p>
+                </div>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    setRevScope(proposal.scopeSummary);
+                    setRevAmount((proposal.commercialTerms.totalAmountMinor / 100).toString());
+                    setRevDuration(proposal.commercialTerms.estimatedDurationDays.toString());
+                    setRevisionError('');
+                    setShowRevisionModal(true);
+                  }}
+                >
+                  Prepare Proposal v{proposal.version + 1}
+                </Button>
               </div>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => {
-                  setRevScope(proposal.scopeSummary);
-                  setRevAmount((proposal.commercialTerms.totalAmountMinor / 100).toString());
-                  setRevDuration(proposal.commercialTerms.estimatedDurationDays.toString());
-                  setRevisionError('');
-                  setShowRevisionModal(true);
-                }}
-              >
-                Prepare Proposal v{proposal.version + 1}
-              </Button>
-            </div>
-          )}
+            )}
 
           {proposal.status === 'changes_requested' && isClient && (
-            <div className="mt-4 p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)]">
-              <strong className="text-[var(--color-text-primary)]">Revision in Progress:</strong> Your change request has been recorded. The specialist is currently updating the proposal terms for Version {proposal.version + 1}.
-            </div>
+            <Alert variant="neutral" title="Revision in Progress">
+              Your adjustment request has been recorded. The specialist is preparing Proposal v
+              {proposal.version + 1}.
+            </Alert>
           )}
         </div>
       )}
@@ -641,48 +697,40 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
       {canAccept && !bothAccepted && (
         <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border-strong)] shadow-[var(--shadow-card)] p-6 sm:p-8 space-y-5">
           <div className="border-b border-[var(--color-border)] pb-4">
-            <h3 className="typo-section-heading text-[var(--color-text-primary)]">
+            <h2 className="typo-section-heading text-[var(--color-text-primary)]">
               Confirm Formal Acceptance as{' '}
-              <span className="capitalize">{isClient ? 'Client' : isProfessional ? 'Specialist' : 'Admin'}</span>
-            </h3>
-            <p className="text-[13px] text-[var(--color-text-secondary)] mt-1.5 leading-relaxed">
-              By confirming acceptance, you agree to all deliverables, milestones, acceptance criteria,
-              and the two-stage staged payment protection terms set forth in this Proposal v{proposal.version}.
+              <span className="capitalize">
+                {isClient ? 'Client' : isProfessional ? 'Specialist' : 'Admin'}
+              </span>
+            </h2>
+            <p className="text-[13px] text-[var(--color-text-secondary)] mt-1.5 leading-relaxed tabular-nums">
+              By confirming acceptance, you agree to the deliverables, acceptance criteria, and two-stage payment terms set out in Proposal v{proposal.version}.
             </p>
           </div>
 
-          {errorMsg && (
-            <div className="p-3.5 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-center gap-2 font-medium">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
+          {acceptError && (
+            <Alert variant="error" onDismiss={() => setAcceptError('')}>
+              {acceptError}
+            </Alert>
           )}
 
           <div className="space-y-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="mt-1 h-4 w-4 accent-[var(--color-primary)] border-[var(--color-border-strong)] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-              />
-              <span className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed select-none tabular-nums">
-                I hereby declare that I have thoroughly examined Proposal v{proposal.version}, and
-                confirm complete alignment with the scheduled milestones, acceptance criteria,
-                staged payment terms ({proposal.commercialTerms.phase1Percentage ?? 50}% / {proposal.commercialTerms.phase2Percentage ?? 50}%), and deliverable commitments.
-              </span>
-            </label>
+            <Checkbox
+              id="proposal-accept-checkbox"
+              checked={agreeTerms}
+              onChange={(e) => setAgreeTerms(e.target.checked)}
+              label={`I have reviewed Proposal v${proposal.version} and agree to the scope, acceptance criteria, and two-stage milestone schedule (${proposal.commercialTerms.phase1Percentage ?? 50}% / ${proposal.commercialTerms.phase2Percentage ?? 50}%).`}
+            />
 
-            <div>
-              <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
-                Typed Full Legal Name (Proposal Acceptance Confirmation)
-              </label>
-              <input
-                type="text"
+            <div className="max-w-md">
+              <Input
+                id="proposal-accept-name"
+                label="Typed Full Legal Name"
+                required
                 value={typedName}
                 onChange={(e) => setTypedName(e.target.value)}
                 placeholder="e.g. Jane Doe"
-                className="w-full max-w-md px-3.5 py-2.5 min-h-[40px] font-sans text-sm font-normal text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
+                helperText="Recorded with timestamp in the proposal acceptance log."
               />
             </div>
 
@@ -690,14 +738,18 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
               <Button
                 variant="primary"
                 onClick={handleAccept}
+                isLoading={isAccepting}
                 disabled={isAccepting || !agreeTerms || !typedName.trim()}
               >
-                {isAccepting ? 'Recording Acceptance...' : `Accept Proposal v${proposal.version}`}
+                {isAccepting ? 'Recording Acceptance…' : `Accept Proposal v${proposal.version}`}
               </Button>
 
               <Button
                 variant="outline"
-                onClick={() => setShowChangeModal(true)}
+                onClick={() => {
+                  setChangeError('');
+                  setShowChangeModal(true);
+                }}
               >
                 Request Adjustments Instead
               </Button>
@@ -711,164 +763,117 @@ export const ProposalReviewView: React.FC<ProposalReviewViewProps> = ({
         isOpen={showChangeModal}
         onClose={() => setShowChangeModal(false)}
         title="Request Adjustments to Proposal"
+        description={`Specify the areas of Proposal v${proposal.version} you would like adjusted prior to acceptance.`}
       >
         <form onSubmit={handleChangeSubmit} className="space-y-4 text-left">
-          <p className="text-xs text-[var(--color-text-secondary)]">
-            Specify the areas of Proposal v{proposal.version} you would like adjusted before formal signoff.
-          </p>
+          <Select
+            id="proposal-change-category"
+            label="Adjustment Category"
+            value={changeCategory}
+            onChange={(e) => setChangeCategory(e.target.value as ChangeRequestCategory)}
+            options={[
+              { value: 'scope', label: 'Scope & Deliverables' },
+              { value: 'pricing', label: 'Commercial Terms & Pricing' },
+              { value: 'timeline', label: 'Timeline & Duration' },
+              { value: 'milestones', label: 'Milestone Criteria' },
+              { value: 'revisions', label: 'Revision Limits' },
+              { value: 'other', label: 'Other Terms' },
+            ]}
+          />
 
-          <div>
-            <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
-              Adjustment Category
-            </label>
-            <select
-              value={changeCategory}
-              onChange={(e) => setChangeCategory(e.target.value as ChangeRequestCategory)}
-              className="w-full px-3.5 py-2.5 min-h-[40px] font-sans text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
-            >
-              <option value="scope">Scope & Deliverables</option>
-              <option value="pricing">Commercial Terms & Pricing</option>
-              <option value="timeline">Timeline & Duration</option>
-              <option value="milestones">Milestone Criteria</option>
-              <option value="revisions">Revision Limits</option>
-              <option value="other">Other Terms</option>
-            </select>
-          </div>
+          <Textarea
+            id="proposal-change-message"
+            label="Requested Adjustments"
+            required
+            rows={4}
+            value={changeMessage}
+            onChange={(e) => setChangeMessage(e.target.value)}
+            placeholder="Provide clear, actionable details of the adjustment you are requesting..."
+          />
 
-          <div>
-            <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
-              Description of Requested Adjustments *
-            </label>
-            <textarea
-              rows={4}
-              value={changeMessage}
-              onChange={(e) => setChangeMessage(e.target.value)}
-              placeholder="Provide clear, actionable details of the adjustment you are requesting..."
-              className="w-full px-3.5 py-2.5 font-sans text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
-            />
-          </div>
+          <Input
+            id="proposal-change-suggestion"
+            label="Specific Alternative Suggestion (Optional)"
+            value={suggestedValue}
+            onChange={(e) => setSuggestedValue(e.target.value)}
+            placeholder="e.g. Include tablet QA verification in Phase 2"
+          />
 
-          <div>
-            <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
-              Proposed Alternative / Specific Suggestion (Optional)
-            </label>
-            <input
-              type="text"
-              value={suggestedValue}
-              onChange={(e) => setSuggestedValue(e.target.value)}
-              placeholder="e.g. Include additional responsive tablet QA step in Phase 2"
-              className="w-full px-3.5 py-2.5 min-h-[40px] font-sans text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
-            />
-          </div>
-
-          {errorMsg && (
-            <p className="text-xs text-[var(--color-error-text)] font-medium">{errorMsg}</p>
-          )}
+          {changeError && <Alert variant="error">{changeError}</Alert>}
 
           <div className="flex justify-end gap-3 pt-3 border-t border-[var(--color-border)]">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowChangeModal(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setShowChangeModal(false)}>
               Cancel
             </Button>
             <Button
               type="submit"
               variant="primary"
+              isLoading={isSubmittingChange}
               disabled={isSubmittingChange || !changeMessage.trim()}
             >
-              {isSubmittingChange ? 'Submitting...' : 'Submit Request'}
+              Submit Request
             </Button>
           </div>
         </form>
       </Modal>
 
-      {/* Revision Modal for Proposal v2 */}
+      {/* Revision Modal for Proposal v2+ */}
       <Modal
         isOpen={showRevisionModal}
         onClose={() => setShowRevisionModal(false)}
         title={`Publish Revised Proposal v${proposal.version + 1}`}
+        description={`Proposal v${proposal.version} remains immutable and preserved in version history.`}
       >
         <form onSubmit={handleRevisionSubmit} className="space-y-4 text-left">
-          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
-            Address feedback and publish Proposal v{proposal.version + 1}. Proposal v{proposal.version} will remain immutable and preserved in history.
-          </p>
-
-          <div>
-            <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
-              Revised Scope Summary *
-            </label>
-            <textarea
-              rows={3}
-              value={revScope}
-              onChange={(e) => setRevScope(e.target.value)}
-              className="w-full px-3.5 py-2.5 font-sans text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
-              required
-            />
-          </div>
+          <Textarea
+            id="proposal-rev-scope"
+            label="Revised Scope Summary"
+            required
+            rows={3}
+            value={revScope}
+            onChange={(e) => setRevScope(e.target.value)}
+          />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
-                Total Consideration ({proposal.commercialTerms.currency}) *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="1"
-                value={revAmount}
-                onChange={(e) => setRevAmount(e.target.value)}
-                className="w-full px-3.5 py-2.5 min-h-[40px] font-sans text-sm tabular-nums text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
-                Estimated Duration (Days) *
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={revDuration}
-                onChange={(e) => setRevDuration(e.target.value)}
-                className="w-full px-3.5 py-2.5 min-h-[40px] font-sans text-sm tabular-nums text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block font-sans text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
-              Summary of Changes / Revision Notes (Optional)
-            </label>
-            <input
-              type="text"
-              value={revNotes}
-              onChange={(e) => setRevNotes(e.target.value)}
-              placeholder="e.g. Adjusted timeline and deliverables to incorporate dedicated QA"
-              className="w-full px-3.5 py-2.5 min-h-[40px] font-sans text-sm text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
+            <Input
+              id="proposal-rev-amount"
+              label={`Total Fee (${proposal.commercialTerms.currency})`}
+              required
+              type="number"
+              step="0.01"
+              min="1"
+              value={revAmount}
+              onChange={(e) => setRevAmount(e.target.value)}
+              className="tabular-nums"
+            />
+            <Input
+              id="proposal-rev-duration"
+              label="Estimated Duration (Days)"
+              required
+              type="number"
+              min="1"
+              value={revDuration}
+              onChange={(e) => setRevDuration(e.target.value)}
+              className="tabular-nums"
             />
           </div>
 
-          {revisionError && (
-            <p className="text-xs text-[var(--color-error-text)] font-medium">{revisionError}</p>
-          )}
+          <Input
+            id="proposal-rev-notes"
+            label="Summary of Changes (Optional)"
+            value={revNotes}
+            onChange={(e) => setRevNotes(e.target.value)}
+            placeholder="e.g. Adjusted timeline and deliverables to incorporate dedicated QA"
+          />
+
+          {revisionError && <Alert variant="error">{revisionError}</Alert>}
 
           <div className="flex justify-end gap-3 pt-3 border-t border-[var(--color-border)]">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowRevisionModal(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setShowRevisionModal(false)}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={isPublishingRevision}
-            >
-              {isPublishingRevision ? 'Publishing...' : `Publish Proposal v${proposal.version + 1}`}
+            <Button type="submit" variant="primary" isLoading={isPublishingRevision}>
+              Publish Proposal v{proposal.version + 1}
             </Button>
           </div>
         </form>

@@ -2,14 +2,13 @@ import React from 'react';
 import { taxonomyService } from '../../services/taxonomyService';
 import { ProjectBrief } from '../../types';
 import { Button } from '../ui/Button';
+import { Alert } from '../ui/Alert';
 import {
   FileCheck,
   Edit3,
-  AlertCircle,
   Clock,
   Euro,
   Layers,
-  Sparkles,
   Paperclip,
   CheckCircle2,
 } from 'lucide-react';
@@ -108,15 +107,8 @@ export const StepReview: React.FC<StepReviewProps> = ({
 
       {/* Validation Errors warning if incomplete */}
       {validationErrors.length > 0 && (
-        <div
-          role="alert"
-          className="p-4 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] space-y-2"
-        >
-          <div className="font-semibold flex items-center gap-1.5">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>Please complete required fields before submitting:</span>
-          </div>
-          <ul className="space-y-1.5 ml-1">
+        <Alert variant="error" title="Please complete required fields before submitting:">
+          <ul className="space-y-1.5 mt-1">
             {validationErrors.map((err, idx) => {
               const target = getStepForError(err);
               return (
@@ -129,16 +121,16 @@ export const StepReview: React.FC<StepReviewProps> = ({
                     <button
                       type="button"
                       onClick={() => onEditSection(target.step)}
-                      className="text-xs font-semibold text-[var(--color-error-text)] hover:underline shrink-0 cursor-pointer"
+                      className="text-xs font-semibold text-[var(--color-error-text)] underline hover:opacity-80 shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
                     >
-                      Fix in {target.label}
+                      Fix in {target.label} →
                     </button>
                   )}
                 </li>
               );
             })}
           </ul>
-        </div>
+        </Alert>
       )}
 
       {/* Structured Sections */}
@@ -147,17 +139,17 @@ export const StepReview: React.FC<StepReviewProps> = ({
         <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
           <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[var(--color-text-secondary)]" />
-              <span className="text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                1 & 2. Service & Type
-              </span>
+              <Layers className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
+              <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] tabular-nums">
+                01 &amp; 02. Service &amp; Project Type
+              </h3>
             </div>
             <button
               type="button"
               onClick={() => onEditSection(1)}
               className="text-xs font-semibold text-[var(--color-text-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
             >
-              <Edit3 className="w-3 h-3" /> Edit
+              <Edit3 className="w-3 h-3" aria-hidden="true" /> Edit
             </button>
           </div>
 
@@ -185,17 +177,17 @@ export const StepReview: React.FC<StepReviewProps> = ({
         <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
           <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-[var(--color-text-secondary)]" />
-              <span className="text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                3. Project Details & Goals
-              </span>
+              <FileCheck className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
+              <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] tabular-nums">
+                03. Project Details &amp; Goals
+              </h3>
             </div>
             <button
               type="button"
               onClick={() => onEditSection(3)}
               className="text-xs font-semibold text-[var(--color-text-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
             >
-              <Edit3 className="w-3 h-3" /> Edit
+              <Edit3 className="w-3 h-3" aria-hidden="true" /> Edit
             </button>
           </div>
 
@@ -213,8 +205,10 @@ export const StepReview: React.FC<StepReviewProps> = ({
               <span className="text-xs font-medium text-[var(--color-text-secondary)] block mb-0.5">
                 Description
               </span>
-              <p className="text-[var(--color-text-secondary)] leading-relaxed whitespace-pre-wrap">
-                {brief.description || <span className="text-[var(--color-error-text)]">No description provided</span>}
+              <p className="text-[var(--color-text-secondary)] leading-relaxed whitespace-pre-wrap break-words">
+                {brief.description || (
+                  <span className="text-[var(--color-error-text)]">No description provided</span>
+                )}
               </p>
             </div>
 
@@ -235,7 +229,11 @@ export const StepReview: React.FC<StepReviewProps> = ({
                     Existing URL
                   </span>
                   <a
-                    href={brief.existingUrl.startsWith('http') ? brief.existingUrl : `https://${brief.existingUrl}`}
+                    href={
+                      brief.existingUrl.startsWith('http')
+                        ? brief.existingUrl
+                        : `https://${brief.existingUrl}`
+                    }
                     target="_blank"
                     rel="noreferrer"
                     className="font-medium text-[var(--color-text-primary)] underline truncate block"
@@ -258,22 +256,19 @@ export const StepReview: React.FC<StepReviewProps> = ({
 
             {brief.goals && brief.goals.length > 0 && (
               <div className="pt-2">
-                <span className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1.5">
+                <span className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">
                   Primary Goals
                 </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {brief.goals.map((gId) => {
-                    const g = goals.find((item) => item.id === gId);
-                    return (
-                      <span
-                        key={gId}
-                        className="px-2.5 py-1 rounded-[6px] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs font-medium"
-                      >
-                        {gId === 'other' && brief.customGoals ? brief.customGoals : g?.name || gId}
-                      </span>
-                    );
-                  })}
-                </div>
+                <p className="text-xs text-[var(--color-text-primary)] leading-relaxed">
+                  {brief.goals
+                    .map((gId) => {
+                      const g = goals.find((item) => item.id === gId);
+                      return gId === 'other' && brief.customGoals
+                        ? brief.customGoals
+                        : g?.name || gId;
+                    })
+                    .join(' · ')}
+                </p>
               </div>
             )}
           </div>
@@ -283,37 +278,34 @@ export const StepReview: React.FC<StepReviewProps> = ({
         <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
           <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[var(--color-text-secondary)]" />
-              <span className="text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                4. Features & Deliverables
-              </span>
+              <Layers className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
+              <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] tabular-nums">
+                04. Features &amp; Deliverables
+              </h3>
             </div>
             <button
               type="button"
               onClick={() => onEditSection(4)}
               className="text-xs font-semibold text-[var(--color-text-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
             >
-              <Edit3 className="w-3 h-3" /> Edit
+              <Edit3 className="w-3 h-3" aria-hidden="true" /> Edit
             </button>
           </div>
 
-          <div className="pt-3 text-xs">
+          <div className="pt-3 text-[13px]">
             {brief.features && brief.features.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {brief.features.map((fId) => {
-                  const feat = allFeatures.find((f) => f.id === fId);
-                  return (
-                    <span
-                      key={fId}
-                      className="px-2.5 py-1 rounded-[6px] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs font-medium"
-                    >
-                      {fId === 'other' && brief.customFeatures ? brief.customFeatures : feat?.name || fId}
-                    </span>
-                  );
-                })}
-              </div>
+              <p className="text-[var(--color-text-primary)] leading-relaxed">
+                {brief.features
+                  .map((fId) => {
+                    const feat = allFeatures.find((f) => f.id === fId);
+                    return fId === 'other' && brief.customFeatures
+                      ? brief.customFeatures
+                      : feat?.name || fId;
+                  })
+                  .join(' · ')}
+              </p>
             ) : (
-              <span className="text-[var(--color-text-secondary)] italic">
+              <span className="text-xs text-[var(--color-text-secondary)]">
                 No specific features selected (General scope)
               </span>
             )}
@@ -324,37 +316,34 @@ export const StepReview: React.FC<StepReviewProps> = ({
         <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
           <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-2">
-              <Paperclip className="w-4 h-4 text-[var(--color-text-secondary)]" />
-              <span className="text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                5. Existing Assets
-              </span>
+              <Paperclip className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
+              <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] tabular-nums">
+                05. Existing Assets
+              </h3>
             </div>
             <button
               type="button"
               onClick={() => onEditSection(5)}
               className="text-xs font-semibold text-[var(--color-text-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
             >
-              <Edit3 className="w-3 h-3" /> Edit
+              <Edit3 className="w-3 h-3" aria-hidden="true" /> Edit
             </button>
           </div>
 
-          <div className="pt-3 text-xs">
+          <div className="pt-3 text-[13px]">
             {brief.existingAssets && brief.existingAssets.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {brief.existingAssets.map((aId) => {
-                  const ast = allAssets.find((a) => a.id === aId);
-                  return (
-                    <span
-                      key={aId}
-                      className="px-2.5 py-1 rounded-[6px] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)] text-xs font-medium"
-                    >
-                      {aId === 'other' && brief.customAssets ? brief.customAssets : ast?.name || aId}
-                    </span>
-                  );
-                })}
-              </div>
+              <p className="text-[var(--color-text-primary)] leading-relaxed">
+                {brief.existingAssets
+                  .map((aId) => {
+                    const ast = allAssets.find((a) => a.id === aId);
+                    return aId === 'other' && brief.customAssets
+                      ? brief.customAssets
+                      : ast?.name || aId;
+                  })
+                  .join(' · ')}
+              </p>
             ) : (
-              <span className="text-[var(--color-text-secondary)] italic">
+              <span className="text-xs text-[var(--color-text-secondary)]">
                 Starting from scratch (No existing assets)
               </span>
             )}
@@ -366,17 +355,17 @@ export const StepReview: React.FC<StepReviewProps> = ({
           <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
             <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[var(--color-text-secondary)]" />
-                <span className="text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                  6. Timeline
-                </span>
+                <Clock className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
+                <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] tabular-nums">
+                  06. Timeline
+                </h3>
               </div>
               <button
                 type="button"
                 onClick={() => onEditSection(6)}
                 className="text-xs font-semibold text-[var(--color-text-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
               >
-                <Edit3 className="w-3 h-3" /> Edit
+                <Edit3 className="w-3 h-3" aria-hidden="true" /> Edit
               </button>
             </div>
 
@@ -402,7 +391,7 @@ export const StepReview: React.FC<StepReviewProps> = ({
                   Flexibility
                 </span>
                 <span className="font-medium capitalize text-[var(--color-text-secondary)]">
-                  {brief.timeline?.flexibility?.replace('_', ' ') || 'Somewhat flexible'}
+                  {brief.timeline?.flexibility?.replace(/_/g, ' ') || 'Somewhat flexible'}
                 </span>
               </div>
             </div>
@@ -411,17 +400,17 @@ export const StepReview: React.FC<StepReviewProps> = ({
           <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
             <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
               <div className="flex items-center gap-2">
-                <Euro className="w-4 h-4 text-[var(--color-text-secondary)]" />
-                <span className="text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                  7. Indicative Budget
-                </span>
+                <Euro className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
+                <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] tabular-nums">
+                  07. Indicative Budget
+                </h3>
               </div>
               <button
                 type="button"
                 onClick={() => onEditSection(7)}
                 className="text-xs font-semibold text-[var(--color-text-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
               >
-                <Edit3 className="w-3 h-3" /> Edit
+                <Edit3 className="w-3 h-3" aria-hidden="true" /> Edit
               </button>
             </div>
 
@@ -446,17 +435,17 @@ export const StepReview: React.FC<StepReviewProps> = ({
           <div className="p-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)]">
             <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
               <div className="flex items-center gap-2">
-                <Paperclip className="w-4 h-4 text-[var(--color-text-secondary)]" />
-                <span className="text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-text-secondary)]">
-                  8. Notes & Attachments
-                </span>
+                <Paperclip className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
+                <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] tabular-nums">
+                  08. Notes &amp; Attachments
+                </h3>
               </div>
               <button
                 type="button"
                 onClick={() => onEditSection(8)}
                 className="text-xs font-semibold text-[var(--color-text-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
               >
-                <Edit3 className="w-3 h-3" /> Edit
+                <Edit3 className="w-3 h-3" aria-hidden="true" /> Edit
               </button>
             </div>
 
@@ -466,7 +455,7 @@ export const StepReview: React.FC<StepReviewProps> = ({
                   <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
                     Additional Notes
                   </span>
-                  <p className="text-[var(--color-text-primary)] whitespace-pre-wrap leading-relaxed">
+                  <p className="text-[var(--color-text-primary)] whitespace-pre-wrap leading-relaxed break-words">
                     {brief.additionalDetails}
                   </p>
                 </div>
@@ -474,14 +463,14 @@ export const StepReview: React.FC<StepReviewProps> = ({
 
               {brief.attachments && brief.attachments.length > 0 && (
                 <div>
-                  <span className="text-[var(--color-text-secondary)] font-medium block mb-1">
+                  <span className="text-[var(--color-text-secondary)] font-medium block mb-1 tabular-nums">
                     Attached Documents ({brief.attachments.length})
                   </span>
                   <ul className="space-y-1 text-[var(--color-text-primary)]">
                     {brief.attachments.map((att) => (
-                      <li key={att.fileId} className="flex items-center gap-1.5">
-                        <Paperclip className="w-3 h-3 text-[var(--color-text-secondary)]" />
-                        <span className="font-medium">{att.name}</span>
+                      <li key={att.fileId} className="flex items-center gap-1.5 flex-wrap">
+                        <Paperclip className="w-3 h-3 text-[var(--color-text-secondary)] shrink-0" />
+                        <span className="font-medium break-words">{att.name}</span>
                         <span className="text-[var(--color-text-secondary)] tabular-nums">
                           ({(att.size / 1024).toFixed(0)} KB)
                         </span>
@@ -496,22 +485,22 @@ export const StepReview: React.FC<StepReviewProps> = ({
       </div>
 
       {/* Submission Card */}
-      <div className="p-6 rounded-[var(--radius-card)] bg-[var(--color-primary)] text-white space-y-4">
+      <div className="p-6 rounded-[var(--radius-card)] bg-[var(--color-primary)] text-[var(--color-primary-text)] space-y-4">
         <div className="flex items-start gap-3">
-          <CheckCircle2 className="w-5 h-5 text-[#C5DBD3] shrink-0 mt-0.5" />
+          <CheckCircle2 className="w-5 h-5 text-white/90 shrink-0 mt-0.5" aria-hidden="true" />
           <div>
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-semibold text-[var(--color-primary-text)]">
               Ready to submit your project brief?
             </h3>
-            <p className="text-xs text-[#E8E5E0] mt-1 leading-relaxed">
-              Once submitted, Alongby will review your requirements and start finding suitable professionals. Your brief will be locked after submission.
+            <p className="text-xs text-white/80 mt-1 leading-relaxed">
+              Once submitted, Alongby reviews your requirements and invites suitable verified specialists to quote. Your brief specification locks upon submission so all candidates quote against identical scope.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/15">
-          <span className="text-xs text-[#D5D0C9]">
-            You'll be notified when your matches are ready.
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-white/15">
+          <span className="text-xs text-white/75">
+            You will be notified as soon as your curated shortlist (2–3 specialists) is ready.
           </span>
 
           <Button

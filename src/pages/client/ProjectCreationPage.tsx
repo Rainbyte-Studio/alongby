@@ -559,7 +559,7 @@ export const ProjectCreationPage: React.FC = () => {
       />
 
       {/* Main Step Container */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="bg-[var(--color-surface)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-5 sm:p-10">
           {currentStep === 1 && (
             <StepService brief={brief} onChange={handleBriefChange} />
@@ -622,8 +622,12 @@ export const ProjectCreationPage: React.FC = () => {
 
           {/* Inline step error notice if blocking */}
           {Object.keys(stepErrors).length > 0 && currentStep !== 9 && (
-            <div className="mt-6 p-3.5 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-[13px] text-[var(--color-error-text)]">
-              {Object.values(stepErrors)[0]}
+            <div
+              role="alert"
+              className="mt-6 p-3.5 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-[13px] text-[var(--color-error-text)] flex items-start gap-2.5"
+            >
+              <AlertCircle className="w-4 h-4 text-[var(--color-error)] shrink-0 mt-0.5" aria-hidden="true" />
+              <span>{Object.values(stepErrors)[0]}</span>
             </div>
           )}
 
@@ -634,7 +638,7 @@ export const ProjectCreationPage: React.FC = () => {
               className="mt-6 p-4 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-[13px] text-[var(--color-error-text)] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             >
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-[var(--color-error)] shrink-0" />
+                <AlertCircle className="w-4 h-4 text-[var(--color-error)] shrink-0" aria-hidden="true" />
                 <span>{saveErrorMessage}</span>
               </div>
               <Button
@@ -649,8 +653,8 @@ export const ProjectCreationPage: React.FC = () => {
           )}
 
           {/* Navigation Controls Bar */}
-          <div className="mt-10 pt-6 border-t border-[var(--color-border)] flex flex-wrap items-center justify-between gap-4">
-            <div>
+          <div className="mt-10 pt-6 border-t border-[var(--color-border)] flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
               {currentStep > 1 && (
                 <Button
                   variant="outline"
@@ -662,9 +666,6 @@ export const ProjectCreationPage: React.FC = () => {
                   Back
                 </Button>
               )}
-            </div>
-
-            <div className="flex items-center gap-3 ml-auto">
               <Button
                 variant="ghost"
                 onClick={handleSaveAndExit}
@@ -675,22 +676,23 @@ export const ProjectCreationPage: React.FC = () => {
               >
                 {isSavingAndExiting ? 'Saving…' : 'Save & Exit'}
               </Button>
-
-              {currentStep < BRIEF_STEPS.length && (
-                <Button
-                  variant="primary"
-                  onClick={handleNext}
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
-                  disabled={isSavingAndExiting || isSubmitting}
-                  aria-label="Continue to next step"
-                >
-                  Continue
-                </Button>
-              )}
             </div>
+
+            {currentStep < BRIEF_STEPS.length && (
+              <Button
+                variant="primary"
+                onClick={handleNext}
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                disabled={isSavingAndExiting || isSubmitting}
+                aria-label="Continue to next step"
+                className="w-full sm:w-auto"
+              >
+                Continue
+              </Button>
+            )}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

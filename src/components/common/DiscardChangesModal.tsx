@@ -35,7 +35,7 @@ export const DiscardChangesModal: React.FC<DiscardChangesModalProps> = ({
         <Button
           id="confirm-discard-changes-btn"
           type="button"
-          variant="primary"
+          variant="destructive"
           size="sm"
           onClick={onDiscard}
           className="w-full sm:w-auto"

@@ -8,9 +8,17 @@ import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Textarea } from '../../components/ui/Textarea';
+import { Alert } from '../../components/ui/Alert';
+import { Modal } from '../../components/ui/Modal';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { opportunityService } from '../../services/opportunityService';
 import { quoteService } from '../../services/quoteService';
+import {
+  formatProjectBudget,
+  formatTimelineOption,
+  getOpportunityStatusDisplay,
+} from '../../utils/statusMapping';
 import {
   Opportunity,
   Quote,
@@ -22,16 +30,12 @@ import {
   Calendar,
   Euro,
   Clock,
-  Sparkles,
+  Compass,
   CheckCircle2,
-  AlertCircle,
   XCircle,
   FileText,
-  ShieldCheck,
-  Plus,
   Trash2,
   Send,
-  HelpCircle,
 } from 'lucide-react';
 
 export const ProfessionalOpportunityDetailPage: React.FC = () => {
@@ -48,6 +52,7 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
   // Proposal mode: 'quote' | 'alternative' | 'pass'
   const [actionTab, setActionTab] = useState<'quote' | 'alternative' | 'pass'>('quote');
+  const [showPassConfirmModal, setShowPassConfirmModal] = useState(false);
 
   // Form State
   const [amountEuros, setAmountEuros] = useState<string>('');
@@ -98,7 +103,12 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
       }
 
       // If already responded with quote or alternative proposal, load the quote
-      if (opp.status === 'interested' || opp.status === 'alternative_proposal' || opp.quoteId) {
+      if (
+        opp.status === 'interested' ||
+        opp.status === 'alternative_proposal' ||
+        opp.status === 'selected' ||
+        opp.quoteId
+      ) {
         if (opp.quoteId) {
           try {
             const directQuote = await quoteService.getQuote(opp.quoteId, currentUser.uid);
@@ -153,19 +163,30 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
   // Submit Standard Quote or Alternative Proposal
   const handleSubmitProposal = async (type: QuoteType) => {
-    if (!opportunity || !currentUser) return;
+    if (!opportunity || !currentUser || submitting) return;
+
+    const parsedEuros = parseFloat(amountEuros);
+    if (isNaN(parsedEuros) || parsedEuros <= 0) {
+      setErrorMsg('Please enter a valid commercial amount in Euros.');
+      return;
+    }
+    if (!scopeSummary.trim() || scopeSummary.trim().length < 15) {
+      setErrorMsg('Please provide a clear scope delivery summary (minimum 15 characters).');
+      return;
+    }
+    if (type === 'alternative' && (!alternativeExplanation.trim() || alternativeExplanation.trim().length < 10)) {
+      setErrorMsg('Please explain why you are proposing an alternative scope or phased approach.');
+      return;
+    }
+    if (!proposedStartDate) {
+      setErrorMsg('Please specify your proposed kickoff date.');
+      return;
+    }
 
     try {
       setSubmitting(true);
       setErrorMsg(null);
       setSuccessMsg(null);
-
-      const parsedEuros = parseFloat(amountEuros);
-      if (isNaN(parsedEuros) || parsedEuros <= 0) {
-        setErrorMsg('Please enter a valid commercial amount in Euros.');
-        setSubmitting(false);
-        return;
-      }
 
       const amountMinor = Math.round(parsedEuros * 100);
 
@@ -174,22 +195,22 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
           opportunityId: opportunity.id,
           quoteType: type,
           amountMinor,
-          scopeSummary,
+          scopeSummary: scopeSummary.trim(),
           includedItems,
           excludedItems,
           proposedStartDate,
           estimatedDurationDays: durationDays,
           revisionsIncluded,
-          note,
-          alternativeExplanation: type === 'alternative' ? alternativeExplanation : undefined,
+          note: note.trim() || undefined,
+          alternativeExplanation: type === 'alternative' ? alternativeExplanation.trim() : undefined,
         },
         currentUser.uid
       );
 
       setSuccessMsg(
         type === 'standard'
-          ? 'Your commercial quote has been submitted successfully to Alongby curation.'
-          : 'Your alternative proposal has been submitted successfully to Alongby curation.'
+          ? 'Your commercial quote has been recorded and submitted to Alongby curation.'
+          : 'Your alternative scope proposal has been recorded and submitted to Alongby curation.'
       );
 
       await loadOpportunity();
@@ -203,7 +224,7 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
   // Pass on opportunity
   const handlePass = async () => {
-    if (!opportunity || !currentUser) return;
+    if (!opportunity || !currentUser || submitting) return;
     try {
       setSubmitting(true);
       setErrorMsg(null);
@@ -213,14 +234,15 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
         opportunity.id,
         currentUser.uid,
         passReason,
-        passNote
+        passNote.trim() || undefined
       );
 
-      setSuccessMsg('You have passed on this opportunity. Your response has been recorded.');
+      setShowPassConfirmModal(false);
+      setSuccessMsg('You have declined this opportunity. Your availability standing remains intact.');
       await loadOpportunity();
     } catch (err: any) {
       console.error('Error passing on opportunity:', err);
-      setErrorMsg(err.message || 'Failed to pass on opportunity.');
+      setErrorMsg(err.message || 'Failed to decline opportunity.');
     } finally {
       setSubmitting(false);
     }
@@ -228,10 +250,9 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <DashboardLayout title="Opportunity Specifications">
+      <DashboardLayout role="professional" title="Opportunity Specifications">
         <div className="py-24 flex flex-col items-center justify-center">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-xs text-[var(--color-text-secondary)]">Loading project brief specifications…</p>
+          <LoadingSpinner size="lg" label="Loading project brief specifications…" />
         </div>
       </DashboardLayout>
     );
@@ -239,14 +260,23 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
   if (errorMsg && !opportunity) {
     return (
-      <DashboardLayout title="Project Opportunity">
-        <div className="max-w-md mx-auto py-16 text-center space-y-4">
-          <AlertCircle className="w-10 h-10 text-[var(--color-error-text)] mx-auto" />
-          <h2 className="typo-card-title text-[var(--color-text-primary)]">{errorMsg}</h2>
-          <Button variant="outline" onClick={() => navigate('/professional/opportunities')}>
-            Back to Opportunities
-          </Button>
-        </div>
+      <DashboardLayout
+        role="professional"
+        breadcrumbs={[
+          { label: 'Workspace', to: '/professional' },
+          { label: 'Opportunities', to: '/professional/opportunities' },
+          { label: 'Unavailable' },
+        ]}
+        title="Project Opportunity"
+      >
+        <EmptyState
+          title="Opportunity Unavailable"
+          description={errorMsg}
+          action={{
+            label: 'Back to Opportunities',
+            onClick: () => navigate('/professional/opportunities'),
+          }}
+        />
       </DashboardLayout>
     );
   }
@@ -254,6 +284,7 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
   if (!opportunity) return null;
 
   const snap = opportunity.projectSnapshot;
+  const statusDisplay = getOpportunityStatusDisplay(opportunity.status);
   const isActionable =
     (opportunity.status === 'pending' || opportunity.status === 'viewed') &&
     new Date(opportunity.expiresAt) >= new Date();
@@ -274,82 +305,73 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
   return (
     <DashboardLayout
+      role="professional"
+      breadcrumbs={[
+        { label: 'Workspace', to: '/professional' },
+        { label: 'Opportunities', to: '/professional/opportunities' },
+        { label: snap.title },
+      ]}
       title={snap.title}
-      subtitle={`Private Opportunity • ${snap.serviceName} (${snap.projectTypeName}) • Expires ${new Date(opportunity.expiresAt).toLocaleDateString()}`}
+      subtitle={`${snap.serviceName} · ${snap.projectTypeName} · Response window closes ${new Date(opportunity.expiresAt).toLocaleDateString()}`}
       action={
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate('/professional/opportunities')}
-          leftIcon={<ArrowLeft className="w-3.5 h-3.5" />}
-        >
-          All Opportunities
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant={statusDisplay.variant} size="md">
+            {statusDisplay.label}
+          </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/professional/opportunities')}
+            leftIcon={<ArrowLeft className="w-3.5 h-3.5" />}
+          >
+            All Opportunities
+          </Button>
+        </div>
       }
     >
-      <div className="space-y-6">
+      <div className="space-y-6 pb-12">
         {/* Alerts */}
         {successMsg && (
-          <div className="p-4 rounded-[var(--radius-card)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] text-xs text-[var(--color-success-text)] flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span className="font-medium">{successMsg}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setSuccessMsg(null)}
-              aria-label="Dismiss success message"
-              className="font-semibold px-1.5 py-0.5 rounded hover:bg-black/5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-            >
-              ×
-            </button>
-          </div>
+          <Alert variant="success" onDismiss={() => setSuccessMsg(null)}>
+            {successMsg}
+          </Alert>
         )}
 
         {errorMsg && (
-          <div className="p-4 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span className="font-medium">{errorMsg}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setErrorMsg(null)}
-              aria-label="Dismiss error message"
-              className="font-semibold px-1.5 py-0.5 rounded hover:bg-black/5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-            >
-              ×
-            </button>
-          </div>
+          <Alert variant="error" onDismiss={() => setErrorMsg(null)}>
+            {errorMsg}
+          </Alert>
         )}
 
         {/* Status Notice Banner if Selected */}
         {(existingQuote?.status === 'selected' || opportunity.status === 'selected') && (
           <div className="p-5 sm:p-6 rounded-[var(--radius-card)] bg-[var(--color-primary)] text-[var(--color-primary-text)] border border-[var(--color-primary)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-[#A7F3D0]">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span className="text-xs font-semibold uppercase tracking-wider">
-                  Proposal Selected
-                </span>
+              <div className="flex items-center gap-2 text-white/90">
+                <CheckCircle2 className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span className="text-xs font-semibold">Selected by Client</span>
               </div>
-              <h2 className="typo-section-heading text-white">
-                Client Selected Your Proposal for Commercial Agreement
+              <h2 className="typo-section-heading text-[var(--color-primary-text)]">
+                Client Selected Your Proposal
               </h2>
-              <p className="text-[13px] text-[#D6D3CD] max-w-2xl leading-relaxed">
-                The client chose your quote. Review the formal Proposal v1 (deliverables, milestones, 50/50 staged payment terms) and proceed to electronic contract execution.
+              <p className="text-[13px] text-white/80 max-w-2xl leading-relaxed">
+                The client selected your quote from the shortlist. Review Commercial Proposal v1 (deliverables, acceptance criteria, and two-stage payment schedule) and proceed to agreement signing.
               </p>
             </div>
 
             <div className="shrink-0 flex flex-wrap items-center gap-2">
               <Link to={`/professional/projects/${opportunity.projectId}/proposal`}>
                 <Button variant="white" size="sm">
-                  Review Proposal v1
+                  Review Proposal
                 </Button>
               </Link>
               <Link to={`/professional/projects/${opportunity.projectId}/contract`}>
-                <Button variant="outline" size="sm" className="bg-transparent text-white border-white/35 hover:bg-white/10">
-                  Master Contract
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-transparent text-white border-white/35 hover:bg-white/10"
+                >
+                  Service Agreement
                 </Button>
               </Link>
             </div>
@@ -357,72 +379,58 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
         )}
 
         {/* Status Notice Banner if Already Responded */}
-        {opportunity.status === 'interested' && existingQuote && existingQuote.status !== 'selected' && (
-          <div className="p-4 rounded-[var(--radius-card)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] text-xs text-[var(--color-success-text)] flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 shrink-0" />
-            <div>
-              <strong className="block font-semibold">Standard Quote Submitted & Locked</strong>
-              <span>
-                You submitted a commercial quote of{' '}
-                <span className="font-semibold tabular-nums">
-                  €{(existingQuote.amountMinor / 100).toLocaleString()}
-                </span>{' '}
-                on{' '}
-                <span className="tabular-nums">
-                  {new Date(existingQuote.submittedAt).toLocaleDateString()}
-                </span>
-                . Alongby curators are reviewing proposals before shortlisting.
+        {opportunity.status === 'interested' &&
+          existingQuote &&
+          existingQuote.status !== 'selected' && (
+            <Alert variant="success" title="Standard Quote Submitted & Locked">
+              You submitted a commercial quote of{' '}
+              <strong className="font-semibold tabular-nums">
+                €{(existingQuote.amountMinor / 100).toLocaleString()}
+              </strong>{' '}
+              on{' '}
+              <span className="tabular-nums">
+                {new Date(existingQuote.submittedAt).toLocaleDateString()}
               </span>
-            </div>
-          </div>
-        )}
+              . Alongby curators review submitted quotes before publishing the client shortlist.
+            </Alert>
+          )}
 
-        {opportunity.status === 'alternative_proposal' && existingQuote && (
-          <div className="p-4 rounded-[var(--radius-card)] bg-[var(--color-info-bg)] border border-[var(--color-info-border)] text-xs text-[var(--color-info-text)] flex items-center gap-3">
-            <Sparkles className="w-5 h-5 shrink-0" />
-            <div>
-              <strong className="block font-semibold">Alternative Proposal Submitted</strong>
-              <span>
-                You submitted an alternative proposal of{' '}
-                <span className="font-semibold tabular-nums">
-                  €{(existingQuote.amountMinor / 100).toLocaleString()}
-                </span>{' '}
-                with custom delivery scope on{' '}
-                <span className="tabular-nums">
-                  {new Date(existingQuote.submittedAt).toLocaleDateString()}
-                </span>
-                .
+        {opportunity.status === 'alternative_proposal' &&
+          existingQuote &&
+          existingQuote.status !== 'selected' && (
+            <Alert variant="info" title="Alternative Scope Proposal Submitted">
+              You submitted an alternative proposal of{' '}
+              <strong className="font-semibold tabular-nums">
+                €{(existingQuote.amountMinor / 100).toLocaleString()}
+              </strong>{' '}
+              with custom delivery scope on{' '}
+              <span className="tabular-nums">
+                {new Date(existingQuote.submittedAt).toLocaleDateString()}
               </span>
-            </div>
-          </div>
-        )}
+              .
+            </Alert>
+          )}
 
         {opportunity.status === 'passed' && (
-          <div className="p-4 rounded-[var(--radius-card)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] flex items-center gap-3">
-            <XCircle className="w-5 h-5 shrink-0 text-[var(--color-text-muted)]" />
-            <div>
-              <strong className="block font-semibold text-[var(--color-text-primary)]">Opportunity Passed</strong>
-              <span>
-                You declined to quote on this project ({opportunity.passReason?.replace(/_/g, ' ')}).
-              </span>
-            </div>
-          </div>
+          <Alert variant="neutral" title="Opportunity Declined">
+            You declined to quote on this brief ({opportunity.passReason?.replace(/_/g, ' ')}).
+          </Alert>
         )}
 
-        {isExpired && opportunity.status === 'expired' && (
-          <div className="p-4 rounded-[var(--radius-card)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] flex items-center gap-3">
-            <Clock className="w-5 h-5 shrink-0 text-[var(--color-text-muted)]" />
-            <div>
-              <strong className="block font-semibold text-[var(--color-text-primary)]">Opportunity Expired</strong>
-              <span>
-                The response window for this opportunity closed on{' '}
-                <span className="tabular-nums">
-                  {new Date(opportunity.expiresAt).toLocaleDateString()}
-                </span>
-                .
-              </span>
-            </div>
-          </div>
+        {opportunity.status === 'not_selected' && (
+          <Alert variant="neutral" title="Shortlist Concluded">
+            The client selected another shortlisted specialist for this engagement. Thank you for preparing a quote.
+          </Alert>
+        )}
+
+        {isExpired && (opportunity.status === 'expired' || opportunity.status === 'pending' || opportunity.status === 'viewed') && (
+          <Alert variant="warning" title="Response Window Closed">
+            The response window for this invitation closed on{' '}
+            <span className="tabular-nums">
+              {new Date(opportunity.expiresAt).toLocaleDateString()}
+            </span>
+            .
+          </Alert>
         )}
 
         {/* 2-Column Layout: Project Specifications on Left, Quote/Action on Right */}
@@ -430,23 +438,29 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
           {/* Left Column: Project Specifications */}
           <div className="lg:col-span-7 space-y-6">
             <Card className="p-6 space-y-6">
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] block mb-1">
-                  Project Brief Specification
+              <div className="pb-4 border-b border-[var(--color-border)]">
+                <span className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">
+                  Client Project Brief Specification
                 </span>
-                <h2 className="typo-section-heading text-[var(--color-text-primary)]">{snap.title}</h2>
-                <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <span className="text-xs font-semibold text-[var(--color-text-primary)]">
+                <h2 className="typo-section-heading text-[var(--color-text-primary)]">
+                  {snap.title}
+                </h2>
+                <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
+                  <span className="font-semibold text-[var(--color-text-primary)]">
                     {snap.serviceName}
                   </span>
-                  <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
-                  <span className="text-xs text-[var(--color-text-secondary)] font-medium">
+                  <span className="text-[var(--color-border-strong)]" aria-hidden="true">
+                    ·
+                  </span>
+                  <span className="text-[var(--color-text-secondary)] font-medium">
                     {snap.projectTypeName}
                   </span>
                   {snap.industryName && (
                     <>
-                      <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
-                      <span className="text-xs text-[var(--color-text-secondary)] font-medium">
+                      <span className="text-[var(--color-border-strong)]" aria-hidden="true">
+                        ·
+                      </span>
+                      <span className="text-[var(--color-text-secondary)] font-medium">
                         {snap.industryName}
                       </span>
                     </>
@@ -456,9 +470,9 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
               {/* Description */}
               <div>
-                <h4 className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-semibold text-[var(--color-text-primary)] mb-2">
                   Project Overview
-                </h4>
+                </h3>
                 <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed whitespace-pre-wrap break-words">
                   {snap.description}
                 </p>
@@ -467,9 +481,9 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
               {/* Goals */}
               {snap.goals && snap.goals.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider mb-2">
+                  <h3 className="text-xs font-semibold text-[var(--color-text-primary)] mb-2">
                     Primary Goals
-                  </h4>
+                  </h3>
                   <ul className="list-disc list-inside text-sm text-[var(--color-text-secondary)] space-y-1.5 leading-relaxed">
                     {snap.goals.map((g, i) => (
                       <li key={i}>{g}</li>
@@ -481,38 +495,24 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
               {/* Features Required */}
               {snap.features && snap.features.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider mb-2">
-                    Required Features & Deliverables
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {snap.features.map((f, i) => (
-                      <span
-                        key={i}
-                        className="text-xs px-2.5 py-1 rounded-md bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] font-medium"
-                      >
-                        {f}
-                      </span>
-                    ))}
-                  </div>
+                  <h3 className="text-xs font-semibold text-[var(--color-text-primary)] mb-2">
+                    Required Features &amp; Deliverables
+                  </h3>
+                  <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                    {snap.features.join(' · ')}
+                  </p>
                 </div>
               )}
 
               {/* Existing Assets */}
               {snap.existingAssets && snap.existingAssets.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider mb-2">
-                    Client's Existing Assets
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {snap.existingAssets.map((asset, i) => (
-                      <span
-                        key={i}
-                        className="text-xs px-2.5 py-1 rounded-md bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-secondary)]"
-                      >
-                        {asset}
-                      </span>
-                    ))}
-                  </div>
+                  <h3 className="text-xs font-semibold text-[var(--color-text-primary)] mb-2">
+                    Existing Client Assets
+                  </h3>
+                  <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                    {snap.existingAssets.join(' · ')}
+                  </p>
                 </div>
               )}
 
@@ -520,31 +520,27 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
               <div className="pt-4 border-t border-[var(--color-border)] grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)]">
                   <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-                    <Euro className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
+                    <Euro className="w-3.5 h-3.5 text-[var(--color-text-muted)]" aria-hidden="true" />
                     <span>Indicative Client Budget</span>
                   </div>
                   <div className="text-sm font-bold tabular-nums text-[var(--color-text-primary)] break-words">
-                    {snap.indicativeBudget?.budgetType === 'unsure' ? (
-                      'Open / Unspecified'
-                    ) : (
-                      `€${((snap.indicativeBudget?.minAmountMinor || 0) / 100).toLocaleString()} – €${((snap.indicativeBudget?.maxAmountMinor || 0) / 100).toLocaleString()} ${snap.indicativeBudget?.currency || 'EUR'}`
-                    )}
+                    {formatProjectBudget(snap.indicativeBudget)}
                   </div>
                   <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">
-                    Guidance only; quote your real baseline
+                    Non-binding guidance; quote your true engagement fee
                   </div>
                 </div>
 
                 <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)]">
                   <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-                    <Calendar className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
+                    <Calendar className="w-3.5 h-3.5 text-[var(--color-text-muted)]" aria-hidden="true" />
                     <span>Target Timeline</span>
                   </div>
                   <div className="text-sm font-bold text-[var(--color-text-primary)]">
-                    Start: {snap.timeline?.preferredStart.replace(/_/g, ' ')}
+                    Start: {formatTimelineOption(snap.timeline?.preferredStart)}
                   </div>
                   <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">
-                    Flexibility: {snap.timeline?.flexibility.replace(/_/g, ' ')}
+                    Flexibility: {formatTimelineOption(snap.timeline?.flexibility)}
                   </div>
                 </div>
               </div>
@@ -552,9 +548,9 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
               {/* Attachments */}
               {snap.attachments && snap.attachments.length > 0 && (
                 <div className="pt-4 border-t border-[var(--color-border)]">
-                  <h4 className="text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider mb-2 tabular-nums">
-                    Project Brief Attachments ({snap.attachments.length})
-                  </h4>
+                  <h3 className="text-xs font-semibold text-[var(--color-text-primary)] mb-2 tabular-nums">
+                    Reference Attachments ({snap.attachments.length})
+                  </h3>
                   <div className="space-y-2">
                     {snap.attachments.map((att) => (
                       <div
@@ -562,8 +558,10 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                         className="flex items-center justify-between p-3 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] text-xs"
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <FileText className="w-4 h-4 text-[var(--color-text-muted)] shrink-0" />
-                          <span className="font-medium text-[var(--color-text-primary)] break-words">{att.name}</span>
+                          <FileText className="w-4 h-4 text-[var(--color-text-muted)] shrink-0" aria-hidden="true" />
+                          <span className="font-medium text-[var(--color-text-primary)] break-words">
+                            {att.name}
+                          </span>
                           <span className="text-[var(--color-text-secondary)] tabular-nums shrink-0">
                             ({Math.round(att.size / 1024)} KB)
                           </span>
@@ -575,10 +573,12 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                             rel="noopener noreferrer"
                             className="text-xs font-semibold text-[var(--color-text-primary)] hover:underline shrink-0 ml-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] rounded-sm"
                           >
-                            View File
+                            Open File
                           </a>
                         ) : (
-                          <span className="text-[var(--color-text-secondary)] text-xs shrink-0 ml-2">Safe storage</span>
+                          <span className="text-[var(--color-text-secondary)] text-xs shrink-0 ml-2">
+                            Stored
+                          </span>
                         )}
                       </div>
                     ))}
@@ -588,21 +588,14 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
               {/* Why You Were Matched */}
               {opportunity.matchReasons && opportunity.matchReasons.length > 0 && (
-                <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] space-y-2">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">
-                    <Sparkles className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />
-                    <span>Why Alongby Matched You for This Project</span>
+                <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)] space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-primary)]">
+                    <Compass className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" aria-hidden="true" />
+                    <span>Why Alongby Invited You</span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {opportunity.matchReasons.map((reason, i) => (
-                      <span
-                        key={i}
-                        className="text-xs px-2.5 py-1 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-primary)] font-medium"
-                      >
-                        ✓ {reason}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                    {opportunity.matchReasons.join(' · ')}
+                  </p>
                 </div>
               )}
             </Card>
@@ -615,15 +608,18 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                 {/* Mode Selector */}
                 <div
                   role="tablist"
-                  aria-label="Response mode"
-                  className="flex items-center p-1 bg-[var(--color-surface-secondary)] rounded-[var(--radius-button)] border border-[var(--color-border)] text-[13px] font-medium"
+                  aria-label="Opportunity response mode"
+                  className="flex items-center p-1 bg-[var(--color-surface-secondary)] rounded-[var(--radius-button)] border border-[var(--color-border)] text-xs sm:text-[13px] font-medium"
                 >
                   <button
                     type="button"
                     role="tab"
                     aria-selected={actionTab === 'quote'}
-                    onClick={() => setActionTab('quote')}
-                    className={`flex-1 py-2 px-2 rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+                    onClick={() => {
+                      setActionTab('quote');
+                      setErrorMsg(null);
+                    }}
+                    className={`flex-1 py-2 px-2 rounded-md transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                       actionTab === 'quote'
                         ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)] font-semibold'
                         : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
@@ -635,68 +631,94 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                     type="button"
                     role="tab"
                     aria-selected={actionTab === 'alternative'}
-                    onClick={() => setActionTab('alternative')}
-                    className={`flex-1 py-2 px-2 rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+                    onClick={() => {
+                      setActionTab('alternative');
+                      setErrorMsg(null);
+                    }}
+                    className={`flex-1 py-2 px-2 rounded-md transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                       actionTab === 'alternative'
                         ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)] font-semibold'
                         : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
                     }`}
                   >
-                    Alternative Scope
+                    Alternative
                   </button>
                   <button
                     type="button"
                     role="tab"
                     aria-selected={actionTab === 'pass'}
-                    onClick={() => setActionTab('pass')}
-                    className={`flex-1 py-2 px-2 rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+                    onClick={() => {
+                      setActionTab('pass');
+                      setErrorMsg(null);
+                    }}
+                    className={`flex-1 py-2 px-2 rounded-md transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
                       actionTab === 'pass'
                         ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)] font-semibold'
                         : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
                     }`}
                   >
-                    Pass
+                    Decline
                   </button>
                 </div>
 
-                {/* MODE A: STANDARD QUOTE */}
-                {actionTab === 'quote' && (
+                {/* MODES A & B: STANDARD QUOTE OR ALTERNATIVE PROPOSAL */}
+                {(actionTab === 'quote' || actionTab === 'alternative') && (
                   <div className="space-y-4">
                     <div>
                       <h3 className="typo-card-title text-[var(--color-text-primary)]">
-                        Submit Commercial Quote
+                        {actionTab === 'quote'
+                          ? 'Submit Commercial Quote'
+                          : 'Submit Alternative Scope Proposal'}
                       </h3>
-                      <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
-                        Propose fixed pricing and delivery terms matching client requirements.
+                      <p className="text-xs text-[var(--color-text-secondary)] mt-0.5 leading-relaxed">
+                        {actionTab === 'quote'
+                          ? 'Propose fixed pricing, timeline, and deliverables matching the client brief.'
+                          : 'Recommend a modified scope, phased MVP, or alternative technical approach.'}
                       </p>
                     </div>
+
+                    {actionTab === 'alternative' && (
+                      <Textarea
+                        id="quote-alt-rationale"
+                        label="Alternative Scope Rationale"
+                        required
+                        rows={3}
+                        placeholder="Explain to the client why an adjusted scope or phased delivery is recommended..."
+                        value={alternativeExplanation}
+                        onChange={(e) => setAlternativeExplanation(e.target.value)}
+                      />
+                    )}
 
                     {/* Price Input */}
                     <div>
                       <Input
-                        label="Total Commercial Amount (€ EUR) *"
+                        id="quote-amount-eur"
+                        label="Total Commercial Fee (€ EUR)"
+                        required
                         type="number"
-                        placeholder="e.g. 2500"
+                        min="1"
+                        placeholder="e.g. 2800"
                         value={amountEuros}
                         onChange={(e) => setAmountEuros(e.target.value)}
                         leftIcon={<Euro className="w-4 h-4 text-[var(--color-text-muted)]" />}
                         className="tabular-nums"
                       />
 
-                      {/* Real-time budget feedback indicator */}
                       {budgetRelation && (
                         <div className="mt-1.5 text-xs font-medium tabular-nums">
                           {budgetRelation === 'within' && (
-                            <span className="text-[var(--color-success-text)]">✓ Within client indicative range</span>
+                            <span className="text-[var(--color-success-text)]">
+                              ✓ Within client indicative range
+                            </span>
                           )}
                           {budgetRelation === 'slightly_above' && (
                             <span className="text-[var(--color-warning-text)]">
-                              ℹ Slightly above client max (€{(maxIndicative / 100).toLocaleString()})
+                              Slightly above indicative max (€{(maxIndicative / 100).toLocaleString()})
                             </span>
                           )}
                           {budgetRelation === 'materially_above' && (
                             <span className="text-[var(--color-text-secondary)]">
-                              ℹ Materially above client max; consider an alternative proposal if appropriate
+                              Above indicative range — consider adding clear scope justification
                             </span>
                           )}
                         </div>
@@ -704,16 +726,20 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                     </div>
 
                     {/* Timeline Grid */}
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Input
-                        label="Kick-off Date *"
+                        id="quote-start-date"
+                        label="Proposed Start Date"
+                        required
                         type="date"
                         value={proposedStartDate}
                         onChange={(e) => setProposedStartDate(e.target.value)}
                         className="tabular-nums"
                       />
                       <Input
-                        label="Duration (Days) *"
+                        id="quote-duration-days"
+                        label="Duration (Days)"
+                        required
                         type="number"
                         min="1"
                         value={durationDays}
@@ -723,7 +749,9 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                     </div>
 
                     <Input
-                      label="Revisions Included *"
+                      id="quote-revisions"
+                      label="Revision Rounds Included"
+                      required
                       type="number"
                       min="0"
                       max="10"
@@ -734,18 +762,20 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
                     {/* Scope Delivery Summary */}
                     <Textarea
-                      label="Scope Delivery Summary *"
+                      id="quote-scope-summary"
+                      label="Scope Delivery Summary"
+                      required
                       rows={3}
-                      placeholder="Detail the technical approach, milestones, and deliverables included in this quote..."
+                      placeholder="Summarize your execution plan, milestones, and deliverables..."
                       value={scopeSummary}
                       onChange={(e) => setScopeSummary(e.target.value)}
                     />
 
                     {/* Inclusions */}
                     <div>
-                      <label className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
+                      <span className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
                         Included Deliverables
-                      </label>
+                      </span>
                       <div className="space-y-1.5 mb-2">
                         {includedItems.map((item, idx) => (
                           <div
@@ -759,21 +789,29 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                               aria-label={`Remove included deliverable: ${item}`}
                               className="text-[var(--color-text-muted)] hover:text-[var(--color-error-text)] shrink-0 ml-2 p-1 rounded cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                             </button>
                           </div>
                         ))}
                       </div>
                       <div className="flex gap-2">
-                        <input
-                          type="text"
-                          placeholder="Add inclusion (e.g. Design handoff)"
+                        <Input
+                          id="quote-new-inclusion"
+                          aria-label="Add included deliverable"
+                          placeholder="Add deliverable (e.g. Design handoff)"
                           value={newIncludedItem}
                           onChange={(e) => setNewIncludedItem(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddIncluded())}
-                          className="flex-1 px-3.5 py-2 min-h-[40px] text-sm font-normal text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                          onKeyDown={(e) =>
+                            e.key === 'Enter' && (e.preventDefault(), handleAddIncluded())
+                          }
                         />
-                        <Button type="button" variant="outline" size="sm" onClick={handleAddIncluded}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleAddIncluded}
+                          className="shrink-0"
+                        >
                           Add
                         </Button>
                       </div>
@@ -781,9 +819,9 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
                     {/* Exclusions */}
                     <div>
-                      <label className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
+                      <span className="block text-[13px] font-medium text-[var(--color-text-primary)] mb-1.5">
                         Exclusions (Out of Scope)
-                      </label>
+                      </span>
                       <div className="space-y-1.5 mb-2">
                         {excludedItems.map((item, idx) => (
                           <div
@@ -797,102 +835,55 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                               aria-label={`Remove exclusion: ${item}`}
                               className="text-[var(--color-text-muted)] hover:text-[var(--color-error-text)] shrink-0 ml-2 p-1 rounded cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                             </button>
                           </div>
                         ))}
                       </div>
                       <div className="flex gap-2">
-                        <input
-                          type="text"
+                        <Input
+                          id="quote-new-exclusion"
+                          aria-label="Add exclusion"
                           placeholder="Add exclusion (e.g. Hosting fees)"
                           value={newExcludedItem}
                           onChange={(e) => setNewExcludedItem(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddExcluded())}
-                          className="flex-1 px-3.5 py-2 min-h-[40px] text-sm font-normal text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-input)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                          onKeyDown={(e) =>
+                            e.key === 'Enter' && (e.preventDefault(), handleAddExcluded())
+                          }
                         />
-                        <Button type="button" variant="outline" size="sm" onClick={handleAddExcluded}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleAddExcluded}
+                          className="shrink-0"
+                        >
                           Add
                         </Button>
                       </div>
                     </div>
 
+                    <Textarea
+                      id="quote-curator-note"
+                      label="Note to Alongby Curators (Optional)"
+                      rows={2}
+                      placeholder="Optional context on availability or relevant domain case studies..."
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                    />
+
                     <Button
                       variant="primary"
                       className="w-full mt-2"
                       isLoading={submitting}
-                      onClick={() => handleSubmitProposal('standard')}
+                      onClick={() =>
+                        handleSubmitProposal(actionTab === 'alternative' ? 'alternative' : 'standard')
+                      }
                       leftIcon={<Send className="w-4 h-4" />}
                     >
-                      Submit Commercial Quote
-                    </Button>
-                  </div>
-                )}
-
-                {/* MODE B: ALTERNATIVE PROPOSAL */}
-                {actionTab === 'alternative' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="typo-card-title text-[var(--color-text-primary)]">
-                        Submit Alternative Proposal
-                      </h3>
-                      <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
-                        Recommend a modified scope, phased delivery, or different architecture.
-                      </p>
-                    </div>
-
-                    <Textarea
-                      label="Alternative Proposal Justification *"
-                      rows={3}
-                      placeholder="Explain to the client why an alternative scope or phased approach is recommended for best results..."
-                      value={alternativeExplanation}
-                      onChange={(e) => setAlternativeExplanation(e.target.value)}
-                    />
-
-                    <Input
-                      label="Proposed Price (€ EUR) *"
-                      type="number"
-                      placeholder="e.g. 3200"
-                      value={amountEuros}
-                      onChange={(e) => setAmountEuros(e.target.value)}
-                      leftIcon={<Euro className="w-4 h-4 text-[var(--color-text-muted)]" />}
-                      className="tabular-nums"
-                    />
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <Input
-                        label="Kick-off Date *"
-                        type="date"
-                        value={proposedStartDate}
-                        onChange={(e) => setProposedStartDate(e.target.value)}
-                        className="tabular-nums"
-                      />
-                      <Input
-                        label="Duration (Days) *"
-                        type="number"
-                        min="1"
-                        value={durationDays}
-                        onChange={(e) => setDurationDays(parseInt(e.target.value, 10) || 1)}
-                        className="tabular-nums"
-                      />
-                    </div>
-
-                    <Textarea
-                      label="Alternative Scope Deliverables *"
-                      rows={3}
-                      placeholder="Detail what is delivered in this alternative proposal..."
-                      value={scopeSummary}
-                      onChange={(e) => setScopeSummary(e.target.value)}
-                    />
-
-                    <Button
-                      variant="primary"
-                      className="w-full mt-2"
-                      isLoading={submitting}
-                      onClick={() => handleSubmitProposal('alternative')}
-                      leftIcon={<Sparkles className="w-4 h-4" />}
-                    >
-                      Submit Alternative Proposal
+                      {actionTab === 'alternative'
+                        ? 'Submit Alternative Proposal'
+                        : 'Submit Commercial Quote'}
                     </Button>
                   </div>
                 )}
@@ -902,20 +893,22 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                   <div className="space-y-4">
                     <div>
                       <h3 className="typo-card-title text-[var(--color-text-primary)]">
-                        Pass on Opportunity
+                        Decline Invitation
                       </h3>
-                      <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
-                        Let us know why you cannot accept this brief. This maintains your marketplace reliability standing.
+                      <p className="text-xs text-[var(--color-text-secondary)] mt-0.5 leading-relaxed">
+                        Let our curators know why this brief isn't the right fit right now. Prompt responses help keep future invitations well calibrated.
                       </p>
                     </div>
 
                     <Select
-                      label="Reason for passing *"
+                      id="pass-reason-select"
+                      label="Reason for declining"
+                      required
                       value={passReason}
                       onChange={(e) => setPassReason(e.target.value as PassReason)}
                       options={[
-                        { value: 'not_available', label: 'I am currently fully booked / no capacity' },
-                        { value: 'budget_too_low', label: 'Client budget is below my engagement floor' },
+                        { value: 'not_available', label: 'Currently fully booked / no capacity' },
+                        { value: 'budget_too_low', label: 'Indicative budget is below my engagement floor' },
                         { value: 'scope_not_fit', label: 'Project scope does not fit my preferred work' },
                         { value: 'timeline_not_fit', label: 'Client timeline is too tight' },
                         { value: 'outside_expertise', label: 'Technical requirements outside my stack' },
@@ -924,21 +917,23 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                     />
 
                     <Textarea
+                      id="pass-private-note"
                       label="Private Note to Alongby Curators (Optional)"
                       rows={3}
-                      placeholder="Share any additional context or when you might be open for similar briefs..."
+                      placeholder="Share context or when you will next have capacity for similar briefs..."
                       value={passNote}
                       onChange={(e) => setPassNote(e.target.value)}
                     />
 
                     <Button
-                      variant="outline"
-                      className="w-full text-[var(--color-error-text)] border-[var(--color-error-border)] hover:bg-[var(--color-error-bg)]"
-                      isLoading={submitting}
-                      onClick={handlePass}
+                      type="button"
+                      variant="danger"
+                      className="w-full"
+                      disabled={submitting}
+                      onClick={() => setShowPassConfirmModal(true)}
                       leftIcon={<XCircle className="w-4 h-4" />}
                     >
-                      Confirm: Pass on this Opportunity
+                      Decline This Opportunity
                     </Button>
                   </div>
                 )}
@@ -952,11 +947,15 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                       ? 'Alternative Proposal Submitted'
                       : 'Commercial Quote Submitted'}
                   </h3>
-                  <Badge variant="success">Locked (v1)</Badge>
+                  <Badge variant="success" size="sm">
+                    Submitted
+                  </Badge>
                 </div>
 
                 <div className="p-4 rounded-[var(--radius-button)] bg-[var(--color-surface-secondary)]">
-                  <span className="text-xs font-medium text-[var(--color-text-secondary)] block mb-0.5">Proposed Amount</span>
+                  <span className="text-xs font-medium text-[var(--color-text-secondary)] block mb-0.5">
+                    Proposed Fee
+                  </span>
                   <span className="text-2xl font-sans font-bold tabular-nums text-[var(--color-text-primary)] break-words">
                     €{(existingQuote.amountMinor / 100).toLocaleString()} {existingQuote.currency}
                   </span>
@@ -964,13 +963,17 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
                 {existingQuote.alternativeExplanation && (
                   <div className="p-3.5 rounded-[var(--radius-button)] bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-xs text-[var(--color-warning-text)]">
-                    <strong className="block mb-1 font-semibold">Proposal Justification</strong>
-                    <p className="leading-relaxed break-words">{existingQuote.alternativeExplanation}</p>
+                    <strong className="block mb-1 font-semibold">Alternative Scope Rationale</strong>
+                    <p className="leading-relaxed break-words">
+                      {existingQuote.alternativeExplanation}
+                    </p>
                   </div>
                 )}
 
                 <div>
-                  <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">Scope Summary</span>
+                  <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">
+                    Scope Summary
+                  </span>
                   <p className="text-sm text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] p-3.5 rounded-[var(--radius-button)] leading-relaxed whitespace-pre-wrap break-words">
                     {existingQuote.scopeSummary}
                   </p>
@@ -978,26 +981,44 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-3 text-xs pt-1">
                   <div>
-                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">Proposed Kick-off</span>
-                    <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">{existingQuote.proposedStartDate}</span>
+                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                      Proposed Start
+                    </span>
+                    <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">
+                      {existingQuote.proposedStartDate}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">Duration</span>
-                    <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">{existingQuote.estimatedDurationDays} days</span>
+                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                      Duration
+                    </span>
+                    <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">
+                      {existingQuote.estimatedDurationDays} days
+                    </span>
                   </div>
                   <div>
-                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">Revisions</span>
-                    <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">{existingQuote.revisionsIncluded} included</span>
+                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                      Revisions
+                    </span>
+                    <span className="font-semibold tabular-nums text-[var(--color-text-primary)]">
+                      {existingQuote.revisionsIncluded} included
+                    </span>
                   </div>
                   <div>
-                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">Status</span>
-                    <span className="font-semibold text-[var(--color-text-primary)] uppercase">{existingQuote.status}</span>
+                    <span className="text-[var(--color-text-secondary)] font-medium block mb-0.5">
+                      Quote Status
+                    </span>
+                    <span className="font-semibold text-[var(--color-text-primary)] capitalize">
+                      {existingQuote.status.replace(/_/g, ' ')}
+                    </span>
                   </div>
                 </div>
 
                 {existingQuote.includedItems && existingQuote.includedItems.length > 0 && (
-                  <div className="pt-2 border-t border-[var(--color-border)]">
-                    <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">Inclusions</span>
+                  <div className="pt-3 border-t border-[var(--color-border)]">
+                    <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">
+                      Inclusions
+                    </span>
                     <ul className="list-disc list-inside text-xs text-[var(--color-text-secondary)] space-y-0.5 leading-relaxed">
                       {existingQuote.includedItems.map((item, i) => (
                         <li key={i}>{item}</li>
@@ -1008,7 +1029,9 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
 
                 {existingQuote.excludedItems && existingQuote.excludedItems.length > 0 && (
                   <div>
-                    <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">Exclusions</span>
+                    <span className="text-xs font-semibold text-[var(--color-text-primary)] block mb-1">
+                      Exclusions
+                    </span>
                     <ul className="list-disc list-inside text-xs text-[var(--color-text-secondary)] space-y-0.5 leading-relaxed">
                       {existingQuote.excludedItems.map((item, i) => (
                         <li key={i}>{item}</li>
@@ -1017,9 +1040,53 @@ export const ProfessionalOpportunityDetailPage: React.FC = () => {
                   </div>
                 )}
               </Card>
-            ) : null}
+            ) : (
+              <Card className="p-6 space-y-2">
+                <h3 className="typo-card-title text-[var(--color-text-primary)]">
+                  Response Closed
+                </h3>
+                <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                  This invitation is no longer accepting new quotes. You can continue reviewing active invitations in your Opportunities inbox.
+                </p>
+              </Card>
+            )}
           </div>
         </div>
+
+        {/* Confirm Decline Modal */}
+        <Modal
+          isOpen={showPassConfirmModal}
+          onClose={() => {
+            if (!submitting) setShowPassConfirmModal(false);
+          }}
+          maxWidth="md"
+          title="Decline Project Invitation?"
+          description={`Confirm that you want to pass on "${snap.title}".`}
+          footer={
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={submitting}
+                onClick={() => setShowPassConfirmModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                isLoading={submitting}
+                onClick={handlePass}
+              >
+                Confirm Decline
+              </Button>
+            </>
+          }
+        >
+          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
+            Once declined, you will not be able to submit a quote for this opportunity, and Alongby curators may invite another verified specialist in your place.
+          </p>
+        </Modal>
       </div>
     </DashboardLayout>
   );

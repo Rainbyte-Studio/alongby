@@ -42,9 +42,16 @@ function AppContent() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[var(--color-bg-app)] text-[var(--color-text-primary)] selection:bg-[var(--color-primary)] selection:text-[var(--color-primary-text)]">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-[var(--radius-button)] focus:bg-[var(--color-primary)] focus:text-[var(--color-primary-text)] focus:text-xs focus:font-semibold focus:shadow-[var(--shadow-overlay)]"
+      >
+        Skip to main content
+      </a>
+
       <Navbar onOpenAuth={handleOpenAuth} />
 
-      <div className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         <Routes>
           {/* Public Landing Page */}
           <Route path="/" element={<LandingPage onOpenAuth={handleOpenAuth} />} />
@@ -276,9 +283,9 @@ function AppContent() {
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </div>
+      </main>
 
-      <Footer />
+      <Footer onOpenAuth={handleOpenAuth} />
 
       {/* Auth Modal */}
       <AuthModal

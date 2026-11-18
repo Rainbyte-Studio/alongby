@@ -7,6 +7,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
+import { Alert } from '../../components/ui/Alert';
 import { DiscardChangesModal } from '../../components/common/DiscardChangesModal';
 import {
   Building,
@@ -14,10 +15,7 @@ import {
   User,
   Mail,
   Phone,
-  MapPin,
-  Clock,
   ShieldCheck,
-  Check,
   AlertCircle,
   FileText,
 } from 'lucide-react';
@@ -33,6 +31,7 @@ const COMMON_COUNTRIES = [
   { value: 'Ireland', label: 'Ireland' },
   { value: 'Spain', label: 'Spain' },
   { value: 'Italy', label: 'Italy' },
+  { value: 'Greece', label: 'Greece' },
   { value: 'Canada', label: 'Canada' },
   { value: 'Australia', label: 'Australia' },
   { value: 'Other', label: 'Other' },
@@ -53,13 +52,17 @@ export const ClientProfilePage: React.FC = () => {
   const { currentUser, userProfile, clientProfile, refreshData } = useAuth();
   const navigate = useNavigate();
 
-  const [fullName, setFullName] = useState(clientProfile?.fullName || userProfile?.displayName || '');
+  const [fullName, setFullName] = useState(
+    clientProfile?.fullName || userProfile?.displayName || ''
+  );
   const [companyName, setCompanyName] = useState(clientProfile?.companyName || '');
   const [companyWebsite, setCompanyWebsite] = useState(clientProfile?.companyWebsite || '');
   const [country, setCountry] = useState(clientProfile?.country || 'United Kingdom');
   const [timezone, setTimezone] = useState(clientProfile?.timezone || 'UTC');
   const [phone, setPhone] = useState(clientProfile?.phone || '');
-  const [billingEmail, setBillingEmail] = useState(clientProfile?.billingEmail || currentUser?.email || '');
+  const [billingEmail, setBillingEmail] = useState(
+    clientProfile?.billingEmail || currentUser?.email || ''
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +70,6 @@ export const ClientProfilePage: React.FC = () => {
   const [isDirty, setIsDirty] = useState(false);
   const [showDiscardModal, setShowDiscardModal] = useState(false);
 
-  // Authoritative reset to persisted profile values
   const resetToPersisted = () => {
     setFullName(clientProfile?.fullName || userProfile?.displayName || '');
     setCompanyName(clientProfile?.companyName || '');
@@ -81,7 +83,6 @@ export const ClientProfilePage: React.FC = () => {
     setSuccessMessage(null);
   };
 
-  // Synchronize when clientProfile finishes loading if not touched yet
   useEffect(() => {
     if (clientProfile && !isDirty) {
       resetToPersisted();
@@ -100,16 +101,12 @@ export const ClientProfilePage: React.FC = () => {
       setShowDiscardModal(true);
       return;
     }
-    // No unsaved changes: navigate immediately
     navigate('/client');
   };
 
   const handleConfirmDiscard = () => {
-    // 1. Discard all unsaved local form changes and restore last persisted profile values
     resetToPersisted();
-    // 2. Clear modal state
     setShowDiscardModal(false);
-    // 3. Navigate back to client dashboard
     navigate('/client');
   };
 
@@ -157,7 +154,6 @@ export const ClientProfilePage: React.FC = () => {
         billingEmail: billingEmail.trim() || undefined,
       });
 
-      // Synchronize in-memory auth state so ClientDashboard updates immediately
       await refreshData();
 
       setIsDirty(false);
@@ -173,49 +169,36 @@ export const ClientProfilePage: React.FC = () => {
 
   return (
     <DashboardLayout
+      breadcrumbs={[
+        { label: 'Client Workspace', to: '/client' },
+        { label: 'Client Profile' },
+      ]}
       title="Client Profile"
-      subtitle="Manage your account and business information used across your Alongby projects."
-      showBack={true}
-      onBack={handleCancel}
+      subtitle="Manage your contact and organization details used across your Alongby projects and agreements."
+      action={
+        <Button variant="outline" size="sm" onClick={handleCancel}>
+          Back to Workspace
+        </Button>
+      }
     >
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Success Alert */}
+      <div className="max-w-4xl space-y-8">
         {successMessage && (
-          <div
-            id="client-profile-success"
-            className="p-4 rounded-[var(--radius-card)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] flex flex-col sm:flex-row sm:items-center gap-3 text-[var(--color-success-text)]"
-          >
-            <div className="w-8 h-8 rounded-[var(--radius-button)] bg-[var(--color-surface)] border border-[var(--color-success-border)] flex items-center justify-center shrink-0 text-[var(--color-success)]">
-              <Check className="w-4 h-4" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold">{successMessage}</h3>
-              <p className="text-xs mt-0.5 opacity-90">
-                Your updated company and contact information is now active for upcoming projects and shortlists.
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/client')}
-              className="shrink-0 self-start sm:self-center"
+          <div id="client-profile-success">
+            <Alert
+              variant="success"
+              title={successMessage}
+              onDismiss={() => setSuccessMessage(null)}
             >
-              Go to Dashboard
-            </Button>
+              Your updated company and contact information is active for upcoming project briefs, proposals, and agreements.
+            </Alert>
           </div>
         )}
 
-        {/* Error Alert */}
         {error && (
-          <div
-            id="client-profile-error"
-            className="p-4 rounded-[var(--radius-card)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-3 text-[var(--color-error-text)]"
-          >
-            <AlertCircle className="w-5 h-5 text-[var(--color-error)] shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h3 className="text-sm font-semibold">Unable to save profile</h3>
-              <p className="text-xs mt-0.5">{error}</p>
-            </div>
+          <div id="client-profile-error">
+            <Alert variant="error" title="Unable to save profile" onDismiss={() => setError(null)}>
+              {error}
+            </Alert>
           </div>
         )}
 
@@ -224,11 +207,11 @@ export const ClientProfilePage: React.FC = () => {
           <Card className="p-6 sm:p-8">
             <div className="border-b border-[var(--color-border)] pb-4 mb-6">
               <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
-                <User className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
+                <User className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" aria-hidden="true" />
                 <span>Personal &amp; Contact Identity</span>
               </h2>
               <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                Your primary contact information for Alongby curation specialists and commercial communications.
+                Primary contact details for curation communications and commercial documents.
               </p>
             </div>
 
@@ -241,7 +224,7 @@ export const ClientProfilePage: React.FC = () => {
                   onChange={(e) => handleFieldChange(setFullName, e.target.value)}
                   placeholder="e.g. Sarah Jenkins"
                   required
-                  helperText="Used as your primary name across project opportunities and communications."
+                  helperText="Used as your primary contact name across project briefs and proposals."
                 />
               </div>
 
@@ -251,7 +234,7 @@ export const ClientProfilePage: React.FC = () => {
                   label="Account Sign-in Email"
                   value={currentUser?.email || ''}
                   disabled
-                  helperText="Managed via your secure authentication account (read-only)."
+                  helperText="Managed via your authenticated account (read-only)."
                   leftIcon={<Mail className="w-4 h-4" />}
                 />
               </div>
@@ -264,7 +247,7 @@ export const ClientProfilePage: React.FC = () => {
                   onChange={(e) => handleFieldChange(setPhone, e.target.value)}
                   placeholder="e.g. +44 20 7946 0912"
                   className="tabular-nums"
-                  helperText="Optional direct line for expedited project kickoff coordination."
+                  helperText="Optional direct line for project kickoff coordination."
                   leftIcon={<Phone className="w-4 h-4" />}
                 />
               </div>
@@ -275,11 +258,11 @@ export const ClientProfilePage: React.FC = () => {
           <Card className="p-6 sm:p-8">
             <div className="border-b border-[var(--color-border)] pb-4 mb-6">
               <h2 className="flex items-center gap-2 typo-section-heading text-[var(--color-text-primary)]">
-                <Building className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" />
+                <Building className="w-5 h-5 text-[var(--color-text-secondary)] shrink-0" aria-hidden="true" />
                 <span>Organization &amp; Commercial Details</span>
               </h2>
               <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                Details representing your organization on project briefs, matches, and future commercial proposals.
+                Organization identity referenced on new briefs, proposals, and service agreements.
               </p>
             </div>
 
@@ -291,7 +274,7 @@ export const ClientProfilePage: React.FC = () => {
                   value={companyName}
                   onChange={(e) => handleFieldChange(setCompanyName, e.target.value)}
                   placeholder="e.g. Acme Innovations Ltd"
-                  helperText="Leave empty if commissioning as an independent private client."
+                  helperText="Leave empty if commissioning as an independent client."
                   leftIcon={<Building className="w-4 h-4" />}
                 />
               </div>
@@ -303,7 +286,7 @@ export const ClientProfilePage: React.FC = () => {
                   value={companyWebsite}
                   onChange={(e) => handleFieldChange(setCompanyWebsite, e.target.value)}
                   placeholder="e.g. https://acme.example.com"
-                  helperText="Helps matched professionals understand your brand identity."
+                  helperText="Helps matched specialists understand your business context."
                   leftIcon={<Globe className="w-4 h-4" />}
                 />
               </div>
@@ -326,7 +309,7 @@ export const ClientProfilePage: React.FC = () => {
                   value={timezone}
                   onChange={(e) => handleFieldChange(setTimezone, e.target.value)}
                   options={COMMON_TIMEZONES}
-                  helperText="Used to suggest professionals with overlapping working hours."
+                  helperText="Used to prioritize specialists with overlapping working hours."
                 />
               </div>
 
@@ -337,25 +320,24 @@ export const ClientProfilePage: React.FC = () => {
                   value={billingEmail}
                   onChange={(e) => handleFieldChange(setBillingEmail, e.target.value)}
                   placeholder="e.g. finance@acme.example.com"
-                  helperText="Invoices, deposit confirmations, and milestone receipts will be dispatched here."
+                  helperText="Commercial notices and agreement records use this contact address."
                   leftIcon={<Mail className="w-4 h-4" />}
                 />
               </div>
             </div>
           </Card>
 
-          {/* Legal & Commercial Snapshot Integrity Callout */}
+          {/* Historical Record Integrity Callout */}
           <div className="p-5 rounded-[var(--radius-card)] bg-[var(--color-surface-secondary)] border border-[var(--color-border)] flex items-start gap-3.5 text-[var(--color-text-secondary)]">
             <div className="w-8 h-8 rounded-[var(--radius-button)] bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center shrink-0 text-[var(--color-text-primary)]">
-              <FileText className="w-4 h-4" />
+              <FileText className="w-4 h-4" aria-hidden="true" />
             </div>
-            <div className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">
+            <div className="text-[13px] leading-relaxed">
               <span className="font-semibold text-[var(--color-text-primary)] block mb-0.5">
-                Commercial &amp; Historical Record Integrity
+                Historical Snapshot Integrity
               </span>
-              Profile updates immediately apply to future project briefs, matches, and new commercial proposals.
-              Any previously submitted brief snapshots, accepted proposals, or executed contracts remain historically
-              preserved as immutable legal records under Alongby governance.
+              Profile updates apply to new project briefs, future proposals, and new agreements.
+              Previously submitted brief snapshots, accepted proposals, and signed contracts remain preserved as immutable historical records.
             </div>
           </div>
 
@@ -364,12 +346,12 @@ export const ClientProfilePage: React.FC = () => {
             <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
               {isDirty ? (
                 <span className="inline-flex items-center gap-1.5 text-[var(--color-warning-text)] font-medium">
-                  <AlertCircle className="w-3.5 h-3.5 text-[var(--color-warning)]" />
+                  <AlertCircle className="w-3.5 h-3.5 text-[var(--color-warning)]" aria-hidden="true" />
                   Unsaved changes
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-[var(--color-text-muted)]">
-                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
                   All changes saved
                 </span>
               )}
@@ -390,7 +372,7 @@ export const ClientProfilePage: React.FC = () => {
                 id="client-profile-save"
                 type="submit"
                 variant="primary"
-                loading={isSubmitting}
+                isLoading={isSubmitting}
                 disabled={isSubmitting || !isDirty}
                 className="w-full sm:w-auto min-w-[140px]"
               >

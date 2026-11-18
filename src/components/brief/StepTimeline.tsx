@@ -5,8 +5,8 @@ import {
   TimelineDurationOption,
   TimelineFlexibility,
 } from '../../types';
-import { Input } from '../ui/Input';
-import { AlertCircle } from 'lucide-react';
+import { DatePicker } from '../ui/DatePicker';
+import { Alert } from '../ui/Alert';
 
 interface StepTimelineProps {
   brief: ProjectBrief;
@@ -110,9 +110,8 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
 
         {timeline.preferredStart === 'specific_date' && (
           <div className="max-w-xs mt-3">
-            <Input
+            <DatePicker
               id="brief-start-date"
-              type="date"
               label="Target Start Date"
               value={timeline.startDate || ''}
               min={new Date().toISOString().split('T')[0]}
@@ -159,9 +158,8 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
 
         {timeline.desiredCompletion === 'specific_date' && (
           <div className="max-w-xs mt-3">
-            <Input
+            <DatePicker
               id="brief-completion-date"
-              type="date"
               label="Target Completion Date"
               value={timeline.completionDate || ''}
               min={timeline.startDate || new Date().toISOString().split('T')[0]}
@@ -173,13 +171,9 @@ export const StepTimeline: React.FC<StepTimelineProps> = ({
         )}
 
         {hasDateConflict && (
-          <div
-            role="alert"
-            className="p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-xs text-[var(--color-error-text)] flex items-center gap-2"
-          >
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>Target completion date cannot be earlier than your chosen start date.</span>
-          </div>
+          <Alert variant="error">
+            Target completion date cannot be earlier than your chosen start date.
+          </Alert>
         )}
       </div>
 

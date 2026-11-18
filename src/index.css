@@ -22,6 +22,13 @@
   --color-border: #E8E5E0;
   --color-border-strong: #D5D0C9;
 
+  /* Interactive Surface & State Tokens */
+  --color-surface-hover: #EAE6DF;
+  --color-surface-active: #E1DCD4;
+  --color-backdrop: rgba(23, 23, 23, 0.45);
+  --color-disabled-bg: #F3F1EE;
+  --color-disabled-text: #8A847E;
+
   /* Semantic Status Tokens + Accessible Soft Surfaces (WCAG 2.2 AA) */
   --color-success: #347866;
   --color-success-text: #24574A;
@@ -58,7 +65,7 @@
   --transition-modal: 220ms cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Responsive Typography Scale */
-  --text-hero: clamp(2.375rem, 4vw + 1.125rem, 3.5rem);               /* 38px -> 56px */
+  --text-hero: clamp(2.125rem, 3.8vw + 1rem, 3.5rem);                 /* 34px -> 56px */
   --text-page-title: clamp(1.625rem, 1.5vw + 1.15rem, 2.125rem);      /* 26px -> 34px */
   --text-section-heading: clamp(1.25rem, 1vw + 0.95rem, 1.5625rem);   /* 20px -> 25px */
   --text-card-title: clamp(1rem, 0.3vw + 0.925rem, 1.125rem);         /* 16px -> 18px */
@@ -100,12 +107,29 @@
     word-break: break-word;
   }
 
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+
   button, input, select, textarea {
     font-family: var(--font-body);
   }
 
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--color-primary);
+  }
+
   table {
     font-family: var(--font-body);
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th {
+    font-weight: 600;
+    text-align: left;
+    color: var(--color-text-secondary);
   }
 }
 
@@ -130,6 +154,7 @@
   font-size: var(--text-page-title);
   line-height: 1.2;
   letter-spacing: -0.015em;
+  text-wrap: balance;
   overflow-wrap: break-word;
 }
 
@@ -139,6 +164,7 @@
   font-size: var(--text-section-heading);
   line-height: 1.28;
   letter-spacing: -0.01em;
+  text-wrap: balance;
   overflow-wrap: break-word;
 }
 

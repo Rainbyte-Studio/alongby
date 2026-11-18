@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MoreVertical, Edit3, Trash2, AlertCircle } from 'lucide-react';
+import { MoreVertical, Edit3, Trash2 } from 'lucide-react';
 import { Project } from '../../types';
 import { projectService } from '../../services/projectService';
 import { useAuth } from '../../context/AuthContext';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { Alert } from '../ui/Alert';
 
 export interface DraftActionMenuProps {
   project: Project;
@@ -23,6 +24,7 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
   const { userProfile } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Rename state
   const [isRenameOpen, setIsRenameOpen] = useState(false);
@@ -35,20 +37,44 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Close dropdown on outside click
+  // Close dropdown on outside click or Escape key
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setMenuOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
     if (menuOpen) {
       document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [menuOpen]);
+
+  const handleMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const items = Array.from<HTMLButtonElement>(
+      e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')
+    );
+    if (items.length === 0) return;
+    const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+    const nextIndex =
+      e.key === 'ArrowDown'
+        ? (currentIndex + 1) % items.length
+        : (currentIndex - 1 + items.length) % items.length;
+    items[nextIndex]?.focus();
+  };
 
   // Keep draftTitle synced if project title changes
   useEffect(() => {
@@ -127,6 +153,7 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
     <>
       <div className={`relative inline-block text-left ${className}`} ref={menuRef}>
         <button
+          ref={triggerRef}
           type="button"
           onClick={(e) => {
             e.stopPropagation();
@@ -134,34 +161,35 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
           }}
           aria-label="Draft options"
           aria-expanded={menuOpen}
-          aria-haspopup="true"
-          className="p-2 rounded-[var(--radius-button)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] border border-transparent hover:border-[var(--color-border)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] cursor-pointer"
+          aria-haspopup="menu"
+          className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] p-2 rounded-[var(--radius-button)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] border border-transparent hover:border-[var(--color-border)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] cursor-pointer"
         >
-          <MoreVertical className="w-4 h-4" />
+          <MoreVertical className="w-4 h-4" aria-hidden="true" />
         </button>
 
         {menuOpen && (
           <div
             role="menu"
             aria-orientation="vertical"
-            className="absolute right-0 mt-1.5 w-44 origin-top-right rounded-[var(--radius-button)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] py-1 z-30 focus:outline-none text-[13px] font-medium"
+            onKeyDown={handleMenuKeyDown}
+            className="absolute right-0 mt-1.5 w-44 origin-top-right rounded-[var(--radius-button)] bg-[var(--color-surface)] shadow-[var(--shadow-overlay)] border border-[var(--color-border)] py-1 z-30 focus:outline-none font-sans text-[13px] font-medium"
           >
             <button
               type="button"
               role="menuitem"
               onClick={handleOpenRename}
-              className="w-full px-3.5 py-2 text-left text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] flex items-center gap-2 transition-colors cursor-pointer"
+              className="w-full px-3.5 py-2 text-left text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] focus-visible:bg-[var(--color-surface-secondary)] focus-visible:outline-none flex items-center gap-2 transition-colors cursor-pointer"
             >
-              <Edit3 className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />
+              <Edit3 className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" aria-hidden="true" />
               <span>Rename Draft</span>
             </button>
             <button
               type="button"
               role="menuitem"
               onClick={handleOpenDelete}
-              className="w-full px-3.5 py-2 text-left text-[var(--color-error-text)] hover:bg-[var(--color-error-bg)] flex items-center gap-2 transition-colors cursor-pointer border-t border-[var(--color-border)]"
+              className="w-full px-3.5 py-2 text-left text-[var(--color-error-text)] hover:bg-[var(--color-error-bg)] focus-visible:bg-[var(--color-error-bg)] focus-visible:outline-none flex items-center gap-2 transition-colors cursor-pointer border-t border-[var(--color-border)]"
             >
-              <Trash2 className="w-3.5 h-3.5 text-[var(--color-error)]" />
+              <Trash2 className="w-3.5 h-3.5 text-[var(--color-error)]" aria-hidden="true" />
               <span>Delete Draft</span>
             </button>
           </div>
@@ -228,12 +256,7 @@ export const DraftActionMenu: React.FC<DraftActionMenuProps> = ({
         maxWidth="sm"
       >
         <div className="space-y-4">
-          {deleteError && (
-            <div className="p-3 rounded-[var(--radius-button)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] text-[var(--color-error-text)] text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[var(--color-error)]" />
-              <span>{deleteError}</span>
-            </div>
-          )}
+          {deleteError && <Alert variant="error">{deleteError}</Alert>}
 
           <div className="text-[13px] text-[var(--color-text-secondary)] bg-[var(--color-surface-secondary)] p-3.5 rounded-[var(--radius-button)] border border-[var(--color-border)]">
             <span className="font-semibold text-[var(--color-text-primary)] block truncate">

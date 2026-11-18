@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, Loader2, AlertCircle } from 'lucide-react';
 
 export interface StepDef {
   number: number;
@@ -34,6 +34,9 @@ export const BriefStepper: React.FC<BriefStepperProps> = ({
   saveStatus,
   onRetrySave,
 }) => {
+  const progressPercent = Math.round(((currentStep - 1) / (BRIEF_STEPS.length - 1)) * 100);
+  const maxAccessibleStep = Math.max(...completedSteps, currentStep);
+
   return (
     <div className="w-full bg-[var(--color-surface)] border-b border-[var(--color-border)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3.5">
@@ -43,28 +46,30 @@ export const BriefStepper: React.FC<BriefStepperProps> = ({
             <span className="font-semibold text-[var(--color-text-primary)] tabular-nums whitespace-nowrap">
               Step {currentStep} of {BRIEF_STEPS.length}
             </span>
-            <span className="text-[var(--color-border-strong)]" aria-hidden="true">·</span>
+            <span className="text-[var(--color-border-strong)]" aria-hidden="true">
+              ·
+            </span>
             <span className="text-[var(--color-text-secondary)] font-medium truncate">
               {BRIEF_STEPS[currentStep - 1]?.label}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 text-xs" aria-live="polite">
             {saveStatus === 'saving' && (
               <span className="inline-flex items-center gap-1.5 text-[var(--color-text-secondary)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-warning)]" />
-                Saving…
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--color-text-muted)]" aria-hidden="true" />
+                Saving draft…
               </span>
             )}
             {saveStatus === 'saved' && (
-              <span className="inline-flex items-center gap-1.5 text-[var(--color-text-secondary)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" />
+              <span className="inline-flex items-center gap-1 text-[var(--color-text-secondary)]">
+                <Check className="w-3.5 h-3.5 text-[var(--color-success)]" aria-hidden="true" />
                 Draft saved
               </span>
             )}
             {saveStatus === 'error' && (
               <span className="inline-flex items-center gap-1.5 text-[var(--color-error-text)] font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-error)]" />
+                <AlertCircle className="w-3.5 h-3.5 text-[var(--color-error)]" aria-hidden="true" />
                 Couldn’t save changes
                 {onRetrySave && (
                   <button
@@ -83,32 +88,70 @@ export const BriefStepper: React.FC<BriefStepperProps> = ({
           </div>
         </div>
 
-        {/* Stepper bar */}
-        <nav aria-label="Project Brief Progress" className="relative">
+        {/* Compact Mobile Progress & Section Switcher (< sm) */}
+        <div className="sm:hidden space-y-2.5">
+          <div
+            role="progressbar"
+            aria-valuenow={currentStep}
+            aria-valuemin={1}
+            aria-valuemax={BRIEF_STEPS.length}
+            aria-label={`Step ${currentStep} of ${BRIEF_STEPS.length}`}
+            className="w-full h-1.5 bg-[var(--color-surface-secondary)] rounded-full overflow-hidden"
+          >
+            <div
+              className="h-full bg-[var(--color-primary)] transition-transform duration-200 origin-left"
+              style={{ transform: `scaleX(${currentStep / BRIEF_STEPS.length})` }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor="brief-mobile-step-jump" className="text-xs text-[var(--color-text-secondary)] shrink-0">
+              Jump to step:
+            </label>
+            <select
+              id="brief-mobile-step-jump"
+              value={currentStep}
+              onChange={(e) => onSelectStep(Number(e.target.value))}
+              className="flex-1 max-w-[220px] px-2.5 py-1.5 min-h-[36px] text-xs font-medium text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded-[var(--radius-button)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+            >
+              {BRIEF_STEPS.map((step) => {
+                const isAccessible =
+                  completedSteps.includes(step.number) || step.number <= maxAccessibleStep;
+                return (
+                  <option key={step.number} value={step.number} disabled={!isAccessible}>
+                    {step.number}. {step.label}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        </div>
+
+        {/* Tablet & Desktop 9-Step Progress Rail (sm+) */}
+        <nav aria-label="Project Brief Progress" className="relative hidden sm:block">
           {/* Progress track background */}
-          <div className="absolute top-3.5 left-0 right-0 h-0.5 bg-[var(--color-border)] -z-0 hidden md:block" />
+          <div className="absolute top-3.5 left-0 right-0 h-px bg-[var(--color-border)] -z-0" />
           {/* Active progress fill */}
           <div
-            className="absolute top-3.5 left-0 h-0.5 bg-[var(--color-primary)] transition-all duration-300 hidden md:block -z-0"
-            style={{
-              width: `${((currentStep - 1) / (BRIEF_STEPS.length - 1)) * 100}%`,
-            }}
+            className="absolute top-3.5 left-0 h-px bg-[var(--color-primary)] transition-all duration-200 -z-0"
+            style={{ width: `${progressPercent}%` }}
           />
 
           <ol className="flex items-center justify-between relative z-10">
             {BRIEF_STEPS.map((step) => {
               const isCurrent = step.number === currentStep;
               const isCompleted = completedSteps.includes(step.number) && !isCurrent;
-              const isAccessible =
-                isCompleted || step.number <= Math.max(...completedSteps, currentStep);
+              const isAccessible = isCompleted || step.number <= maxAccessibleStep;
 
               return (
                 <li key={step.number} className="flex flex-col items-center">
                   <button
                     type="button"
                     disabled={!isAccessible}
+                    aria-current={isCurrent ? 'step' : undefined}
+                    aria-label={`Step ${step.number}: ${step.label}${isCompleted ? ' (completed)' : ''}`}
                     onClick={() => onSelectStep(step.number)}
-                    className={`group flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 rounded-md ${
+                    className={`group flex flex-col items-center p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 rounded-md ${
                       isAccessible ? 'cursor-pointer' : 'cursor-not-allowed opacity-55'
                     }`}
                   >
@@ -117,11 +160,11 @@ export const BriefStepper: React.FC<BriefStepperProps> = ({
                         isCurrent
                           ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] ring-4 ring-[var(--color-surface-secondary)]'
                           : isCompleted
-                          ? 'bg-[#303030] text-white hover:bg-[var(--color-primary)]'
+                          ? 'bg-[var(--color-primary-hover)] text-[var(--color-primary-text)] hover:bg-[var(--color-primary)]'
                           : 'bg-[var(--color-surface)] border border-[var(--color-border-strong)] text-[var(--color-text-secondary)] group-hover:border-[var(--color-text-muted)]'
                       }`}
                     >
-                      {isCompleted ? <Check className="w-3.5 h-3.5" /> : step.number}
+                      {isCompleted ? <Check className="w-3.5 h-3.5" aria-hidden="true" /> : step.number}
                     </div>
 
                     <span

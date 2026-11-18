@@ -3,6 +3,7 @@ import { taxonomyService } from '../../services/taxonomyService';
 import { budgetAssessmentService } from '../../services/budgetAssessmentService';
 import { ProjectBrief } from '../../types';
 import { HelpCircle, Check, Info } from 'lucide-react';
+import { Alert } from '../ui/Alert';
 
 interface StepBudgetProps {
   brief: ProjectBrief;
@@ -63,15 +64,13 @@ export const StepBudget: React.FC<StepBudgetProps> = ({ brief, onChange }) => {
       </div>
 
       {/* Clear product disclaimer card */}
-      <div className="p-4 rounded-[var(--radius-card)] bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-xs text-[var(--color-warning-text)] flex items-start gap-3">
-        <Info className="w-4 h-4 shrink-0 mt-0.5" />
-        <div className="leading-relaxed">
-          <strong className="font-semibold">
-            Indicative Estimate Only:
-          </strong>{' '}
-          This selection is not a binding commitment or guaranteed final price. Matched professionals will review your complete brief and present custom proposals with tailored milestone schedules.
-        </div>
-      </div>
+      <Alert
+        variant="warning"
+        icon={<Info className="w-4 h-4 text-[var(--color-warning)] shrink-0 mt-0.5" aria-hidden="true" />}
+      >
+        <strong className="font-semibold">Indicative Estimate Only:</strong>{' '}
+        This selection is not a binding commitment or guaranteed final price. Matched professionals will review your complete brief and present custom proposals with tailored milestone schedules.
+      </Alert>
 
       {/* Budget range selection cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
