@@ -41,6 +41,7 @@
   --color-warning-border: #E8D2B5;
 
   --color-error: #B84C4C;
+  --color-error-button-text: #FFFFFF;
   --color-error-hover: #9E3C3C;
   --color-error-text: #933535;
   --color-error-bg: #FBECEC;
@@ -224,6 +225,7 @@
  --color-disabled-bg:#292929;--color-disabled-text:#A39E97;
  --color-success:#78B9A4;--color-success-text:#A3DDC8;--color-success-bg:#1E3930;--color-success-border:#386351;
  --color-warning:#E3B275;--color-warning-text:#F3C994;--color-warning-bg:#3D3020;--color-warning-border:#695032;
+ --color-error-button-text:#171717;
  --color-error:#E58B8B;--color-error-hover:#F1A1A1;--color-error-text:#FFB5B5;--color-error-bg:#432727;--color-error-border:#754242;
  --color-info:#91B3E4;--color-info-text:#B6D0F2;--color-info-bg:#25364C;--color-info-border:#415D7D;
  --shadow-card:0 1px 2px rgba(0,0,0,.14);--shadow-overlay:0 12px 32px rgba(0,0,0,.32);
