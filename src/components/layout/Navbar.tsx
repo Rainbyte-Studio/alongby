@@ -109,9 +109,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
     const initialFocus = window.requestAnimationFrame(() => mobilePanelRef.current?.focus());
     const trapFocus = (event: KeyboardEvent) => {
       if (event.key !== "Tab" || !mobilePanelRef.current) return;
-      const elements = Array.from(mobilePanelRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(el => el.getClientRects().length > 0);
+      const panel = mobilePanelRef.current;
+      const elements: HTMLElement[] = Array.from(panel.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')) as HTMLElement[];
+      const visibleElements = elements.filter((el) => el.getClientRects().length > 0);
       const first = mobileToggleRef.current;
-      const focusables = [first, ...elements].filter((el): el is HTMLElement => Boolean(el));
+      const focusables = [first, ...visibleElements].filter((el): el is HTMLElement => Boolean(el));
       if (!focusables.length) return;
       const activeIndex = focusables.indexOf(document.activeElement as HTMLElement);
       if (event.shiftKey && activeIndex <= 0) { event.preventDefault(); focusables[focusables.length - 1].focus(); }
