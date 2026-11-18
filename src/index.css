@@ -233,3 +233,13 @@
 html,body,#root{min-height:100%;background-color:var(--color-bg-app)}
 html{overscroll-behavior-y:none}
 html[data-mobile-nav-open="true"],html[data-mobile-nav-open="true"] body{overflow:hidden}
+
+/* Keep public desktop CTAs out of the compact navbar even if utility order changes.
+   The mobile drawer owns these actions below 1280px. */
+@media (max-width: 1279.98px) {
+  .alongby-desktop-only { display: none !important; }
+  .alongby-mobile-menu-toggle { display: inline-flex; flex-shrink: 0; }
+}
+@media (min-width: 1280px) {
+  .alongby-mobile-menu-toggle { display: none !important; }
+}
