@@ -1,19 +1,31 @@
 name: Editorial UI checks
+
 on:
+  push:
+    branches:
+      - fix/editorial-themes-mobile-navigation
   pull_request:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
+      # This repository has no package-lock.json. npm ci would always fail.
+      # Replace with npm ci once a committed lockfile is available.
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: TypeScript validation
+        run: npm run lint
+      - name: Production build
+        run: npm run build
