@@ -515,7 +515,7 @@ export const AdminMatchingPage: React.FC = () => {
           <div
             role="tablist"
             aria-label="Filter matching candidates"
-            className="flex flex-wrap items-center gap-1 p-1 bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-[var(--radius-button)] text-[13px]"
+            className="flex w-full min-w-0 md:w-auto items-center gap-1 p-1 overflow-x-auto overscroll-x-contain bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-[var(--radius-button)] text-[13px]"
           >
             {(
               [
