@@ -121,7 +121,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
       document.body.style.top = previous.top;
       document.body.style.width = previous.width;
       document.body.style.overflow = previous.overflow;
-      window.scrollTo({ top: scrollY, behavior: 'instant' });
+      window.scrollTo({ top: scrollY, behavior: 'auto' });
       mediaQuery.removeEventListener('change', handleMediaChange);
     };
   }, [mobileMenuOpen]);
